@@ -62,7 +62,7 @@ export function HomeResult() {
       <h2 className="text-2xl font-bold">最新成果</h2>
       <div className="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-6">
         {resultData.map((item) => (
-          <Link href={`/result/${item.id}`} key={item.id} target="_blank" className="h-full">
+          <Link href={`/result/${item.id}`} key={item.id} className="h-full">
             <Card className="py-0 h-full flex flex-col hover:scale-102 transition-all duration-200">
               <div className="relative w-full aspect-video shrink-0">
                 <Image src={item.image} alt={item.title} fill className="object-cover rounded-t-lg" />
