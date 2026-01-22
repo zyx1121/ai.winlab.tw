@@ -5,6 +5,7 @@ import {
   CardTitle
 } from "@/components/ui/card";
 import Image from "next/image";
+import Link from "next/link";
 import { Button } from "./ui/button";
 
 const competitionData = [
@@ -70,7 +71,9 @@ export function HomeCompetition() {
         ))}
       </div>
       <div className="flex justify-center">
-        <Button size="lg" className="px-12 text-lg">探索更多</Button>
+        <Link href="/competition">
+          <Button size="lg" className="px-12 text-lg">探索更多</Button>
+        </Link>
       </div>
     </div>
   )

@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 import Image from "next/image"
+import Link from "next/link"
 
 const resultData = [
   {
@@ -82,7 +83,9 @@ export function HomeResult() {
         ))}
       </div>
       <div className="flex justify-center">
-        <Button size="lg" className="px-12 text-lg">探索更多</Button>
+        <Link href="/result">
+          <Button size="lg" className="px-12 text-lg">探索更多</Button>
+        </Link>
       </div>
     </div>
   )

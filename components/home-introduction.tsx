@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 export function HomeIntroduction() {
   return (
@@ -8,7 +9,9 @@ export function HomeIntroduction() {
         零程式基礎也能上手，專注架構與應用而非深度程式開發雲端、核心伺服器、邊緣運算多面向培訓理論 × 實作，全面掌握 AI 系統規劃與落地產業導向，培養整合 AI 解決方案的實戰力
       </p>
       <div className="flex justify-center">
-        <Button size="lg" className="px-12 text-lg">探索更多</Button>
+        <Link href="/introduction">
+          <Button size="lg" className="px-12 text-lg">探索更多</Button>
+        </Link>
       </div>
     </div>
   )

@@ -7,6 +7,7 @@ import {
   TableHeader,
   TableRow
 } from "@/components/ui/table"
+import Link from "next/link"
 
 const announcementData = [
   {
@@ -68,7 +69,9 @@ export function HomeAnnouncement() {
         </TableBody>
       </Table>
       <div className="flex justify-center">
-        <Button size="lg" className="px-12 text-lg">探索更多</Button>
+        <Link href="/announcement">
+          <Button size="lg" className="px-12 text-lg">探索更多</Button>
+        </Link>
       </div>
     </div>
   )
