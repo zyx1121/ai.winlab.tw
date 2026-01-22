@@ -59,15 +59,17 @@ export function HomeCompetition() {
       <h2 className="text-2xl font-bold">競賽資訊</h2>
       <div className="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-6">
         {competitionData.slice(0, 6).map((item) => (
-          <Card key={item.id} className="py-0 hover:scale-102 transition-all duration-200">
-            <CardHeader className="pb-4">
-              <div className="flex justify-center">
-                <Image src={item.image} alt={item.title} width={300} height={300} />
+          <Link href={item.link} key={item.id} target="_blank">
+            <Card className="py-0 hover:scale-102 transition-all duration-200">
+              <div className="relative w-full aspect-video">
+                <Image src={item.image} alt={item.title} fill className="object-cover rounded-t-lg" />
               </div>
-              <CardTitle className="text-xl font-bold">{item.title}</CardTitle>
-              <CardDescription className="text-right">{item.date}</CardDescription>
-            </CardHeader>
-          </Card>
+              <CardHeader className="pb-4">
+                <CardTitle className="text-xl font-bold">{item.title}</CardTitle>
+                <CardDescription className="text-right">{item.date}</CardDescription>
+              </CardHeader>
+            </Card>
+          </Link>
         ))}
       </div>
       <div className="flex justify-center">

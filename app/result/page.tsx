@@ -1,4 +1,3 @@
-import { Button } from "@/components/ui/button"
 import {
   Card,
   CardContent,
@@ -9,6 +8,7 @@ import {
 } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 import Image from "next/image"
+import Link from "next/link"
 
 const resultData = [
   {
@@ -61,24 +61,22 @@ export default async function ResultPage() {
       <h1 className="text-3xl font-bold w-full text-center">最新成果</h1>
       <div className="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-6">
         {resultData.map((item) => (
-          <Card key={item.id} className="py-0 hover:scale-102 transition-all duration-200">
-            <CardHeader>
-              <div className="flex justify-center">
-                <Image src={item.image} alt={item.title} width={300} height={300} />
+          <Link href={`/result/${item.id}`} key={item.id} target="_blank" className="h-full">
+            <Card className="py-0 h-full flex flex-col hover:scale-102 transition-all duration-200">
+              <div className="relative w-full aspect-video shrink-0">
+                <Image src={item.image} alt={item.title} fill className="object-cover rounded-t-lg" />
               </div>
-              <CardTitle className="text-xl font-bold">{item.title}</CardTitle>
-              <CardDescription className="text-right">{item.date}</CardDescription>
-              <Separator />
-            </CardHeader>
-            <CardContent className="h-full">
-              <p>{item.description}</p>
-            </CardContent>
-            <CardFooter className="bg-muted p-4 justify-end">
-              <Button className="text-base">
-                查看詳情
-              </Button>
-            </CardFooter>
-          </Card>
+              <CardHeader className="shrink-0">
+                <CardTitle className="text-xl font-bold line-clamp-2">{item.title}</CardTitle>
+                <CardDescription className="text-right">{item.date}</CardDescription>
+                <Separator />
+              </CardHeader>
+              <CardContent className="flex-1">
+                <p className="line-clamp-3">{item.description}</p>
+              </CardContent>
+              <CardFooter />
+            </Card>
+          </Link>
         ))}
       </div>
     </div>
