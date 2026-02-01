@@ -1,5 +1,10 @@
 "use client";
 
+import {
+  uploadAnnouncementImage,
+} from "@/lib/upload-image";
+import FileHandler from "@tiptap/extension-file-handler";
+import Image from "@tiptap/extension-image";
 import Placeholder from "@tiptap/extension-placeholder";
 import TextAlign from "@tiptap/extension-text-align";
 import { EditorContent, useEditor } from "@tiptap/react";
@@ -20,8 +25,15 @@ import {
   Strikethrough,
   Undo,
 } from "lucide-react";
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
 import { Button } from "./ui/button";
+
+const IMAGE_MIME_TYPES = [
+  "image/jpeg",
+  "image/png",
+  "image/gif",
+  "image/webp",
+];
 
 interface TiptapEditorProps {
   content: Record<string, unknown>;
@@ -34,6 +46,44 @@ export function TiptapEditor({
   onChange,
   editable = true,
 }: TiptapEditorProps) {
+  const handleImageDrop = useCallback(
+    async (editor: import("@tiptap/core").Editor, files: File[], pos: number) => {
+      const results = await Promise.all(
+        files.map((file) => uploadAnnouncementImage(file))
+      );
+      const urls = results
+        .filter((r): r is { url: string } => "url" in r)
+        .map((r) => r.url);
+      results.forEach((r) => {
+        if ("error" in r) console.error(r.error);
+      });
+      if (urls.length === 0) return;
+      const content =
+        urls.length === 1
+          ? { type: "image" as const, attrs: { src: urls[0] } }
+          : urls.map((url) => ({ type: "image" as const, attrs: { src: url } }));
+      editor.chain().focus().insertContentAt(pos, content).run();
+    },
+    []
+  );
+
+  const handleImagePaste = useCallback(
+    async (
+      editor: import("@tiptap/core").Editor,
+      files: File[]
+    ) => {
+      for (const file of files) {
+        const result = await uploadAnnouncementImage(file);
+        if ("error" in result) {
+          console.error(result.error);
+          continue;
+        }
+        editor.chain().focus().setImage({ src: result.url }).run();
+      }
+    },
+    []
+  );
+
   const editor = useEditor({
     extensions: [
       StarterKit,
@@ -42,6 +92,18 @@ export function TiptapEditor({
       }),
       TextAlign.configure({
         types: ["heading", "paragraph"],
+      }),
+      Image.configure({
+        inline: false,
+        allowBase64: false,
+        HTMLAttributes: {
+          class: "rounded-lg max-w-full h-auto",
+        },
+      }),
+      FileHandler.configure({
+        allowedMimeTypes: IMAGE_MIME_TYPES,
+        onDrop: handleImageDrop,
+        onPaste: handleImagePaste,
       }),
     ],
     content,

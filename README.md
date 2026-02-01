@@ -29,6 +29,17 @@ To learn more about Next.js, take a look at the following resources:
 
 You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
+## Announcement images (Supabase Storage)
+
+The announcement editor supports drag-and-drop and paste for images. Images are uploaded to Supabase Storage.
+
+**One-time setup:**
+
+1. In [Supabase Dashboard](https://supabase.com/dashboard) → **Storage** → **New bucket**
+   - Name: `announcement-images`
+   - Public bucket: **ON**
+2. In **SQL Editor**, run the script `supabase/storage-policies.sql` to allow authenticated uploads and public read.
+
 ## Deploy on Vercel
 
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.

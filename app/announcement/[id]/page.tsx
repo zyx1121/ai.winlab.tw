@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import Image from "@tiptap/extension-image";
 import { generateHTML } from "@tiptap/html";
 import StarterKit from "@tiptap/starter-kit";
 import { ArrowLeft } from "lucide-react";
@@ -26,7 +27,12 @@ export default async function AnnouncementDetailPage({
 
   const contentHtml =
     announcement.content && Object.keys(announcement.content).length > 0
-      ? generateHTML(announcement.content, [StarterKit])
+      ? generateHTML(announcement.content, [
+        StarterKit,
+        Image.configure({
+          HTMLAttributes: { class: "rounded-lg max-w-full h-auto" },
+        }),
+      ])
       : "<p>（無內容）</p>";
 
   return (

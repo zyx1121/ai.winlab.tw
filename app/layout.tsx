@@ -18,8 +18,8 @@ const notoSansMono = Noto_Sans_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "國立陽明交通大學人工智慧專責辦公室",
-  description: "國立陽明交通大學人工智慧專責辦公室",
+  title: "國立陽明交通大學 人工智慧專責辦公室",
+  description: "國立陽明交通大學 人工智慧專責辦公室",
 };
 
 export default function RootLayout({
