@@ -81,7 +81,7 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-sm border-b">
-      <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between gap-6">
+      <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between gap-6  text-xl font-bold">
         <Link href="/" className="text-xl sm:text-2xl font-bold whitespace-nowrap">
           NYCU AI 專責辦公室
         </Link>
@@ -115,7 +115,7 @@ export function Header() {
           }`}
       >
         <div ref={panelRef} className="max-w-7xl mx-auto px-4 pb-4">
-          <div className="flex flex-col">
+          <div className="flex flex-col text-lg font-bold">
             {navItems.map((item) => (
               <Link
                 key={item.href}

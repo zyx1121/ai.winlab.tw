@@ -12,9 +12,9 @@ export function HomeContacts() {
           </div>
           <div className="flex flex-col gap-3 justify-center items-center w-full">
             <Phone className="w-8 h-8" />
-            <p className="text-lg font-bold">曾建超</p>
-            <p className="text-lg">總機：<a href="tel:03-5131867">03-5131867</a></p>
-            <p className="text-lg">電子信箱：<a href="mailto:cctseng@cs.nycu.edu.tw">cctseng@cs.nycu.edu.tw</a></p>
+            <p className="text-lg font-bold">陳心詠</p>
+            <p className="text-lg">分機：<a href="tel:03-5131867">54832</a></p>
+            <p className="text-lg">電子信箱：<a href="mailto:hsinyungchen@nycu.edu.tw">hsinyungchen@nycu.edu.tw</a></p>
           </div>
         </div>
       </div>
