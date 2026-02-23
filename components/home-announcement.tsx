@@ -43,8 +43,8 @@ export function HomeAnnouncement() {
   }, [supabase]);
 
   return (
-    <div className="container max-w-7xl mx-auto p-4 flex flex-col gap-6">
-      <h2 className="text-2xl font-bold">最新公告</h2>
+    <div className="container max-w-6xl mx-auto py-16 px-4 flex flex-col gap-8">
+      <h2 className="text-2xl font-bold border-l-4 border-primary pl-3">最新公告</h2>
       {isLoading ? (
         <div className="flex justify-center py-8">
           <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
@@ -66,7 +66,7 @@ export function HomeAnnouncement() {
             {announcements.map((item) => (
               <TableRow
                 key={item.id}
-                className="cursor-pointer h-12"
+                className="cursor-pointer h-12 transition-colors hover:bg-muted/60"
                 onClick={() => router.push(`/announcement/${item.id}`)}
               >
                 <TableCell className="text-base">{item.date}</TableCell>

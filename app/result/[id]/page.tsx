@@ -22,50 +22,44 @@ export default async function ResultDetailPage({
     .eq("status", "published")
     .single();
 
-  if (error || !result) {
-    notFound();
-  }
+  if (error || !result) notFound();
 
   const contentHtml =
     result.content && Object.keys(result.content).length > 0
       ? generateHTML(result.content, [
-        StarterKit,
-        Image.configure({
-          HTMLAttributes: { class: "rounded-lg max-w-full h-auto" },
-        }),
-      ])
+          StarterKit,
+          Image.configure({ HTMLAttributes: { class: "rounded-lg max-w-full h-auto" } }),
+        ])
       : "<p>（無內容）</p>";
 
   const isExternalImage =
     result.header_image &&
-    (result.header_image.startsWith("http://") ||
-      result.header_image.startsWith("https://"));
+    (result.header_image.startsWith("http://") || result.header_image.startsWith("https://"));
 
   return (
-    <div className="container max-w-5xl mx-auto p-4 flex flex-col gap-6 mt-8">
+    <div className="max-w-6xl mx-auto px-4 py-12">
       <Link
         href="/result"
-        className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors w-fit"
+        className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-10"
       >
         <ArrowLeft className="w-4 h-4" />
         返回列表
       </Link>
 
-      <div className="flex flex-col gap-6">
-        <div className="relative w-full aspect-video rounded-lg overflow-hidden bg-muted">
-          <ImageNext
-            src={result.header_image || "/placeholder.png"}
-            alt={result.title}
-            fill
-            className="object-cover"
-            unoptimized={!!isExternalImage}
-            priority
-          />
-        </div>
-        <div className="flex items-center gap-4 text-sm text-muted-foreground">
-          <span>{result.date}</span>
-        </div>
-        <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight text-balance mt-2 mb-4">
+      <div className="relative w-full aspect-video rounded-xl overflow-hidden bg-muted mb-10">
+        <ImageNext
+          src={result.header_image || "/placeholder.png"}
+          alt={result.title}
+          fill
+          className="object-cover"
+          unoptimized={!!isExternalImage}
+          priority
+        />
+      </div>
+
+      <div className="max-w-3xl">
+        <p className="text-sm text-muted-foreground mb-4">{result.date}</p>
+        <h1 className="text-4xl font-extrabold tracking-tight text-balance mb-8">
           {result.title}
         </h1>
         <div

@@ -1,29 +1,39 @@
 "use client";
 
 import { useAuth } from "@/components/auth-provider";
+import { ResultTagSidebar } from "@/components/result-tag-sidebar";
 import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { createClient } from "@/lib/supabase/client";
-import type { Result } from "@/lib/supabase/types";
-import { Loader2, Plus } from "lucide-react";
+import type { Result, ResultTag, ResultType, Tag, Team } from "@/lib/supabase/types";
+import { Loader2, Plus, User, Users } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+
+type ResultWithMeta = Result & {
+  author_name?: string | null;
+  team_name?: string | null;
+};
 
 export default function ResultPage() {
-  const { user } = useAuth();
+  const { user, isAdmin } = useAuth();
   const router = useRouter();
   const supabase = createClient();
-  const [results, setResults] = useState<Result[]>([]);
+  const [resultTab, setResultTab] = useState<ResultType>("personal");
+  const [results, setResults] = useState<ResultWithMeta[]>([]);
+  const [resultTagMap, setResultTagMap] = useState<Record<string, string[]>>({}); // result_id → [tag_ids]
+  const [allTags, setAllTags] = useState<Tag[]>([]);
+  const [selectedTagIds, setSelectedTagIds] = useState<Set<string>>(new Set());
+  const [leaderTeams, setLeaderTeams] = useState<Team[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isCreating, setIsCreating] = useState(false);
 
@@ -32,135 +42,254 @@ export default function ResultPage() {
     const query = supabase
       .from("results")
       .select("*")
+      .eq("type", resultTab)
       .order("date", { ascending: false });
 
-    if (!user) {
-      query.eq("status", "published");
-    }
+    if (!user) query.eq("status", "published");
 
     const { data, error } = await query;
+    if (error) { setIsLoading(false); return; }
 
-    if (error) {
-      console.error("Error fetching results:", error);
-    } else {
-      setResults(data || []);
+    const rows = (data as Result[]) || [];
+    const resultIds = rows.map((r) => r.id);
+
+    const authorIds = [...new Set(rows.map((r) => r.author_id).filter(Boolean))] as string[];
+    const teamIds = [...new Set(rows.map((r) => r.team_id).filter(Boolean))] as string[];
+
+    const [profilesRes, teamsRes, tagsRes, resultTagsRes] = await Promise.all([
+      authorIds.length
+        ? supabase.from("profiles").select("id, display_name").in("id", authorIds)
+        : Promise.resolve({ data: [] }),
+      teamIds.length
+        ? supabase.from("teams").select("id, name").in("id", teamIds)
+        : Promise.resolve({ data: [] }),
+      supabase.from("tags").select("*").order("sort_order").order("created_at"),
+      resultIds.length
+        ? supabase.from("result_tags").select("result_id, tag_id").in("result_id", resultIds)
+        : Promise.resolve({ data: [] }),
+    ]);
+
+    const profileMap = Object.fromEntries(
+      ((profilesRes.data || []) as { id: string; display_name: string | null }[]).map((p) => [p.id, p.display_name])
+    );
+    const teamMap = Object.fromEntries(
+      ((teamsRes.data || []) as { id: string; name: string }[]).map((t) => [t.id, t.name])
+    );
+
+    // Build result → [tag_ids] map
+    const rtMap: Record<string, string[]> = {};
+    for (const rt of (resultTagsRes.data as ResultTag[] || [])) {
+      if (!rtMap[rt.result_id]) rtMap[rt.result_id] = [];
+      rtMap[rt.result_id].push(rt.tag_id);
     }
+
+    setAllTags((tagsRes.data as Tag[]) || []);
+    setResultTagMap(rtMap);
+    setResults(
+      rows.map((r) => ({
+        ...r,
+        author_name: r.author_id ? profileMap[r.author_id] : null,
+        team_name: r.team_id ? teamMap[r.team_id] : null,
+      }))
+    );
     setIsLoading(false);
+  }, [supabase, user, resultTab]);
+
+  useEffect(() => { fetchResults(); }, [fetchResults]);
+
+  const fetchLeaderTeams = useCallback(async () => {
+    if (!user) return;
+    const { data } = await supabase.from("team_members").select("team_id").eq("user_id", user.id).eq("role", "leader");
+    const ids = (data || []).map((r) => r.team_id);
+    if (!ids.length) { setLeaderTeams([]); return; }
+    const { data: teams } = await supabase.from("teams").select("*").in("id", ids);
+    setLeaderTeams((teams as Team[]) || []);
   }, [supabase, user]);
 
-  useEffect(() => {
-    fetchResults();
-  }, [fetchResults]);
+  useEffect(() => { if (user) fetchLeaderTeams(); }, [user, fetchLeaderTeams]);
 
-  const handleCreateResult = async () => {
-    if (!user) return;
+  // Compute child tag IDs for a parent (for parent-level filter)
+  const childTagIdsOf = useCallback((parentId: string) => {
+    return allTags.filter((t) => t.parent_id === parentId).map((t) => t.id);
+  }, [allTags]);
 
-    setIsCreating(true);
-    const { data, error } = await supabase
-      .from("results")
-      .insert({
-        title: "新成果",
-        date: new Date().toISOString().slice(0, 10),
-        header_image: "/placeholder.png",
-        summary: "",
-        content: {},
-        status: "draft",
-        author_id: user.id,
-      })
-      .select()
-      .single();
+  const handleTagToggle = useCallback((tagId: string) => {
+    setSelectedTagIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(tagId)) {
+        next.delete(tagId);
+      } else {
+        next.add(tagId);
+      }
+      return next;
+    });
+  }, []);
 
-    if (error) {
-      console.error("Error creating result:", error);
-      setIsCreating(false);
-      return;
+  // Filter results based on selected tags
+  const filteredResults = useMemo(() => {
+    if (selectedTagIds.size === 0) return results;
+
+    // Expand each selected ID: if parent → include its children; if child → itself
+    const matchIds = new Set<string>();
+    for (const tid of selectedTagIds) {
+      const tag = allTags.find((t) => t.id === tid);
+      if (!tag) continue;
+      if (tag.parent_id === null) {
+        for (const cid of childTagIdsOf(tid)) matchIds.add(cid);
+      } else {
+        matchIds.add(tid);
+      }
     }
 
+    return results.filter((r) => {
+      const rTags = resultTagMap[r.id] || [];
+      return rTags.some((tid) => matchIds.has(tid));
+    });
+  }, [results, selectedTagIds, allTags, resultTagMap, childTagIdsOf]);
+
+  const handleCreatePersonalResult = async () => {
+    if (!user) return;
+    setIsCreating(true);
+    const { data, error } = await supabase.from("results").insert({
+      title: "新成果", date: new Date().toISOString().slice(0, 10),
+      header_image: "/placeholder.png", summary: "", content: {},
+      status: "draft", author_id: user.id, type: "personal", team_id: null,
+    }).select().single();
+    if (error) { setIsCreating(false); return; }
+    router.push(`/result/${data.id}/edit`);
+  };
+
+  const handleCreateTeamResult = async (teamId: string) => {
+    if (!user) return;
+    setIsCreating(true);
+    const { data, error } = await supabase.from("results").insert({
+      title: "新成果", date: new Date().toISOString().slice(0, 10),
+      header_image: "/placeholder.png", summary: "", content: {},
+      status: "draft", author_id: user.id, type: "team", team_id: teamId,
+    }).select().single();
+    if (error) { setIsCreating(false); return; }
     router.push(`/result/${data.id}/edit`);
   };
 
   const isExternalImage = (src: string | null | undefined) =>
-    !!(
-      src &&
-      (src.startsWith("http://") || src.startsWith("https://"))
-    );
+    !!(src && (src.startsWith("http://") || src.startsWith("https://")));
 
   return (
-    <div className="container max-w-7xl mx-auto p-4 flex flex-col gap-8 mt-8">
-      <div className="z-10 relative">
-        <h1 className="text-3xl font-bold w-full text-center">最新成果</h1>
+    <div className="max-w-6xl mx-auto px-4 py-12 pb-16">
+      {/* Page title */}
+      <div className="flex items-center justify-between gap-4 mb-8">
+        <h1 className="text-3xl font-bold">最新成果</h1>
         {user && (
-          <Button
-            variant="secondary"
-            className="absolute right-0 top-0"
-            onClick={handleCreateResult}
-            disabled={isCreating}
-          >
-            {isCreating ? (
-              <Loader2 className="w-4 h-4 animate-spin" />
+          <div className="flex items-center gap-2">
+            {resultTab === "personal" ? (
+              <Button variant="secondary" onClick={handleCreatePersonalResult} disabled={isCreating}>
+                {isCreating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
+                新增個人成果
+              </Button>
+            ) : leaderTeams.length === 0 ? (
+              <span className="text-sm text-muted-foreground">請先建立隊伍並擔任組長才能新增團隊成果</span>
             ) : (
-              <Plus className="w-4 h-4" />
+              <select
+                className="flex h-9 rounded-md border border-input bg-transparent px-3 py-1 text-sm"
+                value=""
+                onChange={(e) => { if (e.target.value) handleCreateTeamResult(e.target.value); }}
+                disabled={isCreating}
+              >
+                <option value="">選擇隊伍新增團隊成果…</option>
+                {leaderTeams.map((t) => <option key={t.id} value={t.id}>{t.name}</option>)}
+              </select>
             )}
-            新增成果
-          </Button>
+          </div>
         )}
       </div>
-      {isLoading ? (
-        <div className="flex justify-center py-8">
-          <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
+
+      {/* Two-column layout */}
+      <div className="flex gap-6 items-start">
+        {/* Sidebar */}
+        <div className="hidden md:block w-48 shrink-0 sticky top-24">
+          <ResultTagSidebar
+            selectedTagIds={selectedTagIds}
+            onToggle={handleTagToggle}
+            onClear={() => setSelectedTagIds(new Set())}
+            isAdmin={isAdmin}
+          />
         </div>
-      ) : results.length === 0 ? (
-        <div className="text-center py-8 text-muted-foreground">
-          目前沒有成果
+
+        {/* Main content */}
+        <div className="flex-1 min-w-0 flex flex-col gap-6">
+          {/* Mobile tag selector */}
+          <div className="md:hidden">
+            <ResultTagSidebar
+              selectedTagIds={selectedTagIds}
+              onToggle={handleTagToggle}
+              onClear={() => setSelectedTagIds(new Set())}
+              isAdmin={isAdmin}
+            />
+            <div className="mt-4 border-b" />
+          </div>
+
+          {/* Tabs */}
+          <div className="flex gap-2 border-b border-border pb-2">
+            <Button variant={resultTab === "personal" ? "default" : "ghost"} size="sm" onClick={() => setResultTab("personal")}>個人</Button>
+            <Button variant={resultTab === "team" ? "default" : "ghost"} size="sm" onClick={() => setResultTab("team")}>團隊</Button>
+          </div>
+
+          {isLoading ? (
+            <div className="flex justify-center py-8">
+              <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
+            </div>
+          ) : filteredResults.length === 0 ? (
+            <div className="text-center py-8 text-muted-foreground">
+              {selectedTagIds.size > 0 ? "此標籤下尚無成果" : "目前沒有成果"}
+            </div>
+          ) : (
+            <div className="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-6">
+              {filteredResults.map((item) => {
+                const card = <ResultCard item={item} isExternalImage={isExternalImage} />;
+                return user ? (
+                  <button type="button" key={item.id} className="text-left w-full h-full"
+                    onClick={() => router.push(`/result/${item.id}/edit`)}>
+                    {card}
+                  </button>
+                ) : (
+                  <Link href={`/result/${item.id}`} key={item.id} className="h-full">{card}</Link>
+                );
+              })}
+            </div>
+          )}
         </div>
-      ) : (
-        <div className="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-6">
-          {results.map((item) => {
-            const card = (
-              <Card className="py-0 h-full flex flex-col hover:scale-102 transition-all duration-200">
-                <div className="relative w-full aspect-video shrink-0">
-                  <Image
-                    src={item.header_image || "/placeholder.png"}
-                    alt={item.title}
-                    fill
-                    className="object-cover rounded-t-lg"
-                    unoptimized={isExternalImage(item.header_image)}
-                  />
-                </div>
-                <CardHeader className="shrink-0">
-                  <CardTitle className="text-xl font-bold line-clamp-2">
-                    {item.title || "(無標題)"}
-                  </CardTitle>
-                  <CardDescription className="text-right">
-                    {item.date || "—"}
-                  </CardDescription>
-                  <Separator />
-                </CardHeader>
-                <CardContent className="flex-1">
-                  <p className="line-clamp-3 text-muted-foreground">
-                    {item.summary || "（無摘要）"}
-                  </p>
-                </CardContent>
-                <CardFooter />
-              </Card>
-            );
-            return user ? (
-              <button
-                type="button"
-                key={item.id}
-                className="text-left w-full h-full"
-                onClick={() => router.push(`/result/${item.id}/edit`)}
-              >
-                {card}
-              </button>
-            ) : (
-              <Link href={`/result/${item.id}`} key={item.id} className="h-full">
-                {card}
-              </Link>
-            );
-          })}
-        </div>
-      )}
+      </div>
     </div>
+  );
+}
+
+function ResultCard({ item, isExternalImage }: {
+  item: ResultWithMeta;
+  isExternalImage: (src: string | null | undefined) => boolean;
+}) {
+  const publisherName = item.type === "team" ? item.team_name || "未知隊伍" : item.author_name || "匿名";
+  return (
+    <Card className="py-0 h-full flex flex-col transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98]">
+      <div className="relative w-full aspect-video shrink-0">
+        <Image src={item.header_image || "/placeholder.png"} alt={item.title} fill
+          className="object-cover rounded-t-lg" unoptimized={isExternalImage(item.header_image)} />
+      </div>
+      <CardHeader className="shrink-0 pb-2">
+        <CardTitle className="text-xl font-bold line-clamp-2">{item.title || "(無標題)"}</CardTitle>
+        <Separator />
+      </CardHeader>
+      <CardContent className="flex-1">
+        <p className="line-clamp-3 text-muted-foreground text-sm">{item.summary || "（無摘要）"}</p>
+      </CardContent>
+      <CardFooter className="pt-0 pb-4">
+        <div className="flex items-center justify-between w-full gap-2 text-sm text-muted-foreground">
+          <div className="flex items-center gap-1.5 min-w-0">
+            {item.type === "team" ? <Users className="w-3.5 h-3.5 shrink-0" /> : <User className="w-3.5 h-3.5 shrink-0" />}
+            <span className="truncate">{publisherName}</span>
+          </div>
+          <span className="shrink-0">{item.date || "—"}</span>
+        </div>
+      </CardFooter>
+    </Card>
   );
 }

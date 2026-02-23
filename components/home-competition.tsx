@@ -39,52 +39,59 @@ export function HomeCompetition() {
   }, [supabase]);
 
   return (
-    <div className="container max-w-7xl mx-auto p-4 flex flex-col gap-6">
-      <h2 className="text-2xl font-bold">競賽資訊</h2>
-      {isLoading ? (
-        <div className="flex justify-center py-8">
-          <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
+    <div className="bg-muted/40 py-16 px-4">
+      <div className="max-w-6xl mx-auto flex flex-col gap-8">
+        <h2 className="text-2xl font-bold border-l-4 border-primary pl-3">競賽資訊</h2>
+        {isLoading ? (
+          <div className="flex justify-center py-8">
+            <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
+          </div>
+        ) : competitions.length === 0 ? (
+          <div className="text-center py-8 text-muted-foreground">
+            目前沒有競賽資訊
+          </div>
+        ) : (
+          <div className="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-6">
+            {competitions.map((item) => (
+              <Link
+                href={item.link || "#"}
+                key={item.id}
+                target={item.link ? "_blank" : undefined}
+                rel={item.link ? "noopener noreferrer" : undefined}
+              >
+                <Card className="py-0 transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98]">
+                  <div className="relative w-full aspect-video">
+                    <Image
+                      src={item.image || "/placeholder.png"}
+                      alt={item.title}
+                      fill
+                      className="object-cover rounded-t-lg"
+                      unoptimized={isExternalUrl(item.image)}
+                    />
+                  </div>
+                  <CardHeader className="pb-4">
+                    <CardTitle className="text-xl font-bold">{item.title}</CardTitle>
+                    <CardDescription className="text-right">
+                      {item.date || "—"}
+                    </CardDescription>
+                    {item.description && (
+                      <p className="text-sm text-muted-foreground line-clamp-2 mt-1">
+                        {item.description}
+                      </p>
+                    )}
+                  </CardHeader>
+                </Card>
+              </Link>
+            ))}
+          </div>
+        )}
+        <div className="flex justify-center">
+          <Link href="/competition">
+            <Button variant="secondary" size="lg" className="px-12 text-lg">
+              探索更多
+            </Button>
+          </Link>
         </div>
-      ) : competitions.length === 0 ? (
-        <div className="text-center py-8 text-muted-foreground">
-          目前沒有競賽資訊
-        </div>
-      ) : (
-        <div className="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-6">
-          {competitions.map((item) => (
-            <Link
-              href={item.link || "#"}
-              key={item.id}
-              target={item.link ? "_blank" : undefined}
-              rel={item.link ? "noopener noreferrer" : undefined}
-            >
-              <Card className="py-0 hover:scale-102 transition-all duration-200">
-                <div className="relative w-full aspect-video">
-                  <Image
-                    src={item.image || "/placeholder.png"}
-                    alt={item.title}
-                    fill
-                    className="object-cover rounded-t-lg"
-                    unoptimized={isExternalUrl(item.image)}
-                  />
-                </div>
-                <CardHeader className="pb-4">
-                  <CardTitle className="text-xl font-bold">{item.title}</CardTitle>
-                  <CardDescription className="text-right">
-                    {item.date || "—"}
-                  </CardDescription>
-                </CardHeader>
-              </Card>
-            </Link>
-          ))}
-        </div>
-      )}
-      <div className="flex justify-center">
-        <Link href="/competition">
-          <Button variant="secondary" size="lg" className="px-12 text-lg">
-            探索更多
-          </Button>
-        </Link>
       </div>
     </div>
   );

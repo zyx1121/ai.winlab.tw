@@ -2,7 +2,6 @@ import "@/app/globals.css";
 import { AuthProvider } from "@/components/auth-provider";
 import { Footer } from "@/components/footer";
 import { Header } from "@/components/header";
-import { Separator } from "@/components/ui/separator";
 import type { Metadata } from "next";
 import { ThemeProvider } from "next-themes";
 import { Noto_Sans, Noto_Sans_Mono } from "next/font/google";
@@ -34,9 +33,8 @@ export default function RootLayout({
           <AuthProvider>
             <div className="relative min-h-dvh">
               <div className="relative flex flex-col min-h-dvh">
-                <div className="fixed top-0 left-0 right-0 z-50 bg-background/75 backdrop-blur-md shadow-lg">
+                <div className="fixed top-0 left-0 right-0 z-50 bg-background/70 backdrop-blur-md border-b border-background/10">
                   <Header />
-                  <Separator />
                 </div>
                 <div className="flex-1 pt-16">
                   {children}

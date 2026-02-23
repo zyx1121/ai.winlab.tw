@@ -13,7 +13,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 export default function CompetitionEditPage() {
-  const { user, isLoading: authLoading } = useAuth();
+  const { user, isAdmin, isLoading: authLoading } = useAuth();
   const router = useRouter();
   const params = useParams();
   const id = params.id as string;
@@ -32,8 +32,9 @@ export default function CompetitionEditPage() {
   const hasChanges =
     competition && savedCompetition
       ? competition.title !== savedCompetition.title ||
-      competition.link !== savedCompetition.link ||
-      (competition.image ?? "") !== (savedCompetition.image ?? "")
+        competition.link !== savedCompetition.link ||
+        (competition.image ?? "") !== (savedCompetition.image ?? "") ||
+        (competition.description ?? "") !== (savedCompetition.description ?? "")
       : false;
 
   const fetchCompetition = useCallback(async () => {
@@ -64,6 +65,12 @@ export default function CompetitionEditPage() {
     }
   }, [user, authLoading, fetchCompetition, router]);
 
+  useEffect(() => {
+    if (!authLoading && user && !isAdmin) {
+      router.push("/competition");
+    }
+  }, [authLoading, user, isAdmin, router]);
+
   const handleSave = async () => {
     if (!competition) return;
 
@@ -74,6 +81,7 @@ export default function CompetitionEditPage() {
         title: competition.title,
         link: competition.link,
         image: competition.image ?? null,
+        description: competition.description ?? null,
       })
       .eq("id", id);
 
@@ -246,6 +254,23 @@ export default function CompetitionEditPage() {
                 setCompetition({ ...competition, link: e.target.value })
               }
               placeholder="https://..."
+            />
+          </div>
+          <div className="flex flex-col gap-1">
+            <Label htmlFor="description" className="text-sm mx-2">
+              簡介
+            </Label>
+            <textarea
+              id="description"
+              className="flex min-h-[100px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm placeholder:text-muted-foreground resize-y"
+              value={competition.description ?? ""}
+              onChange={(e) =>
+                setCompetition({
+                  ...competition,
+                  description: e.target.value || null,
+                })
+              }
+              placeholder="公司或職缺簡介（選填）"
             />
           </div>
         </div>

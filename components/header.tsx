@@ -7,14 +7,15 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 
 const navItems = [
-  { href: "/introduction", label: "簡介" },
-  { href: "/announcement", label: "公告" },
-  { href: "/result", label: "成果" },
-  { href: "/competition", label: "競賽" },
+  { href: "/introduction", label: "關於我們" },
+  { href: "/organization", label: "組織人員" },
+  { href: "/announcement", label: "活動公告" },
+  { href: "/result", label: "活動成果" },
+  { href: "/competition", label: "公司職缺" },
 ];
 
 export function Header() {
-  const { user, isLoading, signOut } = useAuth();
+  const { user, profile, isLoading, signOut } = useAuth();
   const [open, setOpen] = useState(false);
   const panelRef = useRef<HTMLDivElement | null>(null);
   const buttonRef = useRef<HTMLButtonElement | null>(null);
@@ -46,20 +47,27 @@ export function Header() {
   }, [open]);
 
   const renderAuthSection = (isMobile = false) => {
+    const linkHover = isMobile ? "rounded-lg px-3 py-2 hover:bg-black/10 transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98]" : "inline-block transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98] hover:opacity-80";
+
     if (user) {
+      const displayLabel = profile?.display_name || user.email || "帳號";
       return (
         <div className={isMobile ? "flex flex-col" : "flex items-center gap-4"}>
-          {isMobile && <Separator className="my-2" />}
-          <span className={isMobile ? "rounded-lg px-3 py-2 text-muted-foreground" : "text-sm text-muted-foreground"}>
-            {user.email}
-          </span>
+          {isMobile && <Separator className="my-2 bg-black/10" />}
+          <Link
+            href="/account"
+            className={linkHover}
+            onClick={isMobile ? () => setOpen(false) : undefined}
+          >
+            {displayLabel}
+          </Link>
           <button
             type="button"
             onClick={() => {
               signOut();
               if (isMobile) setOpen(false);
             }}
-            className={isMobile ? "rounded-lg px-3 py-2 hover:bg-black/5 text-left" : "hover:opacity-80 cursor-pointer"}
+            className={isMobile ? "rounded-lg px-3 py-2 hover:bg-black/10 text-left transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98]" : "inline-block transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98] hover:opacity-80 cursor-pointer"}
             disabled={isLoading}
           >
             {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : "登出"}
@@ -71,7 +79,7 @@ export function Header() {
     return (
       <Link
         href="/login"
-        className={isMobile ? "rounded-lg px-3 py-2 hover:bg-black/5" : "hover:opacity-80"}
+        className={linkHover}
         onClick={isMobile ? () => setOpen(false) : undefined}
       >
         登入
@@ -80,15 +88,15 @@ export function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-sm border-b">
-      <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between gap-6  text-xl font-bold">
-        <Link href="/" className="text-xl sm:text-2xl font-bold whitespace-nowrap">
-          NYCU AI 專責辦公室
+    <header className="sticky top-0 z-50 bg-transparent text-black border-b">
+      <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between gap-6 text-xl font-bold">
+        <Link href="/" className="inline-block text-xl sm:text-2xl font-bold whitespace-nowrap transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98]">
+          人工智慧專責辦公室
         </Link>
 
         <nav className="hidden md:flex items-center gap-8">
           {navItems.map((item) => (
-            <Link key={item.href} href={item.href} className="hover:opacity-80">
+            <Link key={item.href} href={item.href} className="inline-block transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98] hover:opacity-80">
               {item.label}
             </Link>
           ))}
@@ -98,7 +106,7 @@ export function Header() {
         <button
           ref={buttonRef}
           type="button"
-          className="md:hidden inline-flex items-center justify-center rounded-lg p-2 hover:bg-black/5"
+          className="md:hidden inline-flex items-center justify-center rounded-lg p-2 hover:bg-black/10 transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98]"
           aria-label="開啟選單"
           aria-expanded={open}
           aria-controls="mobile-menu"
@@ -114,13 +122,13 @@ export function Header() {
         className={`md:hidden overflow-hidden transition-[max-height,opacity] duration-200 ${open ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
           }`}
       >
-        <div ref={panelRef} className="max-w-7xl mx-auto px-4 pb-4">
+        <div ref={panelRef} className="max-w-6xl mx-auto px-4 pb-4">
           <div className="flex flex-col text-lg font-bold">
             {navItems.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
-                className="rounded-lg px-3 py-2 hover:bg-black/5"
+                className="rounded-lg px-3 py-2 hover:bg-black/10 transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98]"
                 onClick={() => setOpen(false)}
               >
                 {item.label}

@@ -32,7 +32,6 @@ export function HomeIntroduction() {
     fetchIntroduction();
   }, [supabase]);
 
-  // Extract plain text from content and truncate
   const contentText =
     introduction?.content && Object.keys(introduction.content).length > 0
       ? generateText(introduction.content, [StarterKit])
@@ -44,25 +43,25 @@ export function HomeIntroduction() {
 
   if (isLoading) {
     return (
-      <div className="container max-w-7xl mx-auto p-4 flex justify-center py-8">
+      <div className="bg-muted/40 py-20 px-4 flex justify-center">
         <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
       </div>
     );
   }
 
   return (
-    <div className="container max-w-7xl mx-auto p-4 flex flex-col gap-6">
-      <h2 className="text-2xl font-bold">
-        {introduction?.title || "國立陽明交通大學人工智慧專責辦公室"}
-      </h2>
-      {truncatedText && (
-        <p className="text-lg text-muted-foreground">
-          {truncatedText}
-        </p>
-      )}
-      <div className="flex justify-center">
+    <div className="bg-muted/40 py-20 px-4">
+      <div className="max-w-3xl mx-auto flex flex-col items-center gap-6 text-center">
+        <h2 className="text-3xl font-bold">
+          {introduction?.title || "國立陽明交通大學人工智慧專責辦公室"}
+        </h2>
+        {truncatedText && (
+          <p className="text-lg text-muted-foreground leading-relaxed">
+            {truncatedText}
+          </p>
+        )}
         <Link href="/introduction">
-          <Button variant="secondary" size="lg" className="px-12 text-lg">探索更多</Button>
+          <Button variant="secondary" size="lg" className="px-12 text-lg mt-2">探索更多</Button>
         </Link>
       </div>
     </div>

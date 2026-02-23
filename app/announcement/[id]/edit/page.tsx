@@ -141,7 +141,7 @@ export default function AnnouncementEditPage() {
   }
 
   return (
-    <div className="container max-w-5xl mx-auto p-4 flex flex-col mt-8 pb-16">
+    <div className="container max-w-6xl mx-auto p-4 flex flex-col mt-8 pb-16">
 
       <div className="sticky top-16 z-20 bg-background/80 backdrop-blur-sm py-4 -mx-4 px-4 flex flex-col gap-4">
         <div className="flex items-center justify-between gap-4">

@@ -11,7 +11,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function IntroductionPage() {
-  const { user } = useAuth();
+  const { isAdmin } = useAuth();
   const router = useRouter();
   const supabase = createClient();
   const [introduction, setIntroduction] = useState<Introduction | null>(null);
@@ -19,19 +19,11 @@ export default function IntroductionPage() {
 
   useEffect(() => {
     const fetchIntroduction = async () => {
-      const { data, error } = await supabase
-        .from("introduction")
-        .select("*")
-        .single();
-
-      if (error) {
-        console.error("Error fetching introduction:", error);
-      } else {
-        setIntroduction(data);
-      }
+      const { data, error } = await supabase.from("introduction").select("*").single();
+      if (error) console.error("Error fetching introduction:", error);
+      else setIntroduction(data);
       setIsLoading(false);
     };
-
     fetchIntroduction();
   }, [supabase]);
 
@@ -42,29 +34,26 @@ export default function IntroductionPage() {
 
   if (isLoading) {
     return (
-      <div className="container max-w-5xl mx-auto p-4 flex justify-center items-center min-h-[50vh]">
+      <div className="max-w-6xl mx-auto px-4 flex justify-center items-center min-h-[50vh]">
         <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
       </div>
     );
   }
 
   return (
-    <div className="container max-w-5xl mx-auto p-4 flex flex-col gap-8 mt-8">
-      <div className="z-10 relative">
-        <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight text-balance">
+    <div className="max-w-6xl mx-auto px-4 py-12 flex flex-col gap-8">
+      <div className="flex items-center justify-between gap-4">
+        <h1 className="text-3xl font-bold">
           {introduction?.title || "國立陽明交通大學 人工智慧專責辦公室"}
         </h1>
-        {user && (
-          <Button
-            variant="secondary"
-            className="absolute right-0 top-0"
-            onClick={() => router.push("/introduction/edit")}
-          >
+        {isAdmin && (
+          <Button variant="secondary" onClick={() => router.push("/introduction/edit")}>
             <Pencil className="w-4 h-4" />
             編輯
           </Button>
         )}
       </div>
+
       {contentHtml && (
         <div
           className="prose prose-sm sm:prose-base max-w-none"

@@ -21,36 +21,34 @@ export default async function AnnouncementDetailPage({
     .eq("status", "published")
     .single();
 
-  if (error || !announcement) {
-    notFound();
-  }
+  if (error || !announcement) notFound();
 
   const contentHtml =
     announcement.content && Object.keys(announcement.content).length > 0
       ? generateHTML(announcement.content, [
-        StarterKit,
-        Image.configure({
-          HTMLAttributes: { class: "rounded-lg max-w-full h-auto" },
-        }),
-      ])
+          StarterKit,
+          Image.configure({ HTMLAttributes: { class: "rounded-lg max-w-full h-auto" } }),
+        ])
       : "<p>（無內容）</p>";
 
   return (
-    <div className="container max-w-5xl mx-auto p-4 flex flex-col gap-6 mt-8">
+    <div className="max-w-6xl mx-auto px-4 py-12">
       <Link
         href="/announcement"
-        className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors w-fit"
+        className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-10"
       >
         <ArrowLeft className="w-4 h-4" />
         返回列表
       </Link>
 
-      <div className="flex flex-col gap-6">
-        <div className="flex items-center gap-4 text-sm text-muted-foreground">
+      <div className="max-w-3xl">
+        <div className="flex items-center gap-3 text-sm text-muted-foreground mb-4">
           <span>{announcement.date}</span>
-          <span className="px-2 py-1 bg-muted rounded">{announcement.category}</span>
+          <span className="px-2 py-0.5 bg-muted rounded text-xs font-medium">{announcement.category}</span>
         </div>
-        <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight text-balance mt-2 mb-4">{announcement.title}</h1>
+        <h1 className="text-4xl font-extrabold tracking-tight text-balance mb-8">
+          {announcement.title}
+        </h1>
         <div
           className="prose prose-sm sm:prose-base max-w-none"
           dangerouslySetInnerHTML={{ __html: contentHtml }}

@@ -12,7 +12,7 @@ import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 
 export default function IntroductionEditPage() {
-  const { user, isLoading: authLoading } = useAuth();
+  const { user, isAdmin, isLoading: authLoading } = useAuth();
   const router = useRouter();
   const supabase = createClient();
 
@@ -68,10 +68,14 @@ export default function IntroductionEditPage() {
       router.push("/login");
       return;
     }
-    if (user) {
+    if (!authLoading && user && !isAdmin) {
+      router.push("/introduction");
+      return;
+    }
+    if (user && isAdmin) {
       fetchIntroduction();
     }
-  }, [user, authLoading, fetchIntroduction, router]);
+  }, [user, isAdmin, authLoading, fetchIntroduction, router]);
 
   const handleSave = async () => {
     if (!introduction) return;
@@ -95,7 +99,7 @@ export default function IntroductionEditPage() {
 
   if (isLoading || authLoading) {
     return (
-      <div className="container max-w-5xl mx-auto p-4 flex justify-center items-center min-h-[50vh]">
+      <div className="container max-w-6xl mx-auto p-4 flex justify-center items-center min-h-[50vh]">
         <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
       </div>
     );
@@ -106,7 +110,7 @@ export default function IntroductionEditPage() {
   }
 
   return (
-    <div className="container max-w-5xl mx-auto p-4 flex flex-col mt-8 pb-16">
+    <div className="container max-w-6xl mx-auto p-4 flex flex-col mt-8 pb-16">
       <div className="sticky top-16 z-20 bg-background/80 backdrop-blur-sm py-4 -mx-4 px-4 flex flex-col gap-4">
         <div className="flex items-center justify-between gap-4">
           <Button variant="ghost" size="sm" onClick={() => router.push("/introduction")}>

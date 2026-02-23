@@ -36,6 +36,7 @@ export function HomeCarousel() {
   )
 
   return (
+    <div className="container max-w-6xl mx-auto px-4">
     <Carousel
       plugins={[plugin.current]}
       className="w-full relative group"
@@ -48,7 +49,7 @@ export function HomeCarousel() {
       <CarouselContent className="ml-0">
         {carouselSlides.map((slide) => (
           <CarouselItem key={slide.id} className="pl-0">
-            <div className="relative w-full aspect-5/2 min-h-[300px] md:min-h-[400px] lg:min-h-[500px]">
+            <div className="relative w-full aspect-video">
               {/* Background Image */}
               <div
                 className="absolute inset-0 bg-cover bg-center bg-no-repeat"
@@ -57,15 +58,15 @@ export function HomeCarousel() {
                 }}
               />
               {/* Dark Overlay */}
-              <div className="absolute inset-0 bg-linear-to-t from-black/70 via-black/10 to-black/0" />
+              <div className="absolute inset-0 bg-linear-to-t from-black/90 via-black/50 to-black/0" />
               {/* Content */}
               <div className="absolute inset-0 flex flex-col items-center justify-end text-white px-4 md:px-8 pb-12 md:pb-16">
-                <h2 className="text-2xl md:text-4xl lg:text-5xl font-bold text-center mb-4 drop-shadow-lg">
+                <h2 className="text-2xl md:text-4xl lg:text-5xl font-bold text-center mb-4">
                   {slide.title}
                 </h2>
                 <a
                   href={slide.link}
-                  className="text-sm md:text-lg lg:text-xl text-center max-w-3xl hover:text-amber-300 transition-colors duration-300 drop-shadow-md"
+                  className="inline-block text-sm md:text-lg lg:text-xl text-center max-w-3xl hover:text-amber-300 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
                 >
                   {slide.subtitle}
                 </a>
@@ -92,5 +93,6 @@ export function HomeCarousel() {
       {/* Indicators */}
       <CarouselIndicators className="absolute bottom-4 md:bottom-6 left-1/2 -translate-x-1/2" />
     </Carousel>
+    </div>
   )
 }
