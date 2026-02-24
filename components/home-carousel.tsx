@@ -36,63 +36,63 @@ export function HomeCarousel() {
   )
 
   return (
-    <div className="container max-w-6xl mx-auto px-4">
-    <Carousel
-      plugins={[plugin.current]}
-      className="w-full relative group"
-      onMouseEnter={plugin.current.stop}
-      onMouseLeave={plugin.current.reset}
-      opts={{
-        loop: true,
-      }}
-    >
-      <CarouselContent className="ml-0">
-        {carouselSlides.map((slide) => (
-          <CarouselItem key={slide.id} className="pl-0">
-            <div className="relative w-full aspect-video">
-              {/* Background Image */}
-              <div
-                className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-                style={{
-                  backgroundImage: `url(${slide.image})`,
-                }}
-              />
-              {/* Dark Overlay */}
-              <div className="absolute inset-0 bg-linear-to-t from-black/90 via-black/50 to-black/0" />
-              {/* Content */}
-              <div className="absolute inset-0 flex flex-col items-center justify-end text-white px-4 md:px-8 pb-12 md:pb-16">
-                <h2 className="text-2xl md:text-4xl lg:text-5xl font-bold text-center mb-4">
-                  {slide.title}
-                </h2>
-                <a
-                  href={slide.link}
-                  className="inline-block text-sm md:text-lg lg:text-xl text-center max-w-3xl hover:text-amber-300 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
-                >
-                  {slide.subtitle}
-                </a>
+    <div className="container max-w-6xl mx-auto">
+      <Carousel
+        plugins={[plugin.current]}
+        className="w-full relative group"
+        onMouseEnter={plugin.current.stop}
+        onMouseLeave={plugin.current.reset}
+        opts={{
+          loop: true,
+        }}
+      >
+        <CarouselContent className="ml-0">
+          {carouselSlides.map((slide) => (
+            <CarouselItem key={slide.id} className="pl-0">
+              <div className="relative w-full aspect-video">
+                {/* Background Image */}
+                <div
+                  className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+                  style={{
+                    backgroundImage: `url(${slide.image})`,
+                  }}
+                />
+                {/* Dark Overlay */}
+                <div className="absolute inset-0 bg-linear-to-t from-black/90 via-black/50 to-black/0" />
+                {/* Content */}
+                <div className="absolute inset-0 flex flex-col items-center justify-end text-white px-4 md:px-8 pb-12 md:pb-16">
+                  <h2 className="text-2xl md:text-4xl lg:text-5xl font-bold text-center mb-4">
+                    {slide.title}
+                  </h2>
+                  <a
+                    href={slide.link}
+                    className="inline-block text-sm md:text-lg lg:text-xl text-center max-w-3xl hover:text-amber-300 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
+                  >
+                    {slide.subtitle}
+                  </a>
+                </div>
               </div>
-            </div>
-          </CarouselItem>
-        ))}
-      </CarouselContent>
+            </CarouselItem>
+          ))}
+        </CarouselContent>
 
-      {/* Navigation Buttons */}
-      <CarouselPrevious
-        variant="ghost"
-        className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 h-10 w-10 md:h-12 md:w-12 rounded-full bg-black/30 hover:bg-black/50 text-white border-none opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-      >
-        <ChevronLeft className="h-6 w-6 md:h-8 md:w-8" />
-      </CarouselPrevious>
-      <CarouselNext
-        variant="ghost"
-        className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 h-10 w-10 md:h-12 md:w-12 rounded-full bg-black/30 hover:bg-black/50 text-white border-none opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-      >
-        <ChevronRight className="h-6 w-6 md:h-8 md:w-8" />
-      </CarouselNext>
+        {/* Navigation Buttons */}
+        <CarouselPrevious
+          variant="ghost"
+          className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 h-10 w-10 md:h-12 md:w-12 rounded-full bg-black/30 hover:bg-black/50 text-white border-none opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+        >
+          <ChevronLeft className="h-6 w-6 md:h-8 md:w-8" />
+        </CarouselPrevious>
+        <CarouselNext
+          variant="ghost"
+          className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 h-10 w-10 md:h-12 md:w-12 rounded-full bg-black/30 hover:bg-black/50 text-white border-none opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+        >
+          <ChevronRight className="h-6 w-6 md:h-8 md:w-8" />
+        </CarouselNext>
 
-      {/* Indicators */}
-      <CarouselIndicators className="absolute bottom-4 md:bottom-6 left-1/2 -translate-x-1/2" />
-    </Carousel>
+        {/* Indicators */}
+        <CarouselIndicators className="absolute bottom-4 md:bottom-6 left-1/2 -translate-x-1/2" />
+      </Carousel>
     </div>
   )
 }
