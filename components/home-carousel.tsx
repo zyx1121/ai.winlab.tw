@@ -8,35 +8,74 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel"
+import { useAuth } from "@/components/auth-provider"
+import { createClient } from "@/lib/supabase/client"
+import type { CarouselSlide } from "@/lib/supabase/types"
 import Autoplay from "embla-carousel-autoplay"
-import { ChevronLeft, ChevronRight } from "lucide-react"
+import { ChevronLeft, ChevronRight, Pencil } from "lucide-react"
+import Link from "next/link"
 import * as React from "react"
-
-// Sample carousel data - replace with actual data
-const carouselSlides = [
-  {
-    id: 1,
-    image: "/carousel/1.jpg",
-    title: "AI架構師實戰班 Cloud × Core × Edge",
-    subtitle: "零程式基礎也能上手，專注架構與應用而非深度程式開發",
-    link: "/announcement/db26de82-204f-4008-8189-56f3a9563d71",
-  },
-  {
-    id: 2,
-    image: "/carousel/2.jpg",
-    title: "AI架構師實戰班 Cloud × Core × Edge",
-    subtitle: "零程式基礎也能上手，專注架構與應用而非深度程式開發",
-    link: "/announcement/db26de82-204f-4008-8189-56f3a9563d71",
-  },
-]
+import { useEffect, useState } from "react"
 
 export function HomeCarousel() {
+  const { isAdmin } = useAuth()
+  const [slides, setSlides] = useState<CarouselSlide[]>([])
+  const supabase = createClient()
+
+  useEffect(() => {
+    const fetchSlides = async () => {
+      const { data } = await supabase
+        .from("carousel_slides")
+        .select("*")
+        .order("sort_order", { ascending: true })
+        .order("created_at", { ascending: true })
+      setSlides((data as CarouselSlide[]) || [])
+    }
+    fetchSlides()
+  }, [supabase])
+
   const plugin = React.useRef(
     Autoplay({ delay: 5000, stopOnInteraction: true })
   )
 
+  if (slides.length === 0) {
+    if (isAdmin) {
+      return (
+        <div className="max-w-6xl mx-auto px-4 py-8">
+          <Link
+            href="/carousel"
+            className="inline-flex items-center gap-2 rounded-lg border border-dashed border-border bg-muted/30 px-4 py-6 w-full justify-center text-muted-foreground hover:text-foreground hover:border-foreground/20 transition-colors"
+          >
+            <Pencil className="w-5 h-5" />
+            尚無橫幅，點此新增首頁輪播
+          </Link>
+        </div>
+      )
+    }
+    // Default placeholder banner when no slides (so layout is correct and intro doesn't appear as first block)
+    return (
+      <div className="w-full max-w-6xl mx-auto relative">
+        <div className="relative w-full aspect-video min-h-[200px] bg-muted">
+          <div className="absolute inset-0 flex flex-col items-center justify-center text-muted-foreground px-4">
+            <p className="text-base md:text-lg font-medium">國立陽明交通大學 人工智慧專責辦公室</p>
+            <p className="text-sm mt-1">歡迎來到 AI Office</p>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   return (
-    <div className="container max-w-6xl mx-auto">
+    <div className="w-full max-w-6xl mx-auto relative">
+      {isAdmin && (
+        <Link
+          href="/carousel"
+          className="absolute top-3 right-3 z-10 inline-flex items-center gap-1.5 rounded-md bg-black/50 px-3 py-1.5 text-sm font-medium text-white hover:bg-black/70 transition-colors"
+        >
+          <Pencil className="w-3.5 h-3.5" />
+          編輯橫幅
+        </Link>
+      )}
       <Carousel
         plugins={[plugin.current]}
         className="w-full relative group"
@@ -47,33 +86,52 @@ export function HomeCarousel() {
         }}
       >
         <CarouselContent className="ml-0">
-          {carouselSlides.map((slide) => (
-            <CarouselItem key={slide.id} className="pl-0">
-              <div className="relative w-full aspect-video">
+          {slides.map((slide) => {
+            const isExternal =
+              slide.link?.startsWith("http://") || slide.link?.startsWith("https://")
+            const slideContent = (
+              <>
                 {/* Background Image */}
                 <div
-                  className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+                  className="absolute inset-0 bg-cover bg-center bg-no-repeat bg-muted"
                   style={{
-                    backgroundImage: `url(${slide.image})`,
+                    backgroundImage: `url(${slide.image || "/placeholder.png"})`,
                   }}
                 />
-                {/* Dark Overlay */}
-                <div className="absolute inset-0 bg-linear-to-t from-black/90 via-black/50 to-black/0" />
-                {/* Content */}
-                <div className="absolute inset-0 flex flex-col items-center justify-end text-white px-4 md:px-8 pb-12 md:pb-16">
-                  <h2 className="text-2xl md:text-4xl lg:text-5xl font-bold text-center mb-4">
+                {/* Dark Overlay - subtle gradient */}
+                <div className="absolute inset-0 bg-linear-to-t from-black/50 via-black/20 to-transparent" />
+                {/* Content - pointer-events-none so the whole banner receives the click */}
+                <div className="absolute inset-0 flex flex-col items-center justify-end text-white px-4 md:px-8 pb-12 md:pb-16 pointer-events-none">
+                  <h2 className="text-xl md:text-2xl lg:text-3xl font-bold text-center mb-3">
                     {slide.title}
                   </h2>
+                  {slide.description && (
+                    <span className="inline-block text-xs md:text-sm lg:text-base text-center max-w-3xl">
+                      {slide.description}
+                    </span>
+                  )}
+                </div>
+              </>
+            )
+
+            return (
+              <CarouselItem key={slide.id} className="pl-0">
+                {slide.link ? (
                   <a
                     href={slide.link}
-                    className="inline-block text-sm md:text-lg lg:text-xl text-center max-w-3xl hover:text-amber-300 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
+                    className="relative block w-full aspect-video min-h-[200px] cursor-pointer"
+                    {...(isExternal && { target: "_blank", rel: "noopener noreferrer" })}
                   >
-                    {slide.subtitle}
+                    {slideContent}
                   </a>
-                </div>
-              </div>
-            </CarouselItem>
-          ))}
+                ) : (
+                  <div className="relative block w-full aspect-video min-h-[200px]">
+                    {slideContent}
+                  </div>
+                )}
+              </CarouselItem>
+            )
+          })}
         </CarouselContent>
 
         {/* Navigation Buttons */}

@@ -11,7 +11,7 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { createClient } from "@/lib/supabase/client";
 import type { Result } from "@/lib/supabase/types";
-import { Loader2, User, Users } from "lucide-react";
+import { Loader2, Link2, User, Users } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -109,6 +109,9 @@ export function HomeResult() {
                       className="object-cover"
                       unoptimized={isExternalImage(item.header_image)}
                     />
+                    <div className="absolute top-2 right-2 rounded-full bg-black/50 p-1.5 text-white pointer-events-none" aria-hidden>
+                      <Link2 className="w-4 h-4" />
+                    </div>
                   </div>
                   <CardHeader className="shrink-0 pb-2">
                     <CardTitle className="text-xl font-bold line-clamp-2">

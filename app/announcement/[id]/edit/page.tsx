@@ -16,7 +16,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 export default function AnnouncementEditPage() {
-  const { user, isLoading: authLoading } = useAuth();
+  const { user, isLoading: authLoading, isAdmin } = useAuth();
   const router = useRouter();
   const params = useParams();
   const id = params.id as string;
@@ -60,10 +60,14 @@ export default function AnnouncementEditPage() {
       router.push("/login");
       return;
     }
-    if (user) {
+    if (!authLoading && user && !isAdmin) {
+      router.push(`/announcement/${id}`);
+      return;
+    }
+    if (user && isAdmin) {
       fetchAnnouncement();
     }
-  }, [user, authLoading, fetchAnnouncement, router]);
+  }, [user, isAdmin, authLoading, fetchAnnouncement, router, id]);
 
   const previewContentHtml = useMemo(
     () =>

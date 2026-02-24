@@ -65,17 +65,17 @@ export function HomeOrganization() {
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {members.slice(0, 6).map((member) => (
             <Link key={member.id} href="/organization">
-              <Card className="py-0 h-full flex flex-col transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98]">
-                <div className="relative w-full aspect-square shrink-0">
+              <Card className="py-0 h-full flex flex-col overflow-hidden transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98]">
+                <div className="relative w-full aspect-square shrink-0 overflow-hidden">
                   <Image
                     src={member.image || "/placeholder.png"}
                     alt={member.name}
                     fill
-                    className="object-cover rounded-t-xl"
+                    className="object-cover"
                     unoptimized={isExternalUrl(member.image)}
                   />
                 </div>
-                <CardHeader className="shrink-0">
+                <CardHeader className="shrink-0 pb-4">
                   <CardTitle className="text-lg font-bold line-clamp-2">
                     {member.name}
                   </CardTitle>

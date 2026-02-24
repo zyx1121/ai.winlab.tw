@@ -1,3 +1,14 @@
+export type CarouselSlide = {
+  id: string;
+  created_at: string;
+  updated_at: string;
+  title: string;
+  description: string | null;
+  link: string | null;
+  image: string | null;
+  sort_order: number;
+};
+
 export type Announcement = {
   id: string;
   created_at: string;

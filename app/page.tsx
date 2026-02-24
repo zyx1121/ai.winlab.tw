@@ -1,9 +1,8 @@
 import { HomeAnnouncement } from "@/components/home-announcement";
 import { HomeCarousel } from "@/components/home-carousel";
-import { HomeRecruitment } from "@/components/home-recruitment";
 import { HomeContacts } from "@/components/home-contacts";
 import { HomeIntroduction } from "@/components/home-introduction";
-import { HomeOrganization } from "@/components/home-organization";
+import { HomeRecruitment } from "@/components/home-recruitment";
 import { HomeResult } from "@/components/home-result";
 
 export default function Home() {
@@ -11,7 +10,7 @@ export default function Home() {
     <main className="flex flex-col">
       <HomeCarousel />
       <HomeIntroduction />
-      <HomeOrganization />
+      {/* <HomeOrganization /> */}
       <HomeAnnouncement />
       <HomeResult />
       <HomeRecruitment />

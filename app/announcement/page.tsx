@@ -17,7 +17,7 @@ import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 
 export default function AnnouncementPage() {
-  const { user } = useAuth();
+  const { user, isAdmin } = useAuth();
   const router = useRouter();
   const supabase = createClient();
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
@@ -44,7 +44,7 @@ export default function AnnouncementPage() {
   }, [fetchAnnouncements]);
 
   const handleCreateAnnouncement = async () => {
-    if (!user) return;
+    if (!user || !isAdmin) return;
     setIsCreating(true);
     const { data, error } = await supabase
       .from("announcements")
@@ -59,7 +59,7 @@ export default function AnnouncementPage() {
     <div className="max-w-6xl mx-auto px-4 py-12 flex flex-col gap-8">
       <div className="flex items-center justify-between gap-4">
         <h1 className="text-3xl font-bold">最新公告</h1>
-        {user && (
+        {isAdmin && (
           <Button variant="secondary" onClick={handleCreateAnnouncement} disabled={isCreating}>
             {isCreating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
             新增公告
@@ -89,12 +89,16 @@ export default function AnnouncementPage() {
                 <TableRow
                   key={item.id}
                   className="cursor-pointer h-12 hover:bg-muted/60 transition-colors"
-                  onClick={() => router.push(user ? `/announcement/${item.id}/edit` : `/announcement/${item.id}`)}
+                  onClick={() =>
+                    router.push(
+                      isAdmin ? `/announcement/${item.id}/edit` : `/announcement/${item.id}`,
+                    )
+                  }
                 >
                   <TableCell className="text-base">{item.date}</TableCell>
                   <TableCell className="text-base">{item.category}</TableCell>
                   <TableCell className="text-base">{item.title || "(無標題)"}</TableCell>
-                  {user && (
+                  {isAdmin && (
                     <TableCell className="text-base">
                       <span className={item.status === "published" ? "text-green-600" : "text-yellow-600"}>
                         {item.status === "published" ? "已發布" : "草稿"}

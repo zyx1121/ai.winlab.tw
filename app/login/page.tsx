@@ -24,7 +24,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center px-4 py-12">
+    <div className="flex items-center justify-center px-4 py-12 md:py-16">
       <div className="w-full max-w-md flex flex-col gap-6">
         <div className="text-center">
           <h1 className="text-3xl font-bold">登入</h1>

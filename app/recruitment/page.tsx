@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/card";
 import { createClient } from "@/lib/supabase/client";
 import type { Recruitment } from "@/lib/supabase/types";
-import { Loader2, Plus } from "lucide-react";
+import { Loader2, Link2, Plus } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -82,6 +82,9 @@ export default function RecruitmentPage() {
                     className="object-cover"
                     unoptimized={!!(item.image && (item.image.startsWith("http://") || item.image.startsWith("https://")))}
                   />
+                  <div className="absolute top-2 right-2 rounded-full bg-black/50 p-1.5 text-white pointer-events-none" aria-hidden>
+                    <Link2 className="w-4 h-4" />
+                  </div>
                 </div>
                 <CardHeader className="pb-4 flex-1">
                   <CardTitle className="text-xl font-bold">{item.title || "(無標題)"}</CardTitle>

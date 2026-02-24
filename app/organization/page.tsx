@@ -14,7 +14,7 @@ import type {
   OrganizationMember,
   OrganizationMemberCategory,
 } from "@/lib/supabase/types";
-import { Loader2, Pencil, Plus } from "lucide-react";
+import { Loader2, Plus } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
@@ -95,38 +95,55 @@ export default function OrganizationPage() {
         <div className="text-center py-12 text-muted-foreground">此分類目前沒有成員</div>
       ) : (
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {members.map((member) => (
-            <Card
-              key={member.id}
-              className={`py-0 h-full flex flex-col ${isAdmin ? "cursor-pointer transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98]" : ""}`}
-              onClick={() => isAdmin && router.push(`/organization/${member.id}/edit`)}
-            >
-              <div className="relative w-full aspect-square shrink-0">
-                <Image
-                  src={member.image || "/placeholder.png"}
-                  alt={member.name}
-                  fill
-                  className="object-cover rounded-t-xl"
-                  unoptimized={isExternalUrl(member.image)}
-                />
-              </div>
-              <CardHeader className="shrink-0">
-                <CardTitle className="text-lg font-bold line-clamp-2">{member.name}</CardTitle>
-                {member.summary && (
-                  <CardDescription className="line-clamp-3">{member.summary}</CardDescription>
-                )}
-              </CardHeader>
-              <CardContent className="flex-1 flex items-end">
-                {isAdmin && (
-                  <Button variant="ghost" size="sm" className="w-fit"
-                    onClick={(e) => { e.stopPropagation(); router.push(`/organization/${member.id}/edit`); }}>
-                    <Pencil className="w-4 h-4" />
-                    編輯
-                  </Button>
-                )}
-              </CardContent>
-            </Card>
-          ))}
+          {members.map((member) => {
+            const isClickable = isAdmin || !!member.link;
+
+            const handleCardClick = () => {
+              if (isAdmin) {
+                router.push(`/organization/${member.id}/edit`);
+                return;
+              }
+              if (!member.link) return;
+
+              if (member.link.startsWith("/")) {
+                router.push(member.link);
+              } else {
+                window.open(member.link, "_blank", "noopener,noreferrer");
+              }
+            };
+
+            return (
+              <Card
+                key={member.id}
+                className={`py-0 h-full flex flex-col overflow-hidden ${
+                  isClickable
+                    ? "cursor-pointer transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98]"
+                    : ""
+                }`}
+                onClick={isClickable ? handleCardClick : undefined}
+              >
+                <div className="relative w-full aspect-square shrink-0 overflow-hidden">
+                  <Image
+                    src={member.image || "/placeholder.png"}
+                    alt={member.name}
+                    fill
+                    className="object-cover"
+                    unoptimized={isExternalUrl(member.image)}
+                  />
+                </div>
+                <CardHeader className="shrink-0 pb-4">
+                  <CardTitle className="text-lg font-bold line-clamp-2">
+                    {member.name}
+                  </CardTitle>
+                  {member.summary && (
+                    <CardDescription className="line-clamp-3">
+                      {member.summary}
+                    </CardDescription>
+                  )}
+                </CardHeader>
+              </Card>
+            );
+          })}
         </div>
       )}
     </div>

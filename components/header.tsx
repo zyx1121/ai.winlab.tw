@@ -15,7 +15,7 @@ const navItems = [
 ];
 
 export function Header() {
-  const { user, profile, isLoading, signOut } = useAuth();
+  const { user, profile, isLoading, signOut, isAdmin } = useAuth();
   const [open, setOpen] = useState(false);
   const panelRef = useRef<HTMLDivElement | null>(null);
   const buttonRef = useRef<HTMLButtonElement | null>(null);
@@ -112,6 +112,11 @@ export function Header() {
               {item.label}
             </Link>
           ))}
+          {isAdmin && (
+            <Link href="/carousel" className="nav-bracket inline-block transition-transform duration-200 active:scale-[0.98]">
+              橫幅
+            </Link>
+          )}
           {renderAuthSection()}
         </nav>
 
@@ -146,6 +151,15 @@ export function Header() {
                 {item.label}
               </Link>
             ))}
+            {isAdmin && (
+              <Link
+                href="/carousel"
+                className="rounded-lg px-3 py-2 hover:bg-black/10 transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98]"
+                onClick={() => setOpen(false)}
+              >
+                橫幅
+              </Link>
+            )}
             {renderAuthSection(true)}
           </div>
         </div>

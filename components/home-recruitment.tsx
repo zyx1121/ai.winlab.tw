@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/card";
 import { createClient } from "@/lib/supabase/client";
 import type { Recruitment } from "@/lib/supabase/types";
-import { Loader2 } from "lucide-react";
+import { Loader2, Link2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -68,6 +68,9 @@ export function HomeRecruitment() {
                       className="object-cover"
                       unoptimized={isExternalUrl(item.image)}
                     />
+                    <div className="absolute top-2 right-2 rounded-full bg-black/50 p-1.5 text-white pointer-events-none" aria-hidden>
+                      <Link2 className="w-4 h-4" />
+                    </div>
                   </div>
                   <CardHeader className="pb-4">
                     <CardTitle className="text-xl font-bold">{item.title}</CardTitle>
