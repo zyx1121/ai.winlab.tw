@@ -11,7 +11,7 @@ const navItems = [
   { href: "/organization", label: "組織人員" },
   { href: "/announcement", label: "活動公告" },
   { href: "/result", label: "活動成果" },
-  { href: "/competition", label: "公司職缺" },
+  { href: "/recruitment", label: "企業徵才" },
 ];
 
 export function Header() {
@@ -47,16 +47,24 @@ export function Header() {
   }, [open]);
 
   const renderAuthSection = (isMobile = false) => {
-    const linkHover = isMobile ? "rounded-lg px-3 py-2 hover:bg-black/10 transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98]" : "inline-block transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98] hover:opacity-80";
+    const badgeClass =
+      "inline-flex items-center rounded-full border border-black/10 bg-black/5 px-3 py-1 font-instrument-serif transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98] hover:bg-black/10";
+    const btnClass = isMobile
+      ? "rounded-lg px-3 py-2 hover:bg-black/10 text-left w-full transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98]"
+      : "inline-block rounded-lg px-3 py-1.5 hover:bg-black/10 transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98] cursor-pointer";
 
     if (user) {
       const displayLabel = profile?.display_name || user.email || "帳號";
       return (
-        <div className={isMobile ? "flex flex-col" : "flex items-center gap-4"}>
-          {isMobile && <Separator className="my-2 bg-black/10" />}
+        <div
+          className={
+            isMobile ? "flex flex-col gap-2" : "flex items-center gap-3"
+          }
+        >
           <Link
             href="/account"
-            className={linkHover}
+            className={badgeClass}
+            style={{ fontFamily: "var(--font-instrument-serif)" }}
             onClick={isMobile ? () => setOpen(false) : undefined}
           >
             {displayLabel}
@@ -67,10 +75,14 @@ export function Header() {
               signOut();
               if (isMobile) setOpen(false);
             }}
-            className={isMobile ? "rounded-lg px-3 py-2 hover:bg-black/10 text-left transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98]" : "inline-block transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98] hover:opacity-80 cursor-pointer"}
+            className={btnClass}
             disabled={isLoading}
           >
-            {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : "登出"}
+            {isLoading ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              "登出"
+            )}
           </button>
         </div>
       );
@@ -79,7 +91,7 @@ export function Header() {
     return (
       <Link
         href="/login"
-        className={linkHover}
+        className={btnClass}
         onClick={isMobile ? () => setOpen(false) : undefined}
       >
         登入
@@ -90,13 +102,13 @@ export function Header() {
   return (
     <header className="sticky top-0 z-50 bg-transparent text-black border-b">
       <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between gap-6 text-xl font-bold">
-        <Link href="/" className="inline-block text-xl sm:text-2xl font-bold whitespace-nowrap transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98]">
-          人工智慧專責辦公室
+        <Link href="/" className="font-instrument-serif inline-block text-3xl sm:text-4xl whitespace-nowrap transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98]">
+          AI Office
         </Link>
 
         <nav className="hidden md:flex items-center gap-8">
           {navItems.map((item) => (
-            <Link key={item.href} href={item.href} className="inline-block transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98] hover:opacity-80">
+            <Link key={item.href} href={item.href} className="nav-bracket inline-block transition-transform duration-200 active:scale-[0.98]">
               {item.label}
             </Link>
           ))}
@@ -124,6 +136,13 @@ export function Header() {
       >
         <div ref={panelRef} className="max-w-6xl mx-auto px-4 pb-4">
           <div className="flex flex-col text-lg font-bold">
+            <Link
+              href="/"
+              className="font-instrument-serif text-2xl rounded-lg px-3 py-2 hover:bg-black/10 transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98]"
+              onClick={() => setOpen(false)}
+            >
+              AI Office
+            </Link>
             {navItems.map((item) => (
               <Link
                 key={item.href}

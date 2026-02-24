@@ -5,22 +5,22 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { createClient } from "@/lib/supabase/client";
-import type { Competition } from "@/lib/supabase/types";
-import { uploadCompetitionImage } from "@/lib/upload-image";
+import type { Recruitment } from "@/lib/supabase/types";
+import { uploadRecruitmentImage } from "@/lib/upload-image";
 import { ArrowLeft, Check, ImagePlus, Loader2, Save, Trash2 } from "lucide-react";
 import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 
-export default function CompetitionEditPage() {
+export default function RecruitmentEditPage() {
   const { user, isAdmin, isLoading: authLoading } = useAuth();
   const router = useRouter();
   const params = useParams();
   const id = params.id as string;
   const supabase = createClient();
 
-  const [competition, setCompetition] = useState<Competition | null>(null);
-  const [savedCompetition, setSavedCompetition] = useState<Competition | null>(
+  const [recruitment, setRecruitment] = useState<Recruitment | null>(null);
+  const [savedRecruitment, setSavedRecruitment] = useState<Recruitment | null>(
     null
   );
   const [isLoading, setIsLoading] = useState(true);
@@ -30,14 +30,14 @@ export default function CompetitionEditPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const hasChanges =
-    competition && savedCompetition
-      ? competition.title !== savedCompetition.title ||
-        competition.link !== savedCompetition.link ||
-        (competition.image ?? "") !== (savedCompetition.image ?? "") ||
-        (competition.description ?? "") !== (savedCompetition.description ?? "")
+    recruitment && savedRecruitment
+      ? recruitment.title !== savedRecruitment.title ||
+        recruitment.link !== savedRecruitment.link ||
+        (recruitment.image ?? "") !== (savedRecruitment.image ?? "") ||
+        (recruitment.description ?? "") !== (savedRecruitment.description ?? "")
       : false;
 
-  const fetchCompetition = useCallback(async () => {
+  const fetchRecruitment = useCallback(async () => {
     const { data, error } = await supabase
       .from("competitions")
       .select("*")
@@ -45,13 +45,13 @@ export default function CompetitionEditPage() {
       .single();
 
     if (error) {
-      console.error("Error fetching competition:", error);
-      router.push("/competition");
+      console.error("Error fetching recruitment:", error);
+      router.push("/recruitment");
       return;
     }
 
-    setCompetition(data);
-    setSavedCompetition(data);
+    setRecruitment(data);
+    setSavedRecruitment(data);
     setIsLoading(false);
   }, [supabase, id, router]);
 
@@ -61,57 +61,57 @@ export default function CompetitionEditPage() {
       return;
     }
     if (user) {
-      fetchCompetition();
+      fetchRecruitment();
     }
-  }, [user, authLoading, fetchCompetition, router]);
+  }, [user, authLoading, fetchRecruitment, router]);
 
   useEffect(() => {
     if (!authLoading && user && !isAdmin) {
-      router.push("/competition");
+      router.push("/recruitment");
     }
   }, [authLoading, user, isAdmin, router]);
 
   const handleSave = async () => {
-    if (!competition) return;
+    if (!recruitment) return;
 
     setIsSaving(true);
     const { error } = await supabase
       .from("competitions")
       .update({
-        title: competition.title,
-        link: competition.link,
-        image: competition.image ?? null,
-        description: competition.description ?? null,
+        title: recruitment.title,
+        link: recruitment.link,
+        image: recruitment.image ?? null,
+        description: recruitment.description ?? null,
       })
       .eq("id", id);
 
     if (error) {
-      console.error("Error saving competition:", error);
+      console.error("Error saving recruitment:", error);
     } else {
-      setSavedCompetition({ ...competition });
+      setSavedRecruitment({ ...recruitment });
     }
     setIsSaving(false);
   };
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (!file || !competition) return;
+    if (!file || !recruitment) return;
 
     setIsUploadingImage(true);
-    const result = await uploadCompetitionImage(file);
+    const result = await uploadRecruitmentImage(file);
     e.target.value = "";
 
     if ("error" in result) {
       console.error(result.error);
       alert(result.error);
     } else {
-      setCompetition({ ...competition, image: result.url });
+      setRecruitment({ ...recruitment, image: result.url });
     }
     setIsUploadingImage(false);
   };
 
   const handleDelete = async () => {
-    if (!confirm("確定要刪除這則競賽嗎？")) return;
+    if (!confirm("確定要刪除這則企業徵才資訊嗎？")) return;
 
     setIsDeleting(true);
     const { error } = await supabase
@@ -120,12 +120,12 @@ export default function CompetitionEditPage() {
       .eq("id", id);
 
     if (error) {
-      console.error("Error deleting competition:", error);
+      console.error("Error deleting recruitment:", error);
       setIsDeleting(false);
       return;
     }
 
-    router.push("/competition");
+    router.push("/recruitment");
   };
 
   if (isLoading || authLoading) {
@@ -136,7 +136,7 @@ export default function CompetitionEditPage() {
     );
   }
 
-  if (!competition) {
+  if (!recruitment) {
     return null;
   }
 
@@ -147,7 +147,7 @@ export default function CompetitionEditPage() {
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => router.push("/competition")}
+            onClick={() => router.push("/recruitment")}
           >
             <ArrowLeft className="w-4 h-4" />
             返回列表
@@ -188,15 +188,15 @@ export default function CompetitionEditPage() {
             <div className="flex items-start gap-4">
               <div className="relative w-40 aspect-video rounded-lg overflow-hidden bg-muted shrink-0">
                 <Image
-                  src={competition.image || "/placeholder.png"}
-                  alt={competition.title}
+                  src={recruitment.image || "/placeholder.png"}
+                  alt={recruitment.title}
                   fill
                   className="object-cover"
                   unoptimized={
                     !!(
-                      competition.image &&
-                      (competition.image.startsWith("http://") ||
-                        competition.image.startsWith("https://"))
+                      recruitment.image &&
+                      (recruitment.image.startsWith("http://") ||
+                        recruitment.image.startsWith("https://"))
                     )
                   }
                 />
@@ -235,11 +235,11 @@ export default function CompetitionEditPage() {
             </Label>
             <Input
               id="title"
-              value={competition.title}
+              value={recruitment.title}
               onChange={(e) =>
-                setCompetition({ ...competition, title: e.target.value })
+                setRecruitment({ ...recruitment, title: e.target.value })
               }
-              placeholder="請輸入競賽標題"
+              placeholder="請輸入標題"
             />
           </div>
           <div className="flex flex-col gap-1">
@@ -249,9 +249,9 @@ export default function CompetitionEditPage() {
             <Input
               id="link"
               type="url"
-              value={competition.link}
+              value={recruitment.link}
               onChange={(e) =>
-                setCompetition({ ...competition, link: e.target.value })
+                setRecruitment({ ...recruitment, link: e.target.value })
               }
               placeholder="https://..."
             />
@@ -263,10 +263,10 @@ export default function CompetitionEditPage() {
             <textarea
               id="description"
               className="flex min-h-[100px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm placeholder:text-muted-foreground resize-y"
-              value={competition.description ?? ""}
+              value={recruitment.description ?? ""}
               onChange={(e) =>
-                setCompetition({
-                  ...competition,
+                setRecruitment({
+                  ...recruitment,
                   description: e.target.value || null,
                 })
               }

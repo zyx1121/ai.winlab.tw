@@ -31,7 +31,7 @@ Key entities:
 - **Announcement** — news posts with Tiptap rich-text content (JSON), `status: draft|published`
 - **Introduction** — single-record office introduction page with Tiptap content
 - **Result** — competition results, `type: personal|team`, linked to optional `team_id`
-- **Competition** — upcoming competitions with image and external link
+- **Recruitment** — job postings with image and external link (DB table: `competitions`)
 - **OrganizationMember** — staff/members with `category: ai_newcomer|industry_academy|alumni`
 - **Profile** — extends `auth.users`; `role: admin|user`
 - **Team / TeamMember / TeamInvitation** — team management for competition results
@@ -58,7 +58,7 @@ Key entities:
 
 All images go to the `announcement-images` Supabase Storage bucket (public). Paths are prefixed by content type:
 - Announcement inline images: root-level
-- Competition cards: `competitions/`
+- Recruitment cards: `recruitment/`
 - Result header images: `results/`
 - Organization member photos: `organization/`
 
@@ -67,12 +67,12 @@ All images go to the `announcement-images` Supabase Storage bucket (public). Pat
 ### Page Structure
 
 **Public pages** (home sections rendered as server components, each fetches its own data):
-- `/` — home page composed of `HomeCarousel`, `HomeIntroduction`, `HomeOrganization`, `HomeAnnouncement`, `HomeResult`, `HomeCompetition`, `HomeContacts`
+- `/` — home page composed of `HomeCarousel`, `HomeIntroduction`, `HomeOrganization`, `HomeAnnouncement`, `HomeResult`, `HomeRecruitment`, `HomeContacts`
 
 **Content management pages** (all client components, require login):
 - `/announcement` — list; `/announcement/[id]` — read-only view; `/announcement/[id]/edit` — editor
 - `/result` — list; `/result/[id]` — read-only view; `/result/[id]/edit` — editor
-- `/competition` — list with edit-in-place
+- `/recruitment` — list with edit-in-place (DB table: `competitions`)
 - `/introduction` — read-only; `/introduction/edit` — editor
 - `/organization` — member grid by category; `/organization/[id]/edit` — member editor
 

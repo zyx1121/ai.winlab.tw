@@ -74,36 +74,38 @@ export default function AnnouncementPage() {
       ) : announcements.length === 0 ? (
         <div className="text-center py-12 text-muted-foreground">目前沒有公告</div>
       ) : (
-        <Table>
-          <TableHeader>
-            <TableRow className="bg-muted h-12">
-              <TableHead className="text-base font-bold">公告日期</TableHead>
-              <TableHead className="text-base font-bold">類別</TableHead>
-              <TableHead className="text-base font-bold">標題</TableHead>
-              {user && <TableHead className="text-base font-bold">狀態</TableHead>}
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {announcements.map((item) => (
-              <TableRow
-                key={item.id}
-                className="cursor-pointer h-12 hover:bg-muted/60 transition-colors"
-                onClick={() => router.push(user ? `/announcement/${item.id}/edit` : `/announcement/${item.id}`)}
-              >
-                <TableCell className="text-base">{item.date}</TableCell>
-                <TableCell className="text-base">{item.category}</TableCell>
-                <TableCell className="text-base">{item.title || "(無標題)"}</TableCell>
-                {user && (
-                  <TableCell className="text-base">
-                    <span className={item.status === "published" ? "text-green-600" : "text-yellow-600"}>
-                      {item.status === "published" ? "已發布" : "草稿"}
-                    </span>
-                  </TableCell>
-                )}
+        <div className="rounded-xl border border-border overflow-hidden">
+          <Table>
+            <TableHeader>
+              <TableRow className="bg-muted h-12">
+                <TableHead className="text-base font-bold">公告日期</TableHead>
+                <TableHead className="text-base font-bold">類別</TableHead>
+                <TableHead className="text-base font-bold">標題</TableHead>
+                {user && <TableHead className="text-base font-bold">狀態</TableHead>}
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {announcements.map((item) => (
+                <TableRow
+                  key={item.id}
+                  className="cursor-pointer h-12 hover:bg-muted/60 transition-colors"
+                  onClick={() => router.push(user ? `/announcement/${item.id}/edit` : `/announcement/${item.id}`)}
+                >
+                  <TableCell className="text-base">{item.date}</TableCell>
+                  <TableCell className="text-base">{item.category}</TableCell>
+                  <TableCell className="text-base">{item.title || "(無標題)"}</TableCell>
+                  {user && (
+                    <TableCell className="text-base">
+                      <span className={item.status === "published" ? "text-green-600" : "text-yellow-600"}>
+                        {item.status === "published" ? "已發布" : "草稿"}
+                      </span>
+                    </TableCell>
+                  )}
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
       )}
     </div>
   );

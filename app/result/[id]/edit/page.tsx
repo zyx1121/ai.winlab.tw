@@ -1,6 +1,7 @@
 "use client";
 
 import { useAuth } from "@/components/auth-provider";
+import { ResultDetail, type PublisherInfo } from "@/components/result-detail";
 import { TiptapEditor } from "@/components/tiptap-editor";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,6 +12,8 @@ import { uploadResultImage } from "@/lib/upload-image";
 import {
   ArrowLeft,
   Check,
+  Eye,
+  EyeOff,
   ImagePlus,
   Loader2,
   Save,
@@ -19,6 +22,7 @@ import {
   Trash2,
 } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 
@@ -39,7 +43,10 @@ export default function ResultEditPage() {
   const [isPublishing, setIsPublishing] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
+  const [isPreview, setIsPreview] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const [publisherInfo, setPublisherInfo] = useState<PublisherInfo>(null);
 
   // Tags
   const [tagGroups, setTagGroups] = useState<TagWithChildren[]>([]);
@@ -62,6 +69,15 @@ export default function ResultEditPage() {
     const r = { ...data, type: (data as Result).type ?? "personal", team_id: (data as Result).team_id ?? null } as Result;
     setResult(r);
     setSavedResult(r);
+
+    // Fetch publisher info
+    if (r.type === "team" && r.team_id) {
+      const { data: teamData } = await supabase.from("teams").select("name").eq("id", r.team_id).single();
+      setPublisherInfo({ name: teamData?.name || "未知團隊", href: `/team/${r.team_id}` });
+    } else if (r.author_id) {
+      const { data: profileData } = await supabase.from("profiles").select("display_name").eq("id", r.author_id).single();
+      setPublisherInfo({ name: profileData?.display_name || "未知使用者", href: `/profile/${r.author_id}` });
+    }
 
     if (!user) { setCanEdit(false); }
     else if (isAdmin) { setCanEdit(true); }
@@ -173,6 +189,10 @@ export default function ResultEditPage() {
             返回列表
           </Button>
           <div className="flex gap-2">
+            <Button variant={isPreview ? "secondary" : "ghost"} size="sm" onClick={() => setIsPreview(v => !v)}>
+              {isPreview ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              {isPreview ? "編輯" : "預覽"}
+            </Button>
             <Button variant={hasChanges ? "outline" : "ghost"} onClick={handleSave} disabled={isSaving || !hasChanges}>
               {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : hasChanges ? <Save className="w-4 h-4" /> : <Check className="w-4 h-4 text-green-600" />}
               {hasChanges ? "儲存" : "已儲存"}
@@ -188,7 +208,7 @@ export default function ResultEditPage() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 gap-4">
+        {!isPreview && <div className="grid grid-cols-1 gap-4">
           {/* Cover image */}
           <div className="flex flex-col gap-1">
             <Label className="text-sm mx-2">封面圖片</Label>
@@ -262,10 +282,16 @@ export default function ResultEditPage() {
               </div>
             </div>
           )}
-        </div>
+        </div>}
       </div>
 
-      <TiptapEditor content={result.content} onChange={(content) => setResult({ ...result, content })} />
+      {isPreview ? (
+        <div className="py-12">
+          <ResultDetail result={result} publisherInfo={publisherInfo} />
+        </div>
+      ) : (
+        <TiptapEditor content={result.content} onChange={(content) => setResult({ ...result, content })} />
+      )}
     </div>
   );
 }

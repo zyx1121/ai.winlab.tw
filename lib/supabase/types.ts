@@ -71,7 +71,7 @@ export type OrganizationMember = {
   sort_order: number;
 };
 
-export type Competition = {
+export type Recruitment = {
   id: string;
   created_at: string;
   updated_at: string;

@@ -1,6 +1,6 @@
 import { HomeAnnouncement } from "@/components/home-announcement";
 import { HomeCarousel } from "@/components/home-carousel";
-import { HomeCompetition } from "@/components/home-competition";
+import { HomeRecruitment } from "@/components/home-recruitment";
 import { HomeContacts } from "@/components/home-contacts";
 import { HomeIntroduction } from "@/components/home-introduction";
 import { HomeOrganization } from "@/components/home-organization";
@@ -14,7 +14,7 @@ export default function Home() {
       <HomeOrganization />
       <HomeAnnouncement />
       <HomeResult />
-      <HomeCompetition />
+      <HomeRecruitment />
       <HomeContacts />
     </main>
   );

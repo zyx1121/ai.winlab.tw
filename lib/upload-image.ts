@@ -50,15 +50,15 @@ export async function uploadAnnouncementImage(
   return { url: publicUrl };
 }
 
-const COMPETITION_PREFIX = "competitions/";
+const RECRUITMENT_PREFIX = "recruitment/";
 const RESULT_PREFIX = "results/";
 const ORGANIZATION_PREFIX = "organization/";
 
 /**
- * Upload an image for competition card to Supabase Storage (same bucket, path: competitions/).
+ * Upload an image for recruitment card to Supabase Storage (same bucket, path: competitions/).
  * Returns the public URL of the uploaded file.
  */
-export async function uploadCompetitionImage(
+export async function uploadRecruitmentImage(
   file: File,
 ): Promise<{ url: string } | { error: string }> {
   if (!isImageFile(file)) {
@@ -70,7 +70,7 @@ export async function uploadCompetitionImage(
 
   const supabase = createClient();
   const ext = file.name.split(".").pop() || "jpg";
-  const path = `${COMPETITION_PREFIX}${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+  const path = `${RECRUITMENT_PREFIX}${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
 
   const { error } = await supabase.storage.from(BUCKET).upload(path, file, {
     cacheControl: "3600",

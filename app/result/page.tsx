@@ -16,6 +16,7 @@ import type { Result, ResultTag, ResultType, Tag, Team } from "@/lib/supabase/ty
 import { Loader2, Plus, User, Users } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { parseAsArrayOf, parseAsString, useQueryState } from "nuqs";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
@@ -32,7 +33,11 @@ export default function ResultPage() {
   const [results, setResults] = useState<ResultWithMeta[]>([]);
   const [resultTagMap, setResultTagMap] = useState<Record<string, string[]>>({}); // result_id → [tag_ids]
   const [allTags, setAllTags] = useState<Tag[]>([]);
-  const [selectedTagIds, setSelectedTagIds] = useState<Set<string>>(new Set());
+  const [tagIdsFromUrl, setTagIdsFromUrl] = useQueryState(
+    "tag",
+    parseAsArrayOf(parseAsString).withDefault([])
+  );
+  const selectedTagIds = useMemo(() => new Set(tagIdsFromUrl), [tagIdsFromUrl]);
   const [leaderTeams, setLeaderTeams] = useState<Team[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isCreating, setIsCreating] = useState(false);
@@ -113,17 +118,21 @@ export default function ResultPage() {
     return allTags.filter((t) => t.parent_id === parentId).map((t) => t.id);
   }, [allTags]);
 
-  const handleTagToggle = useCallback((tagId: string) => {
-    setSelectedTagIds((prev) => {
-      const next = new Set(prev);
-      if (next.has(tagId)) {
-        next.delete(tagId);
-      } else {
-        next.add(tagId);
-      }
-      return next;
-    });
-  }, []);
+  const handleTagToggle = useCallback(
+    (tagId: string) => {
+      setTagIdsFromUrl((prev) => {
+        const set = new Set(prev ?? []);
+        if (set.has(tagId)) set.delete(tagId);
+        else set.add(tagId);
+        return set.size ? Array.from(set) : null;
+      });
+    },
+    [setTagIdsFromUrl]
+  );
+
+  const handleClearTags = useCallback(() => {
+    setTagIdsFromUrl(null);
+  }, [setTagIdsFromUrl]);
 
   // Filter results based on selected tags
   const filteredResults = useMemo(() => {
@@ -210,7 +219,7 @@ export default function ResultPage() {
           <ResultTagSidebar
             selectedTagIds={selectedTagIds}
             onToggle={handleTagToggle}
-            onClear={() => setSelectedTagIds(new Set())}
+            onClear={handleClearTags}
             isAdmin={isAdmin}
           />
         </div>
@@ -222,7 +231,7 @@ export default function ResultPage() {
             <ResultTagSidebar
               selectedTagIds={selectedTagIds}
               onToggle={handleTagToggle}
-              onClear={() => setSelectedTagIds(new Set())}
+              onClear={handleClearTags}
               isAdmin={isAdmin}
             />
             <div className="mt-4 border-b" />
@@ -269,10 +278,10 @@ function ResultCard({ item, isExternalImage }: {
 }) {
   const publisherName = item.type === "team" ? item.team_name || "未知隊伍" : item.author_name || "匿名";
   return (
-    <Card className="py-0 h-full flex flex-col transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98]">
+    <Card className="py-0 h-full flex flex-col transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98] overflow-hidden">
       <div className="relative w-full aspect-video shrink-0">
         <Image src={item.header_image || "/placeholder.png"} alt={item.title} fill
-          className="object-cover rounded-t-lg" unoptimized={isExternalImage(item.header_image)} />
+          className="object-cover" unoptimized={isExternalImage(item.header_image)} />
       </div>
       <CardHeader className="shrink-0 pb-2">
         <CardTitle className="text-xl font-bold line-clamp-2">{item.title || "(無標題)"}</CardTitle>

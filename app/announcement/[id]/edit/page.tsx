@@ -1,5 +1,6 @@
 "use client";
 
+import { AnnouncementDetail } from "@/components/announcement-detail";
 import { useAuth } from "@/components/auth-provider";
 import { TiptapEditor } from "@/components/tiptap-editor";
 import { Button } from "@/components/ui/button";
@@ -7,9 +8,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { createClient } from "@/lib/supabase/client";
 import type { Announcement } from "@/lib/supabase/types";
-import { ArrowLeft, Check, Loader2, Save, Send, Trash2 } from "lucide-react";
+import TiptapImage from "@tiptap/extension-image";
+import { generateHTML } from "@tiptap/html";
+import StarterKit from "@tiptap/starter-kit";
+import { ArrowLeft, Check, Eye, EyeOff, Loader2, Save, Send, Trash2 } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 export default function AnnouncementEditPage() {
   const { user, isLoading: authLoading } = useAuth();
@@ -24,6 +28,7 @@ export default function AnnouncementEditPage() {
   const [isSaving, setIsSaving] = useState(false);
   const [isPublishing, setIsPublishing] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isPreview, setIsPreview] = useState(false);
 
   const hasChanges = announcement && savedAnnouncement
     ? announcement.title !== savedAnnouncement.title ||
@@ -59,6 +64,17 @@ export default function AnnouncementEditPage() {
       fetchAnnouncement();
     }
   }, [user, authLoading, fetchAnnouncement, router]);
+
+  const previewContentHtml = useMemo(
+    () =>
+      announcement?.content && Object.keys(announcement.content).length > 0
+        ? generateHTML(announcement.content, [
+            StarterKit,
+            TiptapImage.configure({ HTMLAttributes: { class: "rounded-lg max-w-full h-auto" } }),
+          ])
+        : "<p>（無內容）</p>",
+    [announcement?.content]
+  );
 
   const handleSave = async () => {
     if (!announcement) return;
@@ -130,7 +146,7 @@ export default function AnnouncementEditPage() {
 
   if (isLoading || authLoading) {
     return (
-      <div className="container max-w-4xl mx-auto p-4 flex justify-center items-center min-h-[50vh]">
+      <div className="max-w-6xl mx-auto px-4 py-12 flex justify-center items-center min-h-[50vh]">
         <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
       </div>
     );
@@ -141,7 +157,7 @@ export default function AnnouncementEditPage() {
   }
 
   return (
-    <div className="container max-w-6xl mx-auto p-4 flex flex-col mt-8 pb-16">
+    <div className="max-w-6xl mx-auto px-4 flex flex-col mt-8 pb-16">
 
       <div className="sticky top-16 z-20 bg-background/80 backdrop-blur-sm py-4 -mx-4 px-4 flex flex-col gap-4">
         <div className="flex items-center justify-between gap-4">
@@ -150,6 +166,10 @@ export default function AnnouncementEditPage() {
             返回列表
           </Button>
           <div className="flex gap-2">
+            <Button variant={isPreview ? "secondary" : "ghost"} size="sm" onClick={() => setIsPreview(v => !v)}>
+              {isPreview ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              {isPreview ? "編輯" : "預覽"}
+            </Button>
             <Button
               variant={hasChanges ? "outline" : "ghost"}
               onClick={handleSave}
@@ -191,7 +211,7 @@ export default function AnnouncementEditPage() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {!isPreview && <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="flex flex-col gap-1">
             <Label htmlFor="date" className="text-sm mx-2">公告日期</Label>
             <Input
@@ -225,15 +245,24 @@ export default function AnnouncementEditPage() {
               placeholder="請輸入公告標題"
             />
           </div>
-        </div>
+        </div>}
       </div>
 
-      <TiptapEditor
-        content={announcement.content}
-        onChange={(content) =>
-          setAnnouncement({ ...announcement, content })
-        }
-      />
+      {isPreview ? (
+        <div className="py-12">
+          <AnnouncementDetail
+            title={announcement.title}
+            date={announcement.date}
+            category={announcement.category}
+            contentHtml={previewContentHtml}
+          />
+        </div>
+      ) : (
+        <TiptapEditor
+          content={announcement.content}
+          onChange={(content) => setAnnouncement({ ...announcement, content })}
+        />
+      )}
     </div>
   );
 }

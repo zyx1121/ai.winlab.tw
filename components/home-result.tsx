@@ -100,13 +100,13 @@ export function HomeResult() {
 
             return (
               <Link href={`/result/${item.id}`} key={item.id} className="h-full">
-                <Card className="py-0 h-full flex flex-col transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98]">
+                <Card className="py-0 h-full flex flex-col transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98] overflow-hidden">
                   <div className="relative w-full aspect-video shrink-0">
                     <Image
                       src={item.header_image || "/placeholder.png"}
                       alt={item.title}
                       fill
-                      className="object-cover rounded-t-lg"
+                      className="object-cover"
                       unoptimized={isExternalImage(item.header_image)}
                     />
                   </div>

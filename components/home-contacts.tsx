@@ -12,11 +12,11 @@ export function HomeContacts() {
           <p className="text-lg font-semibold">陳心詠</p>
           <div className="flex items-center gap-3 text-background/80">
             <Phone className="w-4 h-4 shrink-0" />
-            <a href="tel:03-5131867" className="hover:text-background transition-colors">54832</a>
+            <a href="tel:03-5131867" className="hover:text-background transition-colors font-mono">54832</a>
           </div>
           <div className="flex items-center gap-3 text-background/80">
             <Mail className="w-4 h-4 shrink-0" />
-            <a href="mailto:hsinyungchen@nycu.edu.tw" className="hover:text-background transition-colors">
+            <a href="mailto:hsinyungchen@nycu.edu.tw" className="hover:text-background transition-colors font-mono">
               hsinyungchen@nycu.edu.tw
             </a>
           </div>

@@ -9,56 +9,56 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { createClient } from "@/lib/supabase/client";
-import type { Competition } from "@/lib/supabase/types";
+import type { Recruitment } from "@/lib/supabase/types";
 import { Loader2, Plus } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 
-export default function CompetitionPage() {
+export default function RecruitmentPage() {
   const { user, isAdmin } = useAuth();
   const router = useRouter();
   const supabase = createClient();
-  const [competitions, setCompetitions] = useState<Competition[]>([]);
+  const [recruitments, setRecruitments] = useState<Recruitment[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isCreating, setIsCreating] = useState(false);
 
-  const fetchCompetitions = useCallback(async () => {
+  const fetchRecruitments = useCallback(async () => {
     setIsLoading(true);
     const { data, error } = await supabase
       .from("competitions")
       .select("*")
       .order("date", { ascending: false });
-    if (error) console.error("Error fetching competitions:", error);
-    else setCompetitions(data || []);
+    if (error) console.error("Error fetching recruitments:", error);
+    else setRecruitments(data || []);
     setIsLoading(false);
   }, [supabase]);
 
   useEffect(() => {
-    fetchCompetitions();
-  }, [fetchCompetitions]);
+    fetchRecruitments();
+  }, [fetchRecruitments]);
 
-  const handleCreateCompetition = async () => {
+  const handleCreate = async () => {
     if (!user) return;
     setIsCreating(true);
     const { data, error } = await supabase
       .from("competitions")
-      .insert({ title: "新競賽", link: "", image: "/placeholder.png", date: new Date().toISOString().slice(0, 10), description: null })
+      .insert({ title: "新企業徵才", link: "", image: "/placeholder.png", date: new Date().toISOString().slice(0, 10), description: null })
       .select()
       .single();
     if (error) { setIsCreating(false); return; }
-    router.push(`/competition/${data.id}/edit`);
+    router.push(`/recruitment/${data.id}/edit`);
   };
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-12 flex flex-col gap-8">
       <div className="flex items-center justify-between gap-4">
-        <h1 className="text-3xl font-bold">競賽資訊</h1>
+        <h1 className="text-3xl font-bold">企業徵才</h1>
         {isAdmin && (
-          <Button variant="secondary" onClick={handleCreateCompetition} disabled={isCreating}>
+          <Button variant="secondary" onClick={handleCreate} disabled={isCreating}>
             {isCreating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
-            新增競賽
+            新增
           </Button>
         )}
       </div>
@@ -67,19 +67,19 @@ export default function CompetitionPage() {
         <div className="flex justify-center py-12">
           <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
         </div>
-      ) : competitions.length === 0 ? (
-        <div className="text-center py-12 text-muted-foreground">目前沒有競賽資訊</div>
+      ) : recruitments.length === 0 ? (
+        <div className="text-center py-12 text-muted-foreground">目前沒有企業徵才資訊</div>
       ) : (
         <div className="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-6">
-          {competitions.map((item) => {
+          {recruitments.map((item) => {
             const card = (
-              <Card className="py-0 h-full flex flex-col transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98]">
+              <Card className="py-0 h-full flex flex-col transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98] overflow-hidden">
                 <div className="relative w-full aspect-video">
                   <Image
                     src={item.image || "/placeholder.png"}
                     alt={item.title}
                     fill
-                    className="object-cover rounded-t-lg"
+                    className="object-cover"
                     unoptimized={!!(item.image && (item.image.startsWith("http://") || item.image.startsWith("https://")))}
                   />
                 </div>
@@ -95,7 +95,7 @@ export default function CompetitionPage() {
 
             return isAdmin ? (
               <button type="button" key={item.id} className="text-left w-full"
-                onClick={() => router.push(`/competition/${item.id}/edit`)}>
+                onClick={() => router.push(`/recruitment/${item.id}/edit`)}>
                 {card}
               </button>
             ) : (

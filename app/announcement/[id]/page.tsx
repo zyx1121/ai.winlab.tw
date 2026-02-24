@@ -1,3 +1,4 @@
+import { AnnouncementDetail } from "@/components/announcement-detail";
 import { createClient } from "@/lib/supabase/server";
 import Image from "@tiptap/extension-image";
 import { generateHTML } from "@tiptap/html";
@@ -41,19 +42,12 @@ export default async function AnnouncementDetailPage({
         返回列表
       </Link>
 
-      <div className="max-w-3xl">
-        <div className="flex items-center gap-3 text-sm text-muted-foreground mb-4">
-          <span>{announcement.date}</span>
-          <span className="px-2 py-0.5 bg-muted rounded text-xs font-medium">{announcement.category}</span>
-        </div>
-        <h1 className="text-4xl font-extrabold tracking-tight text-balance mb-8">
-          {announcement.title}
-        </h1>
-        <div
-          className="prose prose-sm sm:prose-base max-w-none"
-          dangerouslySetInnerHTML={{ __html: contentHtml }}
-        />
-      </div>
+      <AnnouncementDetail
+        title={announcement.title}
+        date={announcement.date}
+        category={announcement.category}
+        contentHtml={contentHtml}
+      />
     </div>
   );
 }

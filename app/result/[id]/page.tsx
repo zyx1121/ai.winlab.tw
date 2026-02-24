@@ -1,9 +1,7 @@
+import { ResultDetail, type PublisherInfo } from "@/components/result-detail";
 import { createClient } from "@/lib/supabase/server";
-import Image from "@tiptap/extension-image";
-import { generateHTML } from "@tiptap/html";
-import StarterKit from "@tiptap/starter-kit";
+import type { Result } from "@/lib/supabase/types";
 import { ArrowLeft } from "lucide-react";
-import ImageNext from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
@@ -15,26 +13,25 @@ export default async function ResultDetailPage({
   const { id } = await params;
   const supabase = await createClient();
 
-  const { data: result, error } = await supabase
+  const { data, error } = await supabase
     .from("results")
     .select("*")
     .eq("id", id)
     .eq("status", "published")
     .single();
 
-  if (error || !result) notFound();
+  if (error || !data) notFound();
 
-  const contentHtml =
-    result.content && Object.keys(result.content).length > 0
-      ? generateHTML(result.content, [
-          StarterKit,
-          Image.configure({ HTMLAttributes: { class: "rounded-lg max-w-full h-auto" } }),
-        ])
-      : "<p>（無內容）</p>";
+  const result = data as Result;
 
-  const isExternalImage =
-    result.header_image &&
-    (result.header_image.startsWith("http://") || result.header_image.startsWith("https://"));
+  let publisherInfo: PublisherInfo = null;
+  if (result.type === "team" && result.team_id) {
+    const { data: team } = await supabase.from("teams").select("name").eq("id", result.team_id).single();
+    if (team) publisherInfo = { name: team.name, href: `/team/${result.team_id}` };
+  } else if (result.author_id) {
+    const { data: profile } = await supabase.from("profiles").select("display_name").eq("id", result.author_id).single();
+    if (profile) publisherInfo = { name: profile.display_name || "未知使用者", href: `/profile/${result.author_id}` };
+  }
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-12">
@@ -46,27 +43,7 @@ export default async function ResultDetailPage({
         返回列表
       </Link>
 
-      <div className="relative w-full aspect-video rounded-xl overflow-hidden bg-muted mb-10">
-        <ImageNext
-          src={result.header_image || "/placeholder.png"}
-          alt={result.title}
-          fill
-          className="object-cover"
-          unoptimized={!!isExternalImage}
-          priority
-        />
-      </div>
-
-      <div className="max-w-3xl">
-        <p className="text-sm text-muted-foreground mb-4">{result.date}</p>
-        <h1 className="text-4xl font-extrabold tracking-tight text-balance mb-8">
-          {result.title}
-        </h1>
-        <div
-          className="prose prose-sm sm:prose-base max-w-none"
-          dangerouslySetInnerHTML={{ __html: contentHtml }}
-        />
-      </div>
+      <ResultDetail result={result} publisherInfo={publisherInfo} />
     </div>
   );
 }
