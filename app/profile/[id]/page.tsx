@@ -118,7 +118,7 @@ export default async function ProfilePage({
                 <div>
                   <dt className="text-sm font-medium text-muted-foreground">社群連結</dt>
                   <dd className="mt-0.5 flex flex-col gap-1">
-                    {socialLinks.map((url, i) => (
+                    {socialLinks.map((url: string, i: number) => (
                       <a
                         key={i}
                         href={url}

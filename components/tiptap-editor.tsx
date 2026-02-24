@@ -134,9 +134,12 @@ export function TiptapEditor({
   }
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4 pb-24 md:pb-32">
       {editable && (
-        <div className="flex flex-wrap gap-1 p-2 sticky top-52 z-10 bg-background/80 backdrop-blur-sm border rounded-lg">
+        <div className="fixed inset-x-0 bottom-0 z-30 pointer-events-none">
+          <div className="max-w-6xl mx-auto px-4 pb-4">
+            <div className="pointer-events-auto flex flex-wrap gap-1 p-2 bg-background/80 backdrop-blur-sm border rounded-lg shadow-sm">
+          
           <Button
             type="button"
             variant="ghost"
@@ -275,6 +278,8 @@ export function TiptapEditor({
           >
             <Redo className="w-4 h-4" />
           </Button>
+            </div>
+          </div>
         </div>
       )}
       <EditorContent editor={editor} />

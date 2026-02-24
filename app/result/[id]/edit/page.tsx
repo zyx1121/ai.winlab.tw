@@ -181,8 +181,8 @@ export default function ResultEditPage() {
 
   return (
     <div className="container max-w-6xl mx-auto p-4 flex flex-col mt-8 pb-16">
-      {/* Sticky toolbar */}
-      <div className="sticky top-16 z-20 bg-background/80 backdrop-blur-sm py-4 -mx-4 px-4 flex flex-col gap-4">
+      {/* Sticky toolbar：只固定上方操作列，內容與屬性一起滾動 */}
+      <div className="sticky top-16 z-20 bg-background/80 backdrop-blur-sm py-4 -mx-4 px-4">
         <div className="flex items-center justify-between gap-4">
           <Button variant="ghost" size="sm" onClick={() => router.push("/result")}>
             <ArrowLeft className="w-4 h-4" />
@@ -207,8 +207,10 @@ export default function ResultEditPage() {
             </Button>
           </div>
         </div>
+      </div>
 
-        {!isPreview && <div className="grid grid-cols-1 gap-4">
+      {!isPreview && (
+        <div className="mt-6 grid grid-cols-1 gap-4">
           {/* Cover image */}
           <div className="flex flex-col gap-1">
             <Label className="text-sm mx-2">封面圖片</Label>
@@ -282,8 +284,8 @@ export default function ResultEditPage() {
               </div>
             </div>
           )}
-        </div>}
-      </div>
+        </div>
+      )}
 
       {isPreview ? (
         <div className="py-12">
