@@ -13,7 +13,7 @@ function Card({ className, style, ...props }: React.ComponentProps<"div">) {
       cornerSmoothing={0.8}
       className={cn(
         "bg-card text-card-foreground flex flex-col gap-6 py-6",
-        "rounded-[20px] border border-border drop-shadow-sm",
+        "rounded-[20px] border border-border",
         className
       )}
       style={style}
