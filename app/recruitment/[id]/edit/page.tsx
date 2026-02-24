@@ -130,7 +130,7 @@ export default function RecruitmentEditPage() {
 
   if (isLoading || authLoading) {
     return (
-      <div className="container max-w-4xl mx-auto p-4 flex justify-center items-center min-h-[50vh]">
+      <div className="max-w-6xl mx-auto px-4 py-12 flex justify-center items-center min-h-[50vh]">
         <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
       </div>
     );
@@ -141,7 +141,7 @@ export default function RecruitmentEditPage() {
   }
 
   return (
-    <div className="container max-w-2xl mx-auto p-4 flex flex-col mt-8 pb-16">
+    <div className="max-w-6xl mx-auto px-4 flex flex-col mt-8 pb-16">
       <div className="sticky top-16 z-20 bg-background/80 backdrop-blur-sm py-4 -mx-4 px-4 flex flex-col gap-4">
         <div className="flex items-center justify-between gap-4">
           <Button

@@ -1,7 +1,13 @@
-import { ResultDetail, type PublisherInfo } from "@/components/result-detail";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { createClient } from "@/lib/supabase/server";
-import type { Result } from "@/lib/supabase/types";
-import { ArrowLeft, User } from "lucide-react";
+import type { Result, Team } from "@/lib/supabase/types";
+import { ArrowLeft, Link2, Mail, Phone, User, Users } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
@@ -13,16 +19,35 @@ export default async function ProfilePage({
   const { id } = await params;
   const supabase = await createClient();
 
-  const [profileRes, resultsRes] = await Promise.all([
-    supabase.from("profiles").select("id, display_name, avatar_url").eq("id", id).single(),
-    supabase.from("results").select("*").eq("author_id", id).eq("status", "published").eq("type", "personal").order("date", { ascending: false }),
+  const [profileRes, resultsRes, membersRes] = await Promise.all([
+    supabase
+      .from("profiles")
+      .select("id, display_name, avatar_url, phone, social_links")
+      .eq("id", id)
+      .single(),
+    supabase
+      .from("results")
+      .select("*")
+      .eq("author_id", id)
+      .eq("status", "published")
+      .eq("type", "personal")
+      .order("date", { ascending: false }),
+    supabase.from("team_members").select("team_id").eq("user_id", id),
   ]);
 
   if (profileRes.error || !profileRes.data) notFound();
 
   const profile = profileRes.data;
   const results = (resultsRes.data as Result[]) || [];
-  const publisherInfo: PublisherInfo = { name: profile.display_name || "未知使用者", href: null };
+  const teamIds = (membersRes.data || []).map((m) => m.team_id);
+  let teams: Team[] = [];
+  if (teamIds.length > 0) {
+    const { data } = await supabase.from("teams").select("*").in("id", teamIds);
+    teams = (data as Team[]) || [];
+  }
+
+  const displayName = profile.display_name || "未知使用者";
+  const socialLinks = profile.social_links || [];
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-12">
@@ -35,24 +60,104 @@ export default async function ProfilePage({
       </Link>
 
       {/* Profile header */}
-      <div className="flex items-center gap-4 mb-10">
-        <div className="w-14 h-14 rounded-full bg-muted flex items-center justify-center shrink-0 overflow-hidden">
+      <div className="flex items-center gap-4 mb-8">
+        <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center shrink-0 overflow-hidden">
           {profile.avatar_url ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={profile.avatar_url} alt={profile.display_name || ""} className="w-full h-full object-cover" />
+            <img
+              src={profile.avatar_url}
+              alt={displayName}
+              className="w-full h-full object-cover"
+            />
           ) : (
-            <User className="w-6 h-6 text-muted-foreground" />
+            <User className="w-8 h-8 text-muted-foreground" />
           )}
         </div>
         <div>
-          <h1 className="text-2xl font-bold">{profile.display_name || "未知使用者"}</h1>
-          <p className="text-sm text-muted-foreground mt-0.5">{results.length} 篇成果</p>
+          <h1 className="text-2xl font-bold">{displayName}</h1>
+          <p className="text-sm text-muted-foreground mt-0.5">
+            {results.length} 篇個人成果 · {teams.length} 個隊伍
+          </p>
         </div>
       </div>
 
-      <hr className="mb-10" />
+      {/* Profile details */}
+      <Card className="mb-10">
+        <CardHeader>
+          <CardTitle>個人資訊</CardTitle>
+          <CardDescription>姓名、聯絡方式與所屬隊伍</CardDescription>
+        </CardHeader>
+        <CardContent className="flex flex-col gap-4">
+          <dl className="grid gap-4 sm:grid-cols-1">
+            <div className="flex items-start gap-3">
+              <User className="w-4 h-4 shrink-0 mt-0.5 text-muted-foreground" />
+              <div>
+                <dt className="text-sm font-medium text-muted-foreground">姓名</dt>
+                <dd className="mt-0.5">{displayName}</dd>
+              </div>
+            </div>
+            <div className="flex items-start gap-3">
+              <Mail className="w-4 h-4 shrink-0 mt-0.5 text-muted-foreground" />
+              <div>
+                <dt className="text-sm font-medium text-muted-foreground">電子信箱</dt>
+                <dd className="mt-0.5 text-muted-foreground">未公開</dd>
+              </div>
+            </div>
+            {(profile.phone ?? "").trim() !== "" && (
+              <div className="flex items-start gap-3">
+                <Phone className="w-4 h-4 shrink-0 mt-0.5 text-muted-foreground" />
+                <div>
+                  <dt className="text-sm font-medium text-muted-foreground">手機</dt>
+                  <dd className="mt-0.5">{profile.phone}</dd>
+                </div>
+              </div>
+            )}
+            {socialLinks.length > 0 && (
+              <div className="flex items-start gap-3">
+                <Link2 className="w-4 h-4 shrink-0 mt-0.5 text-muted-foreground" />
+                <div>
+                  <dt className="text-sm font-medium text-muted-foreground">社群連結</dt>
+                  <dd className="mt-0.5 flex flex-col gap-1">
+                    {socialLinks.map((url, i) => (
+                      <a
+                        key={i}
+                        href={url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-primary underline underline-offset-2 break-all hover:opacity-80"
+                      >
+                        {url}
+                      </a>
+                    ))}
+                  </dd>
+                </div>
+              </div>
+            )}
+            {teams.length > 0 && (
+              <div className="flex items-start gap-3">
+                <Users className="w-4 h-4 shrink-0 mt-0.5 text-muted-foreground" />
+                <div>
+                  <dt className="text-sm font-medium text-muted-foreground">隊伍</dt>
+                  <dd className="mt-0.5 flex flex-wrap gap-2">
+                    {teams.map((t) => (
+                      <Link
+                        key={t.id}
+                        href={`/team/${t.id}`}
+                        className="inline-flex items-center rounded-md bg-muted px-2.5 py-1 text-sm font-medium hover:bg-muted/80 transition-colors"
+                      >
+                        {t.name}
+                      </Link>
+                    ))}
+                  </dd>
+                </div>
+              </div>
+            )}
+          </dl>
+        </CardContent>
+      </Card>
 
       {/* Results list */}
+      <h2 className="text-lg font-semibold mb-4">個人成果</h2>
       {results.length === 0 ? (
         <p className="text-muted-foreground">尚無已發布的成果。</p>
       ) : (
@@ -64,9 +169,13 @@ export default async function ProfilePage({
               className="py-6 group flex flex-col gap-1 hover:bg-muted/30 -mx-4 px-4 transition-colors rounded-lg"
             >
               <p className="text-sm text-muted-foreground">{result.date}</p>
-              <h2 className="text-xl font-semibold group-hover:underline underline-offset-2">{result.title}</h2>
+              <h3 className="text-xl font-semibold group-hover:underline underline-offset-2">
+                {result.title}
+              </h3>
               {result.summary && (
-                <p className="text-sm text-muted-foreground line-clamp-2 mt-0.5">{result.summary}</p>
+                <p className="text-sm text-muted-foreground line-clamp-2 mt-0.5">
+                  {result.summary}
+                </p>
               )}
             </Link>
           ))}

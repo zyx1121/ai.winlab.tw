@@ -20,7 +20,7 @@ import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 
 const CATEGORIES: { value: OrganizationMemberCategory; label: string }[] = [
-  { value: "ai_newcomer", label: "AI新秀" },
+  { value: "ai_newcomer", label: "AI 新秀" },
   { value: "industry_academy", label: "產學聯盟" },
   { value: "alumni", label: "校友" },
 ];
