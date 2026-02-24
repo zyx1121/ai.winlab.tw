@@ -106,7 +106,7 @@ export default function RecruitmentEditPage() {
     setRecruitment({ ...recruitment, positions: pos });
   };
   const addPosition = () => setPositions([...positions, { name: "", count: 1, location: null }]);
-  const updatePosition = (idx: number, field: keyof RecruitmentPosition, value: string | number) =>
+  const updatePosition = (idx: number, field: keyof RecruitmentPosition, value: string | number | null) =>
     setPositions(positions.map((p, i) => i === idx ? { ...p, [field]: value } : p));
   const removePosition = (idx: number) => setPositions(positions.filter((_, i) => i !== idx));
 
