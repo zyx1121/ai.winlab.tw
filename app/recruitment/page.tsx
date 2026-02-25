@@ -1,17 +1,11 @@
 "use client";
 
 import { useAuth } from "@/components/auth-provider";
+import { RecruitmentCard } from "@/components/recruitment-card";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { createClient } from "@/lib/supabase/client";
 import type { Recruitment } from "@/lib/supabase/types";
-import { Loader2, ArrowUpRight, Plus } from "lucide-react";
-import Image from "next/image";
+import { Loader2, Plus } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
@@ -71,52 +65,18 @@ export default function RecruitmentPage() {
         <div className="text-center py-12 text-muted-foreground">目前沒有企業徵才資訊</div>
       ) : (
         <div className="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-6">
-          {recruitments.map((item) => {
-            const card = (
-              <Card className="py-0 h-full flex flex-col transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98] overflow-hidden">
-                <div className="relative w-full aspect-video">
-                  <Image
-                    src={item.image || "/placeholder.png"}
-                    alt={item.title}
-                    fill
-                    className="object-cover"
-                    unoptimized={!!(item.image && (item.image.startsWith("http://") || item.image.startsWith("https://")))}
-                  />
-                  <div className="absolute top-2 right-2 rounded-full bg-black/50 p-1.5 text-white pointer-events-none" aria-hidden>
-                    <ArrowUpRight className="w-4 h-4" />
-                  </div>
-                </div>
-                <CardHeader className="pb-4 flex-1 flex flex-col gap-2">
-                  <CardTitle className="text-xl font-bold">{item.title || "(無標題)"}</CardTitle>
-                  {item.description && (
-                    <p className="text-sm text-muted-foreground line-clamp-2">{item.description}</p>
-                  )}
-                  {item.positions && item.positions.length > 0 && (
-                    <div className="flex flex-wrap gap-1.5 mt-1">
-                      {item.positions.map((pos, i) => (
-                        <span key={i} className="inline-flex items-center gap-1 rounded-full border px-3 py-1 text-sm font-medium">
-                          {pos.name}
-                          {pos.location && <span className="text-muted-foreground">· {pos.location}</span>}
-                          <span className="text-muted-foreground">× {pos.count}</span>
-                        </span>
-                      ))}
-                    </div>
-                  )}
-                </CardHeader>
-              </Card>
-            );
-
-            return isAdmin ? (
-              <button type="button" key={item.id} className="text-left w-full"
+          {recruitments.map((item) =>
+            isAdmin ? (
+              <div key={item.id} className="cursor-pointer h-full"
                 onClick={() => router.push(`/recruitment/${item.id}/edit`)}>
-                {card}
-              </button>
+                <RecruitmentCard item={item} />
+              </div>
             ) : (
-              <Link href={item.link || "#"} key={item.id} target="_blank" rel="noopener noreferrer">
-                {card}
+              <Link href={item.link || "#"} key={item.id} className="h-full" target="_blank" rel="noopener noreferrer">
+                <RecruitmentCard item={item} />
               </Link>
-            );
-          })}
+            )
+          )}
         </div>
       )}
     </div>
