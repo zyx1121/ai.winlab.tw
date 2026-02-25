@@ -1,14 +1,7 @@
 "use client";
 
+import { AnnouncementTable } from "@/components/announcement-table";
 import { Button } from "@/components/ui/button";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { createClient } from "@/lib/supabase/client";
 import type { Announcement } from "@/lib/supabase/types";
 import { Loader2 } from "lucide-react";
@@ -50,36 +43,12 @@ export function HomeAnnouncement() {
           <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
         </div>
       ) : announcements.length === 0 ? (
-        <div className="text-center py-8 text-muted-foreground">
-          目前沒有公告
-        </div>
+        <div className="text-center py-8 text-muted-foreground">目前沒有公告</div>
       ) : (
-        <div className="rounded-xl border border-border overflow-hidden">
-          <Table>
-            <TableHeader>
-              <TableRow className="bg-muted h-12">
-                <TableHead className="text-base font-bold">公告日期</TableHead>
-                <TableHead className="text-base font-bold">類別</TableHead>
-                <TableHead className="text-base font-bold">標題</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {announcements.map((item) => (
-                <TableRow
-                  key={item.id}
-                  className="cursor-pointer h-12 transition-colors hover:bg-muted/60"
-                  onClick={() => router.push(`/announcement/${item.id}`)}
-                >
-                  <TableCell className="text-base">{item.date}</TableCell>
-                  <TableCell className="text-base">{item.category}</TableCell>
-                  <TableCell className="text-base">
-                    {item.title || "(無標題)"}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
+        <AnnouncementTable
+          announcements={announcements}
+          onRowClick={(item) => router.push(`/announcement/${item.id}`)}
+        />
       )}
       <div className="flex justify-center">
         <Link href="/announcement">

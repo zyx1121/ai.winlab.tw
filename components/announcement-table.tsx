@@ -1,0 +1,76 @@
+"use client";
+
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import type { Announcement } from "@/lib/supabase/types";
+
+export function AnnouncementTable({
+  announcements,
+  onRowClick,
+  showStatus = false,
+}: {
+  announcements: Announcement[];
+  onRowClick: (item: Announcement) => void;
+  showStatus?: boolean;
+}) {
+  return (
+    <div className="rounded-xl border border-border overflow-hidden">
+      <Table>
+        <TableHeader>
+          <TableRow className="bg-muted h-12">
+            <TableHead
+              className="text-base font-bold"
+              style={{ paddingLeft: "1.25rem" }}
+            >
+              公告日期
+            </TableHead>
+            <TableHead className="text-base font-bold">類別</TableHead>
+            <TableHead className="text-base font-bold whitespace-normal">標題</TableHead>
+            {showStatus && (
+              <TableHead className="text-base font-bold">狀態</TableHead>
+            )}
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {announcements.map((item) => (
+            <TableRow
+              key={item.id}
+              className="cursor-pointer h-12 hover:bg-muted/60 transition-colors"
+              onClick={() => onRowClick(item)}
+            >
+              <TableCell
+                className="text-base"
+                style={{ paddingLeft: "1.25rem" }}
+              >
+                {item.date}
+              </TableCell>
+              <TableCell className="text-base">{item.category}</TableCell>
+              <TableCell className="text-base whitespace-normal">
+                {item.title || "(無標題)"}
+              </TableCell>
+              {showStatus && (
+                <TableCell className="text-base">
+                  <span
+                    className={
+                      item.status === "published"
+                        ? "text-green-600"
+                        : "text-yellow-600"
+                    }
+                  >
+                    {item.status === "published" ? "已發布" : "草稿"}
+                  </span>
+                </TableCell>
+              )}
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </div>
+  );
+}

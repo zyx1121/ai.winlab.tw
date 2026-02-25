@@ -1,15 +1,8 @@
 "use client";
 
 import { useAuth } from "@/components/auth-provider";
+import { AnnouncementTable } from "@/components/announcement-table";
 import { Button } from "@/components/ui/button";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { createClient } from "@/lib/supabase/client";
 import type { Announcement } from "@/lib/supabase/types";
 import { Loader2, Plus } from "lucide-react";
@@ -74,42 +67,13 @@ export default function AnnouncementPage() {
       ) : announcements.length === 0 ? (
         <div className="text-center py-12 text-muted-foreground">目前沒有公告</div>
       ) : (
-        <div className="rounded-xl border border-border overflow-hidden">
-          <Table>
-            <TableHeader>
-              <TableRow className="bg-muted h-12">
-                <TableHead className="text-base font-bold" style={{ paddingLeft: "1.25rem" }}>公告日期</TableHead>
-                <TableHead className="text-base font-bold">類別</TableHead>
-                <TableHead className="text-base font-bold whitespace-normal">標題</TableHead>
-                {user && <TableHead className="text-base font-bold">狀態</TableHead>}
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {announcements.map((item) => (
-                <TableRow
-                  key={item.id}
-                  className="cursor-pointer h-12 hover:bg-muted/60 transition-colors"
-                  onClick={() =>
-                    router.push(
-                      isAdmin ? `/announcement/${item.id}/edit` : `/announcement/${item.id}`,
-                    )
-                  }
-                >
-                  <TableCell className="text-base" style={{ paddingLeft: "1.25rem" }}>{item.date}</TableCell>
-                  <TableCell className="text-base">{item.category}</TableCell>
-                  <TableCell className="text-base whitespace-normal">{item.title || "(無標題)"}</TableCell>
-                  {isAdmin && (
-                    <TableCell className="text-base">
-                      <span className={item.status === "published" ? "text-green-600" : "text-yellow-600"}>
-                        {item.status === "published" ? "已發布" : "草稿"}
-                      </span>
-                    </TableCell>
-                  )}
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
+        <AnnouncementTable
+          announcements={announcements}
+          showStatus={!!user}
+          onRowClick={(item) =>
+            router.push(isAdmin ? `/announcement/${item.id}/edit` : `/announcement/${item.id}`)
+          }
+        />
       )}
     </div>
   );
