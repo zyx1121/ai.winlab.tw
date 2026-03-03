@@ -5,7 +5,7 @@ import { Header } from "@/components/header";
 import { SquircleNoScript } from "@squircle-js/react";
 import type { Metadata } from "next";
 import { ThemeProvider } from "next-themes";
-import { Instrument_Serif, Noto_Sans, Noto_Sans_Mono } from "next/font/google";
+import { Noto_Sans, Noto_Sans_Mono } from "next/font/google";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 
 const notoSans = Noto_Sans({
@@ -16,12 +16,6 @@ const notoSans = Noto_Sans({
 const notoSansMono = Noto_Sans_Mono({
   variable: "--font-noto-sans-mono",
   subsets: ["latin"],
-});
-
-const instrumentSerif = Instrument_Serif({
-  variable: "--font-instrument-serif",
-  subsets: ["latin"],
-  weight: "400",
 });
 
 export const metadata: Metadata = {
@@ -36,7 +30,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="zh-TW" suppressHydrationWarning>
-      <body className={`${notoSans.variable} ${notoSansMono.variable} ${instrumentSerif.variable} antialiased`}>
+      <body className={`${notoSans.variable} ${notoSansMono.variable} antialiased`}>
         <SquircleNoScript />
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
           <NuqsAdapter>

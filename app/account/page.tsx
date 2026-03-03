@@ -4,6 +4,7 @@ import { useAuth } from "@/components/auth-provider";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Card,
   CardContent,
@@ -14,7 +15,18 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { createClient } from "@/lib/supabase/client";
 import type { Result } from "@/lib/supabase/types";
-import { Loader2, Plus, Trash2, Trophy, Link2 } from "lucide-react";
+import {
+  FileText,
+  Github,
+  Globe,
+  Linkedin,
+  Loader2,
+  Plus,
+  Trash2,
+  Trophy,
+  Link2,
+  Facebook,
+} from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -28,6 +40,12 @@ export default function AccountPage() {
   // Profile fields
   const [displayName, setDisplayName] = useState("");
   const [phone, setPhone] = useState("");
+  const [bio, setBio] = useState("");
+  const [linkedin, setLinkedin] = useState("");
+  const [facebook, setFacebook] = useState("");
+  const [github, setGithub] = useState("");
+  const [website, setWebsite] = useState("");
+  const [resume, setResume] = useState("");
   const [socialLinks, setSocialLinks] = useState<string[]>([]);
   const [isSaving, setIsSaving] = useState(false);
 
@@ -45,6 +63,12 @@ export default function AccountPage() {
     if (profile) {
       setDisplayName(profile.display_name ?? "");
       setPhone(profile.phone ?? "");
+      setBio(profile.bio ?? "");
+      setLinkedin(profile.linkedin ?? "");
+      setFacebook(profile.facebook ?? "");
+      setGithub(profile.github ?? "");
+      setWebsite(profile.website ?? "");
+      setResume(profile.resume ?? "");
       setSocialLinks(profile.social_links ?? []);
     }
   }, [profile]);
@@ -76,6 +100,12 @@ export default function AccountPage() {
       .update({
         display_name: displayName || null,
         phone: phone || null,
+        bio: bio || null,
+        linkedin: linkedin || null,
+        facebook: facebook || null,
+        github: github || null,
+        website: website || null,
+        resume: resume || null,
         social_links: socialLinks.filter((l) => l.trim() !== ""),
       })
       .eq("id", user.id);
@@ -135,13 +165,79 @@ export default function AccountPage() {
             </div>
           </div>
 
+          <div className="grid gap-2">
+            <Label>自我介紹</Label>
+            <Textarea
+              value={bio}
+              onChange={(e) => setBio(e.target.value)}
+              placeholder="簡單介紹一下自己..."
+              rows={3}
+              className="resize-none"
+            />
+          </div>
+
           <Separator />
 
+          {/* Structured social links */}
+          <div className="grid gap-3">
+            <Label>社群連結</Label>
+            <div className="grid sm:grid-cols-2 gap-3">
+              <div className="flex items-center gap-2">
+                <Linkedin className="w-4 h-4 shrink-0 text-muted-foreground" />
+                <Input
+                  value={linkedin}
+                  onChange={(e) => setLinkedin(e.target.value)}
+                  placeholder="LinkedIn 個人頁網址"
+                  type="url"
+                />
+              </div>
+              <div className="flex items-center gap-2">
+                <Facebook className="w-4 h-4 shrink-0 text-muted-foreground" />
+                <Input
+                  value={facebook}
+                  onChange={(e) => setFacebook(e.target.value)}
+                  placeholder="Facebook 個人頁網址"
+                  type="url"
+                />
+              </div>
+              <div className="flex items-center gap-2">
+                <Github className="w-4 h-4 shrink-0 text-muted-foreground" />
+                <Input
+                  value={github}
+                  onChange={(e) => setGithub(e.target.value)}
+                  placeholder="GitHub 個人頁網址"
+                  type="url"
+                />
+              </div>
+              <div className="flex items-center gap-2">
+                <Globe className="w-4 h-4 shrink-0 text-muted-foreground" />
+                <Input
+                  value={website}
+                  onChange={(e) => setWebsite(e.target.value)}
+                  placeholder="個人網站網址"
+                  type="url"
+                />
+              </div>
+              <div className="flex items-center gap-2">
+                <FileText className="w-4 h-4 shrink-0 text-muted-foreground" />
+                <Input
+                  value={resume}
+                  onChange={(e) => setResume(e.target.value)}
+                  placeholder="履歷連結（Google Drive、PDF 等）"
+                  type="url"
+                />
+              </div>
+            </div>
+          </div>
+
+          <Separator />
+
+          {/* Extra links */}
           <div className="grid gap-2">
             <div className="flex items-center justify-between">
               <Label className="flex items-center gap-1.5">
                 <Link2 className="w-4 h-4" />
-                社群連結
+                額外連結
               </Label>
               <Button
                 type="button"
@@ -154,7 +250,7 @@ export default function AccountPage() {
               </Button>
             </div>
             {socialLinks.length === 0 && (
-              <p className="text-sm text-muted-foreground">尚未新增社群連結</p>
+              <p className="text-sm text-muted-foreground">尚未新增額外連結</p>
             )}
             {socialLinks.map((link, idx) => (
               <div key={idx} className="flex gap-2">
@@ -183,14 +279,6 @@ export default function AccountPage() {
           </Button>
         </CardContent>
       </Card>
-
-      {/* TODO: 隊伍功能暫時隱藏 */}
-      {/* Pending invitations */}
-      {/* {invitations.length > 0 && ( ... )} */}
-
-      {/* TODO: 隊伍功能暫時隱藏 */}
-      {/* Teams */}
-      {/* <Card> ... 我的隊伍 ... </Card> */}
 
       {/* Results */}
       <Card>

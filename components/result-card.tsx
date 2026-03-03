@@ -11,8 +11,6 @@ import type { Result } from "@/lib/supabase/types";
 import { Pin, User, Users } from "lucide-react";
 import Image from "next/image";
 
-const instrumentSerif = { fontFamily: "var(--font-instrument-serif)" };
-
 export type ResultWithMeta = Result & {
   author_name?: string | null;
   team_name?: string | null;
@@ -48,11 +46,10 @@ export function ResultCard({
             type="button"
             aria-label={item.pinned ? "取消釘選" : "釘選"}
             onClick={(e) => { e.stopPropagation(); onPinToggle?.(item.id, !item.pinned); }}
-            className={`absolute top-2 right-2 rounded-full p-1.5 transition-opacity duration-150 text-white ${
-              item.pinned
-                ? "bg-black/50 opacity-100"
-                : "bg-black/50 opacity-40 hover:opacity-80"
-            }`}
+            className={`absolute top-2 right-2 rounded-full p-1.5 transition-opacity duration-150 text-white ${item.pinned
+              ? "bg-black/50 opacity-100"
+              : "bg-black/50 opacity-40 hover:opacity-80"
+              }`}
           >
             <Pin className="w-4 h-4" fill={item.pinned ? "currentColor" : "none"} />
           </button>
@@ -83,9 +80,9 @@ export function ResultCard({
             ) : (
               <User className="w-3.5 h-3.5 shrink-0" />
             )}
-            <span className="truncate" style={instrumentSerif}>{publisherName}</span>
+            <span className="truncate">{publisherName}</span>
           </div>
-          <span className="shrink-0" style={instrumentSerif}>{item.date || "—"}</span>
+          <span className="shrink-0">{item.date || "—"}</span>
         </div>
       </CardFooter>
     </Card>

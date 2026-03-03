@@ -10,8 +10,6 @@ type Props = {
   contentHtml: string;
 };
 
-const instrumentSerifStyle = { fontFamily: "var(--font-instrument-serif)" };
-
 export function AnnouncementDetail({ title, date, category, contentHtml }: Props) {
   return (
     <>
@@ -21,7 +19,6 @@ export function AnnouncementDetail({ title, date, category, contentHtml }: Props
         </h1>
         <div
           className="flex items-center gap-2 text-base text-muted-foreground flex-wrap"
-          style={instrumentSerifStyle}
         >
           <span>{date}</span>
           <span className="opacity-30" aria-hidden>

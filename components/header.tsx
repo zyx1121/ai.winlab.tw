@@ -1,7 +1,6 @@
 "use client";
 
 import { useAuth } from "@/components/auth-provider";
-import { Separator } from "@/components/ui/separator";
 import { Loader2, TextAlignJustify } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
@@ -48,7 +47,7 @@ export function Header() {
 
   const renderAuthSection = (isMobile = false) => {
     const badgeClass =
-      "inline-flex items-center rounded-full border border-black/10 bg-black/5 px-3 py-1 font-instrument-serif transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98] hover:bg-black/10";
+      "inline-flex items-center rounded-full border border-black/10 bg-black/5 px-3 py-1 transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98] hover:bg-black/10";
     const btnClass = isMobile
       ? "rounded-lg px-3 py-2 hover:bg-black/10 text-left w-full transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98]"
       : "inline-block rounded-lg px-3 py-1.5 hover:bg-black/10 transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98] cursor-pointer";
@@ -64,7 +63,6 @@ export function Header() {
           <Link
             href="/account"
             className={badgeClass}
-            style={{ fontFamily: "var(--font-instrument-serif)" }}
             onClick={isMobile ? () => setOpen(false) : undefined}
           >
             {displayLabel}
@@ -100,13 +98,13 @@ export function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-50 bg-transparent text-black border-b">
+    <header className="sticky top-0 z-50 bg-nycu text-white">
       <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between gap-6 text-xl font-bold">
-        <Link href="/" className="font-instrument-serif inline-block text-3xl sm:text-4xl whitespace-nowrap transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98]">
+        <Link href="/" className="inline-block text-2xl sm:text-3xl whitespace-nowrap transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98]">
           Office of AI Affairs
         </Link>
 
-        <nav className="hidden md:flex items-center gap-8">
+        <nav className="hidden min-[1152px]:flex items-center gap-8 text-lg">
           {navItems.map((item) => (
             <Link key={item.href} href={item.href} className="nav-bracket inline-block transition-transform duration-200 active:scale-[0.98]">
               {item.label}
@@ -123,7 +121,7 @@ export function Header() {
         <button
           ref={buttonRef}
           type="button"
-          className="md:hidden inline-flex items-center justify-center rounded-lg p-2 hover:bg-black/10 transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98]"
+          className="min-[1152px]:hidden inline-flex items-center justify-center rounded-lg p-2 hover:bg-black/10 transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98]"
           aria-label="開啟選單"
           aria-expanded={open}
           aria-controls="mobile-menu"
@@ -136,7 +134,7 @@ export function Header() {
 
       <div
         id="mobile-menu"
-        className={`md:hidden overflow-hidden transition-[max-height,opacity] duration-200 ${open ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
+        className={`min-[1152px]:hidden overflow-hidden transition-[max-height,opacity] duration-200 ${open ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
           }`}
       >
         <div ref={panelRef} className="max-w-6xl mx-auto px-4 pb-4">

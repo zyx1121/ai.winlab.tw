@@ -1,13 +1,21 @@
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
 import { createClient } from "@/lib/supabase/server";
 import type { Result } from "@/lib/supabase/types";
-import { ArrowLeft, Link2, Mail, Phone, User } from "lucide-react";
+import {
+  ArrowLeft,
+  Facebook,
+  FileText,
+  Github,
+  Globe,
+  Link2,
+  Linkedin,
+  User,
+} from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
@@ -22,7 +30,7 @@ export default async function ProfilePage({
   const [profileRes, resultsRes] = await Promise.all([
     supabase
       .from("profiles")
-      .select("id, display_name, avatar_url, phone, social_links")
+      .select("id, display_name, avatar_url, bio, linkedin, facebook, github, website, resume, social_links")
       .eq("id", id)
       .single(),
     supabase
@@ -32,24 +40,23 @@ export default async function ProfilePage({
       .eq("status", "published")
       .eq("type", "personal")
       .order("date", { ascending: false }),
-    // TODO: 隊伍功能暫時隱藏
-    // supabase.from("team_members").select("team_id").eq("user_id", id),
   ]);
 
   if (profileRes.error || !profileRes.data) notFound();
 
   const profile = profileRes.data;
   const results = (resultsRes.data as Result[]) || [];
-  // TODO: 隊伍功能暫時隱藏
-  // const teamIds = (membersRes.data || []).map((m) => m.team_id);
-  // let teams: Team[] = [];
-  // if (teamIds.length > 0) {
-  //   const { data } = await supabase.from("teams").select("*").in("id", teamIds);
-  //   teams = (data as Team[]) || [];
-  // }
 
   const displayName = profile.display_name || "未知使用者";
-  const socialLinks = profile.social_links || [];
+  const socialLinks = (profile.social_links as string[]) || [];
+
+  const structuredLinks = [
+    { key: "linkedin", label: "LinkedIn", href: profile.linkedin, icon: Linkedin },
+    { key: "facebook", label: "Facebook", href: profile.facebook, icon: Facebook },
+    { key: "github", label: "GitHub", href: profile.github, icon: Github },
+    { key: "website", label: "個人網站", href: profile.website, icon: Globe },
+    { key: "resume", label: "履歷", href: profile.resume, icon: FileText },
+  ].filter((l) => l.href);
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-12">
@@ -87,56 +94,59 @@ export default async function ProfilePage({
       <Card className="mb-10">
         <CardHeader>
           <CardTitle>個人資訊</CardTitle>
-          <CardDescription>姓名與聯絡方式</CardDescription>
         </CardHeader>
-        <CardContent className="flex flex-col gap-4">
-          <dl className="grid gap-4 sm:grid-cols-1">
-            <div className="flex items-start gap-3">
-              <User className="w-4 h-4 shrink-0 mt-0.5 text-muted-foreground" />
-              <div>
-                <dt className="text-sm font-medium text-muted-foreground">姓名</dt>
-                <dd className="mt-0.5">{displayName}</dd>
+        <CardContent className="flex flex-col gap-5">
+          {/* Bio */}
+          {profile.bio && (
+            <p className="text-sm leading-relaxed text-foreground whitespace-pre-wrap">
+              {profile.bio}
+            </p>
+          )}
+
+          {/* Structured social links */}
+          {structuredLinks.length > 0 && (
+            <div className="flex flex-wrap gap-2">
+              {structuredLinks.map(({ key, label, href, icon: Icon }) => (
+                <a
+                  key={key}
+                  href={href!}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 rounded-full border border-border bg-muted/50 px-3 py-1.5 text-sm font-medium hover:bg-muted transition-colors"
+                >
+                  <Icon className="w-3.5 h-3.5" />
+                  {label}
+                </a>
+              ))}
+            </div>
+          )}
+
+          {/* Extra links */}
+          {socialLinks.length > 0 && (
+            <div className="flex flex-col gap-1">
+              <p className="text-xs font-medium text-muted-foreground flex items-center gap-1">
+                <Link2 className="w-3.5 h-3.5" />
+                額外連結
+              </p>
+              <div className="flex flex-col gap-1">
+                {socialLinks.map((url: string, i: number) => (
+                  <a
+                    key={i}
+                    href={url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm text-primary underline underline-offset-2 break-all hover:opacity-80"
+                  >
+                    {url}
+                  </a>
+                ))}
               </div>
             </div>
-            <div className="flex items-start gap-3">
-              <Mail className="w-4 h-4 shrink-0 mt-0.5 text-muted-foreground" />
-              <div>
-                <dt className="text-sm font-medium text-muted-foreground">電子信箱</dt>
-                <dd className="mt-0.5 text-muted-foreground">未公開</dd>
-              </div>
-            </div>
-            {(profile.phone ?? "").trim() !== "" && (
-              <div className="flex items-start gap-3">
-                <Phone className="w-4 h-4 shrink-0 mt-0.5 text-muted-foreground" />
-                <div>
-                  <dt className="text-sm font-medium text-muted-foreground">手機</dt>
-                  <dd className="mt-0.5">{profile.phone}</dd>
-                </div>
-              </div>
-            )}
-            {socialLinks.length > 0 && (
-              <div className="flex items-start gap-3">
-                <Link2 className="w-4 h-4 shrink-0 mt-0.5 text-muted-foreground" />
-                <div>
-                  <dt className="text-sm font-medium text-muted-foreground">社群連結</dt>
-                  <dd className="mt-0.5 flex flex-col gap-1">
-                    {socialLinks.map((url: string, i: number) => (
-                      <a
-                        key={i}
-                        href={url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-primary underline underline-offset-2 break-all hover:opacity-80"
-                      >
-                        {url}
-                      </a>
-                    ))}
-                  </dd>
-                </div>
-              </div>
-            )}
-            {/* TODO: 隊伍功能暫時隱藏 */}
-          </dl>
+          )}
+
+          {!profile.bio && structuredLinks.length === 0 && socialLinks.length === 0 && (
+            <p className="text-sm text-muted-foreground">尚未填寫個人資訊</p>
+          )}
         </CardContent>
       </Card>
 

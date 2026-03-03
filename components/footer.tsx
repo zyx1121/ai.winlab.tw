@@ -3,7 +3,7 @@ import Link from "next/link";
 export function Footer() {
   return (
     <footer className="flex items-center justify-center gap-4 py-8 w-full">
-      <p className="text-sm font-bold text-muted-foreground" style={{ fontFamily: "var(--font-instrument-serif)" }}>
+      <p className="text-sm font-bold text-muted-foreground">
         Copyright &copy; {new Date().getFullYear()} AI Office. All rights reserved.
       </p>
       <Link

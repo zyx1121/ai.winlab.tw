@@ -1,10 +1,10 @@
+import type { Result } from "@/lib/supabase/types";
 import TiptapImage from "@tiptap/extension-image";
+import Youtube from "@tiptap/extension-youtube";
 import { generateHTML } from "@tiptap/html";
 import StarterKit from "@tiptap/starter-kit";
-import Youtube from "@tiptap/extension-youtube";
 import { User, Users } from "lucide-react";
 import Link from "next/link";
-import type { Result } from "@/lib/supabase/types";
 
 export type PublisherInfo = { name: string; href: string | null } | null;
 
@@ -13,16 +13,14 @@ type Props = {
   publisherInfo: PublisherInfo;
 };
 
-const instrumentSerifStyle = { fontFamily: "var(--font-instrument-serif)" };
-
 export function ResultDetail({ result, publisherInfo }: Props) {
   const contentHtml =
     result.content && Object.keys(result.content).length > 0
       ? generateHTML(result.content, [
-          StarterKit,
-          TiptapImage.configure({ HTMLAttributes: { class: "rounded-lg max-w-full h-auto" } }),
-          Youtube,
-        ])
+        StarterKit,
+        TiptapImage.configure({ HTMLAttributes: { class: "rounded-lg max-w-full h-auto" } }),
+        Youtube,
+      ])
       : "<p>（無內容）</p>";
 
   return (
@@ -31,7 +29,7 @@ export function ResultDetail({ result, publisherInfo }: Props) {
         <h1 className="text-4xl font-extrabold tracking-tight text-balance mb-4">
           {result.title}
         </h1>
-        <div className="flex items-center gap-2 text-base text-muted-foreground" style={instrumentSerifStyle}>
+        <div className="flex items-center gap-2 text-base text-muted-foreground">
           {result.type === "team"
             ? <Users className="w-4 h-4 shrink-0" />
             : <User className="w-4 h-4 shrink-0" />

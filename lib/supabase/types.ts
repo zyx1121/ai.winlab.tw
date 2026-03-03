@@ -37,6 +37,12 @@ export type Profile = {
   avatar_url: string | null;
   role: "admin" | "user";
   phone: string | null;
+  bio: string | null;
+  linkedin: string | null;
+  facebook: string | null;
+  github: string | null;
+  website: string | null;
+  resume: string | null;
   social_links: string[] | null;
 };
 
