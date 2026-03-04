@@ -7,9 +7,9 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 
 const staticNavItems = [
-  { href: "/introduction", label: "關於我們" },
-  { href: "/organization", label: "組織人員" },
-  { href: "/announcement", label: "活動公告" },
+  { href: "/introduction", label: "關於" },
+  { href: "/organization", label: "組織" },
+  { href: "/announcement", label: "公告" },
 ];
 
 export function Header() {
@@ -131,11 +131,11 @@ export function Header() {
             </Link>
           ))}
           <Link href="/events" className="nav-bracket inline-block transition-transform duration-200 active:scale-[0.98]">
-            活動專區
+            活動
           </Link>
           {isAdmin && (
             <Link href="/settings" className="nav-bracket inline-block transition-transform duration-200 active:scale-[0.98]">
-              系統設定
+              設定
             </Link>
           )}
           {renderAuthSection()}
@@ -187,7 +187,7 @@ export function Header() {
               className="rounded-lg px-3 py-2 hover:bg-black/10 transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98]"
               onClick={() => setOpen(false)}
             >
-              活動專區
+              活動
             </Link>
             {isAdmin && (
               <Link
@@ -195,7 +195,7 @@ export function Header() {
                 className="rounded-lg px-3 py-2 hover:bg-black/10 transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98]"
                 onClick={() => setOpen(false)}
               >
-                系統設定
+                設定
               </Link>
             )}
             {renderAuthSection(true)}
