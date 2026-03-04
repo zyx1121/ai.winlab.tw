@@ -54,6 +54,7 @@ const CAROUSEL_PREFIX = "carousel/";
 const RECRUITMENT_PREFIX = "recruitment/";
 const RESULT_PREFIX = "results/";
 const ORGANIZATION_PREFIX = "organization/";
+const EVENT_PREFIX = "events/";
 
 /**
  * Upload an image for homepage carousel to Supabase Storage (same bucket, path: carousel/).
@@ -142,6 +143,40 @@ export async function uploadResultImage(
   const supabase = createClient();
   const ext = file.name.split(".").pop() || "jpg";
   const path = `${RESULT_PREFIX}${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+
+  const { error } = await supabase.storage.from(BUCKET).upload(path, file, {
+    cacheControl: "3600",
+    upsert: false,
+  });
+
+  if (error) {
+    console.error("Upload error:", error);
+    return { error: error.message };
+  }
+
+  const {
+    data: { publicUrl },
+  } = supabase.storage.from(BUCKET).getPublicUrl(path);
+
+  return { url: publicUrl };
+}
+
+/**
+ * Upload a cover image for an event to Supabase Storage (same bucket, path: events/).
+ */
+export async function uploadEventImage(
+  file: File,
+): Promise<{ url: string } | { error: string }> {
+  if (!isImageFile(file)) {
+    return { error: "不支援的圖片格式，請使用 JPEG、PNG、GIF 或 WebP" };
+  }
+  if (!isWithinSizeLimit(file)) {
+    return { error: "圖片大小不可超過 5MB" };
+  }
+
+  const supabase = createClient();
+  const ext = file.name.split(".").pop() || "jpg";
+  const path = `${EVENT_PREFIX}${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
 
   const { error } = await supabase.storage.from(BUCKET).upload(path, file, {
     cacheControl: "3600",

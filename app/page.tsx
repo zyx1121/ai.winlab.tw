@@ -1,9 +1,8 @@
 import { HomeAnnouncement } from "@/components/home-announcement";
 import { HomeCarousel } from "@/components/home-carousel";
 import { HomeContacts } from "@/components/home-contacts";
+import { HomeEvents } from "@/components/home-events";
 import { HomeIntroduction } from "@/components/home-introduction";
-import { HomeRecruitment } from "@/components/home-recruitment";
-import { HomeResult } from "@/components/home-result";
 
 export default function Home() {
   return (
@@ -12,8 +11,7 @@ export default function Home() {
       <HomeIntroduction />
       {/* <HomeOrganization /> */}
       <HomeAnnouncement />
-      <HomeResult />
-      <HomeRecruitment />
+      <HomeEvents />
       <HomeContacts />
     </main>
   );

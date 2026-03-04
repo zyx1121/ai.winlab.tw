@@ -22,6 +22,7 @@ export default function AnnouncementPage() {
     const query = supabase
       .from("announcements")
       .select("*")
+      .is("event_id", null)
       .order("date", { ascending: false });
 
     if (!isAdmin) query.eq("status", "published");
@@ -41,7 +42,7 @@ export default function AnnouncementPage() {
     setIsCreating(true);
     const { data, error } = await supabase
       .from("announcements")
-      .insert({ title: "新公告", category: "一般", content: {}, status: "draft", author_id: user.id })
+      .insert({ title: "新公告", category: "一般", content: {}, status: "draft", author_id: user.id, event_id: null })
       .select()
       .single();
     if (error) { setIsCreating(false); return; }

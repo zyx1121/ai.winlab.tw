@@ -23,6 +23,7 @@ export default function RecruitmentPage() {
     const { data, error } = await supabase
       .from("competitions")
       .select("*")
+      .is("event_id", null)
       .order("date", { ascending: false });
     if (error) console.error("Error fetching recruitments:", error);
     else setRecruitments(data || []);
@@ -38,7 +39,7 @@ export default function RecruitmentPage() {
     setIsCreating(true);
     const { data, error } = await supabase
       .from("competitions")
-      .insert({ title: "新企業徵才", link: "", image: "/placeholder.png", date: new Date().toISOString().slice(0, 10), description: null, location: null, positions: null })
+      .insert({ title: "新企業徵才", link: "", image: "/placeholder.png", date: new Date().toISOString().slice(0, 10), description: null, location: null, positions: null, event_id: null })
       .select()
       .single();
     if (error) { setIsCreating(false); return; }

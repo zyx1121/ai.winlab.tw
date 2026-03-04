@@ -9,6 +9,19 @@ export type CarouselSlide = {
   sort_order: number;
 };
 
+export type Event = {
+  id: string;
+  created_at: string;
+  updated_at: string;
+  name: string;
+  slug: string;
+  description: string | null;
+  cover_image: string | null;
+  pinned: boolean;
+  sort_order: number;
+  status: "draft" | "published";
+};
+
 export type Announcement = {
   id: string;
   created_at: string;
@@ -19,6 +32,7 @@ export type Announcement = {
   content: Record<string, unknown>;
   status: "draft" | "published";
   author_id: string | null;
+  event_id: string | null;
 };
 
 export type Introduction = {
@@ -116,6 +130,7 @@ export type Recruitment = {
   description: string | null;
   location: string | null;
   positions: RecruitmentPosition[] | null;
+  event_id: string | null;
 };
 
 export type Tag = {
@@ -147,4 +162,5 @@ export type Result = {
   type: ResultType;
   team_id: string | null;
   pinned: boolean;
+  event_id: string | null;
 };

@@ -1,16 +1,15 @@
 "use client";
 
 import { useAuth } from "@/components/auth-provider";
+import { createClient } from "@/lib/supabase/client";
 import { Loader2, TextAlignJustify } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 
-const navItems = [
+const staticNavItems = [
   { href: "/introduction", label: "關於我們" },
   { href: "/organization", label: "組織人員" },
   { href: "/announcement", label: "活動公告" },
-  { href: "/result", label: "活動成果" },
-  { href: "/recruitment", label: "企業徵才" },
 ];
 
 export function Header() {
@@ -18,6 +17,7 @@ export function Header() {
   const [open, setOpen] = useState(false);
   const panelRef = useRef<HTMLDivElement | null>(null);
   const buttonRef = useRef<HTMLButtonElement | null>(null);
+  const [pinnedEvents, setPinnedEvents] = useState<{ name: string; slug: string }[]>([]);
 
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
@@ -26,6 +26,21 @@ export function Header() {
     document.addEventListener("keydown", onKeyDown);
     return () => document.removeEventListener("keydown", onKeyDown);
   }, []);
+
+  useEffect(() => {
+    const fetchPinnedEvents = async () => {
+      const supabase = createClient();
+      const query = supabase
+        .from("events")
+        .select("name, slug")
+        .eq("pinned", true)
+        .order("sort_order", { ascending: true });
+      if (!user) query.eq("status", "published");
+      const { data } = await query;
+      setPinnedEvents(data ?? []);
+    };
+    fetchPinnedEvents();
+  }, [user]);
 
   useEffect(() => {
     if (!open) return;
@@ -105,11 +120,19 @@ export function Header() {
         </Link>
 
         <nav className="hidden min-[1152px]:flex items-center gap-8 text-lg">
-          {navItems.map((item) => (
+          {staticNavItems.map((item) => (
             <Link key={item.href} href={item.href} className="nav-bracket inline-block transition-transform duration-200 active:scale-[0.98]">
               {item.label}
             </Link>
           ))}
+          {pinnedEvents.map((event) => (
+            <Link key={event.slug} href={`/events/${event.slug}`} className="nav-bracket inline-block transition-transform duration-200 active:scale-[0.98]">
+              {event.name}
+            </Link>
+          ))}
+          <Link href="/events" className="nav-bracket inline-block transition-transform duration-200 active:scale-[0.98]">
+            活動專區
+          </Link>
           {isAdmin && (
             <Link href="/settings" className="nav-bracket inline-block transition-transform duration-200 active:scale-[0.98]">
               系統設定
@@ -139,7 +162,7 @@ export function Header() {
       >
         <div ref={panelRef} className="max-w-6xl mx-auto px-4 pb-4">
           <div className="flex flex-col text-lg font-bold">
-            {navItems.map((item) => (
+            {staticNavItems.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
@@ -149,6 +172,23 @@ export function Header() {
                 {item.label}
               </Link>
             ))}
+            {pinnedEvents.map((event) => (
+              <Link
+                key={event.slug}
+                href={`/events/${event.slug}`}
+                className="rounded-lg px-3 py-2 hover:bg-black/10 transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98]"
+                onClick={() => setOpen(false)}
+              >
+                {event.name}
+              </Link>
+            ))}
+            <Link
+              href="/events"
+              className="rounded-lg px-3 py-2 hover:bg-black/10 transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98]"
+              onClick={() => setOpen(false)}
+            >
+              活動專區
+            </Link>
             {isAdmin && (
               <Link
                 href="/settings"
