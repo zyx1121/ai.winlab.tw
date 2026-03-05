@@ -1,7 +1,6 @@
 "use client";
 
 import { useAuth } from "@/components/auth-provider";
-import { createClient } from "@/lib/supabase/client";
 import { Loader2, TextAlignJustify } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
@@ -12,12 +11,11 @@ const staticNavItems = [
   { href: "/announcement", label: "公告" },
 ];
 
-export function Header() {
+export function Header({ pinnedEvents }: { pinnedEvents: { name: string; slug: string }[] }) {
   const { user, profile, isLoading, signOut, isAdmin } = useAuth();
   const [open, setOpen] = useState(false);
   const panelRef = useRef<HTMLDivElement | null>(null);
   const buttonRef = useRef<HTMLButtonElement | null>(null);
-  const [pinnedEvents, setPinnedEvents] = useState<{ name: string; slug: string }[]>([]);
 
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
@@ -26,21 +24,6 @@ export function Header() {
     document.addEventListener("keydown", onKeyDown);
     return () => document.removeEventListener("keydown", onKeyDown);
   }, []);
-
-  useEffect(() => {
-    const fetchPinnedEvents = async () => {
-      const supabase = createClient();
-      const query = supabase
-        .from("events")
-        .select("name, slug")
-        .eq("pinned", true)
-        .order("sort_order", { ascending: true });
-      if (!user) query.eq("status", "published");
-      const { data } = await query;
-      setPinnedEvents(data ?? []);
-    };
-    fetchPinnedEvents();
-  }, [user]);
 
   useEffect(() => {
     if (!open) return;

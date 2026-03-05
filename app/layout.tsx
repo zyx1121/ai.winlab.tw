@@ -3,6 +3,7 @@ import { AuthProvider } from "@/components/auth-provider";
 import { Footer } from "@/components/footer";
 import { Header } from "@/components/header";
 import { Toaster } from "@/components/ui/sonner";
+import { createClient } from "@/lib/supabase/server";
 import { SquircleNoScript } from "@squircle-js/react";
 import type { Metadata } from "next";
 import { ThemeProvider } from "next-themes";
@@ -27,11 +28,19 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const supabase = await createClient();
+  const { data: pinnedEvents } = await supabase
+    .from("events")
+    .select("name, slug")
+    .eq("pinned", true)
+    .eq("status", "published")
+    .order("sort_order", { ascending: true });
+
   return (
     <html lang="zh-TW" suppressHydrationWarning>
       <body className={`${notoSans.variable} ${notoSansMono.variable} antialiased`}>
@@ -40,7 +49,7 @@ export default function RootLayout({
           <NuqsAdapter>
             <AuthProvider>
               <div className="relative flex flex-col min-h-dvh">
-                <Header />
+                <Header pinnedEvents={pinnedEvents ?? []} />
                 <div className="flex-1">
                   {children}
                 </div>
