@@ -6,7 +6,20 @@ import StarterKit from "@tiptap/starter-kit";
 import Youtube from "@tiptap/extension-youtube";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  const { id } = await params;
+  const supabase = await createClient();
+  const { data } = await supabase.from("announcements").select("title").eq("id", id).single();
+  const title = data?.title ?? "公告";
+  return { title: `${title}｜人工智慧專責辦公室` };
+}
 
 export default async function AnnouncementDetailPage({
   params,

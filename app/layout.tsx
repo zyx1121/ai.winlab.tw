@@ -37,10 +37,8 @@ export default function RootLayout({
           <NuqsAdapter>
             <AuthProvider>
               <div className="relative flex flex-col min-h-dvh">
-                <div className="fixed top-0 left-0 right-0 z-50 bg-background/70 backdrop-blur-md border-b border-background/10">
-                  <Header />
-                </div>
-                <div className="flex-1 pt-16">
+                <Header />
+                <div className="flex-1">
                   {children}
                 </div>
                 <Footer />

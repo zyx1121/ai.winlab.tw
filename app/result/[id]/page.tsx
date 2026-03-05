@@ -1,9 +1,23 @@
 import { ResultDetail, type PublisherInfo } from "@/components/result-detail";
 import { createClient } from "@/lib/supabase/server";
 import type { Result } from "@/lib/supabase/types";
-import { ArrowLeft } from "lucide-react";
-import Link from "next/link";
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  const { id } = await params;
+  const supabase = await createClient();
+  const { data } = await supabase.from("results").select("title, summary").eq("id", id).single();
+  const title = data?.title ?? "成果";
+  return {
+    title: `${title}｜人工智慧專責辦公室`,
+    description: data?.summary ?? undefined,
+  };
+}
 
 export default async function ResultDetailPage({
   params,
@@ -35,14 +49,6 @@ export default async function ResultDetailPage({
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-12">
-      <Link
-        href="/result"
-        className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-10"
-      >
-        <ArrowLeft className="w-4 h-4" />
-        返回列表
-      </Link>
-
       <ResultDetail result={result} publisherInfo={publisherInfo} />
     </div>
   );

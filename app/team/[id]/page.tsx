@@ -1,8 +1,21 @@
 import { createClient } from "@/lib/supabase/server";
 import type { Result } from "@/lib/supabase/types";
-import { ArrowLeft, Users } from "lucide-react";
+import { Users } from "lucide-react";
 import Link from "next/link";
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  const { id } = await params;
+  const supabase = await createClient();
+  const { data } = await supabase.from("teams").select("name").eq("id", id).single();
+  const name = data?.name ?? "隊伍";
+  return { title: `${name}｜人工智慧專責辦公室` };
+}
 
 export default async function TeamPage({
   params,
@@ -24,14 +37,6 @@ export default async function TeamPage({
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-12">
-      <Link
-        href="/result"
-        className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-10"
-      >
-        <ArrowLeft className="w-4 h-4" />
-        返回列表
-      </Link>
-
       {/* Team header */}
       <div className="flex items-center gap-4 mb-10">
         <div className="w-14 h-14 rounded-full bg-muted flex items-center justify-center shrink-0">

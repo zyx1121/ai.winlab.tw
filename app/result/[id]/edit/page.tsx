@@ -65,7 +65,7 @@ export default function ResultEditPage() {
 
   const fetchResult = useCallback(async () => {
     const { data, error } = await supabase.from("results").select("*").eq("id", id).single();
-    if (error) { router.push("/result"); return; }
+    if (error) { router.push(user ? `/profile/${user.id}` : "/"); return; }
 
     const r = { ...data, type: (data as Result).type ?? "personal", team_id: (data as Result).team_id ?? null } as Result;
     setResult(r);
@@ -167,7 +167,7 @@ export default function ResultEditPage() {
     setIsDeleting(true);
     const { error } = await supabase.from("results").delete().eq("id", id);
     if (error) { console.error("Error deleting result:", error.message, error.code); setIsDeleting(false); return; }
-    router.push("/result");
+    router.push(user ? `/profile/${user.id}` : "/");
   };
 
   if (isLoading || authLoading) {
@@ -178,14 +178,14 @@ export default function ResultEditPage() {
     );
   }
   if (!result) return null;
-  if (canEdit === false) { router.push("/result"); return null; }
+  if (canEdit === false) { router.push(user ? `/profile/${user.id}` : "/"); return null; }
 
   return (
     <div className="container max-w-6xl mx-auto p-4 flex flex-col mt-8 pb-16">
       {/* Sticky toolbar：只固定上方操作列，內容與屬性一起滾動 */}
       <div className="sticky top-16 z-20 bg-background/80 backdrop-blur-sm py-4 -mx-4 px-4">
         <div className="flex items-center justify-between gap-4">
-          <Button variant="ghost" size="sm" onClick={() => router.push("/result")}>
+          <Button variant="ghost" size="sm" onClick={() => router.push(user ? `/profile/${user.id}` : "/")}>
             <ArrowLeft className="w-4 h-4" />
             返回列表
           </Button>

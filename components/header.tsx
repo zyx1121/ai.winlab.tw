@@ -61,22 +61,23 @@ export function Header() {
   }, [open]);
 
   const renderAuthSection = (isMobile = false) => {
-    const badgeClass =
-      "inline-flex items-center rounded-full border border-black/10 bg-black/5 px-3 py-1 transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98] hover:bg-black/10";
+    const badgeClass = isMobile
+      ? "rounded-lg px-3 py-2 hover:bg-black/10 text-left w-full transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98]"
+      : "inline-flex items-center rounded-full border border-black/10 bg-black/5 px-3 py-1 transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98] hover:bg-black/10";
     const btnClass = isMobile
       ? "rounded-lg px-3 py-2 hover:bg-black/10 text-left w-full transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98]"
-      : "inline-block rounded-lg px-3 py-1.5 hover:bg-black/10 transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98] cursor-pointer";
+      : "nav-bracket inline-block transition-transform duration-200 active:scale-[0.98] cursor-pointer";
 
     if (user) {
       const displayLabel = profile?.display_name || user.email || "帳號";
       return (
         <div
           className={
-            isMobile ? "flex flex-col gap-2" : "flex items-center gap-3"
+            isMobile ? "flex flex-col" : "flex items-center gap-8"
           }
         >
           <Link
-            href="/account"
+            href={user ? `/profile/${user.id}` : "/account"}
             className={badgeClass}
             onClick={isMobile ? () => setOpen(false) : undefined}
           >
@@ -115,8 +116,8 @@ export function Header() {
   return (
     <header className="sticky top-0 z-50 bg-nycu text-white">
       <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between gap-6 text-xl font-bold">
-        <Link href="/" className="inline-block text-2xl transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98]">
-          Office of AI Affairs
+        <Link href="/" className="inline-block text-2xl tracking-widest transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98]">
+          人工智慧專責辦公室
         </Link>
 
         <nav className="hidden min-[1152px]:flex items-center gap-8 text-lg">
