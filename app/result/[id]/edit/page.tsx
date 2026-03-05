@@ -113,13 +113,15 @@ export default function ResultEditPage() {
     setIsSavingTags(true);
 
     if (assignedTagIds.has(tagId)) {
-      // Deselect
+      // Deselect: remove this tag
       await supabase.from("result_tags").delete().eq("result_id", id).eq("tag_id", tagId);
       setAssignedTagIds(new Set());
     } else {
-      // Single-select: remove all existing tags, then insert the new one
-      await supabase.from("result_tags").delete().eq("result_id", id);
-      await supabase.from("result_tags").insert({ result_id: id, tag_id: tagId });
+      // Single-select: clear all existing and add new one — run in parallel
+      await Promise.all([
+        supabase.from("result_tags").delete().eq("result_id", id),
+        supabase.from("result_tags").insert({ result_id: id, tag_id: tagId }),
+      ]);
       setAssignedTagIds(new Set([tagId]));
     }
 
