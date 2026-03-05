@@ -22,6 +22,9 @@ const notoSansMono = Noto_Sans_Mono({
 export const metadata: Metadata = {
   title: "國立陽明交通大學 人工智慧專責辦公室",
   description: "Office of AI Affairs",
+  verification: {
+    google: "vjj3Fw7BmozLkeGrZTCo6PYVVqBhPQG6tTvbQel7fwM",
+  },
 };
 
 export default function RootLayout({
