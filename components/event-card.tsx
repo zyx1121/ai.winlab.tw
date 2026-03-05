@@ -7,6 +7,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import type { Event } from "@/lib/supabase/types";
+import { isExternalImage } from "@/lib/utils";
 import Image from "next/image";
 
 export function EventCard({
@@ -16,9 +17,6 @@ export function EventCard({
   item: Event;
   isAdmin?: boolean;
 }) {
-  const isExternalImage = (src: string | null | undefined) =>
-    !!(src && (src.startsWith("http://") || src.startsWith("https://")));
-
   return (
     <Card className="py-0 h-full flex flex-col gap-4 transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98] overflow-hidden">
       <div className="relative w-full aspect-video shrink-0">

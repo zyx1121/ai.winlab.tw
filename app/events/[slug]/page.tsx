@@ -5,6 +5,7 @@ import { RecruitmentCard } from "@/components/recruitment-card";
 import { ResultCard, type ResultWithMeta } from "@/components/result-card";
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/client";
+import { isExternalImage } from "@/lib/utils";
 import type { Announcement, Event, Recruitment, Result } from "@/lib/supabase/types";
 import { ArrowLeft, Loader2, Pencil, Plus } from "lucide-react";
 import Image from "next/image";
@@ -147,9 +148,6 @@ export default function EventDetailPage() {
     if (error) { setIsCreating(false); return; }
     router.push(`/events/${slug}/recruitment/${data.id}/edit`);
   };
-
-  const isExternalImage = (src: string | null | undefined) =>
-    !!(src && (src.startsWith("http://") || src.startsWith("https://")));
 
   if (isLoading) {
     return (

@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { createClient } from "@/lib/supabase/client";
+import { isExternalImage } from "@/lib/utils";
 import type { Profile, Result } from "@/lib/supabase/types";
 import {
   Eye,
@@ -139,9 +140,6 @@ export default function ProfilePage() {
     setSocialLinks((prev) => prev.map((l, i) => (i === idx ? val : l)));
   const removeSocialLink = (idx: number) =>
     setSocialLinks((prev) => prev.filter((_, i) => i !== idx));
-
-  const isExternalImage = (src: string | null | undefined) =>
-    !!(src && (src.startsWith("http://") || src.startsWith("https://")));
 
   if (isLoading || authLoading) {
     return (

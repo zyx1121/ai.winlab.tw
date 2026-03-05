@@ -8,6 +8,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import type { Result } from "@/lib/supabase/types";
+import { isExternalImage } from "@/lib/utils";
 import { Pin, User, Users } from "lucide-react";
 import Image from "next/image";
 
@@ -25,9 +26,6 @@ export function ResultCard({
   isAdmin?: boolean;
   onPinToggle?: (id: string, pinned: boolean) => void;
 }) {
-  const isExternalImage = (src: string | null | undefined) =>
-    !!(src && (src.startsWith("http://") || src.startsWith("https://")));
-
   const publisherName =
     item.type === "team" ? item.team_name || "未知隊伍" : item.author_name || "匿名";
 
