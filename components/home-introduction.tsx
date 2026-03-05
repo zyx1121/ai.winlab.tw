@@ -1,53 +1,23 @@
-"use client";
-
-import { Button } from "@/components/ui/button";
-import { createClient } from "@/lib/supabase/client";
-import type { Introduction } from "@/lib/supabase/types";
+import { createClient } from "@/lib/supabase/server";
 import { generateText } from "@tiptap/core";
 import StarterKit from "@tiptap/starter-kit";
-import { Loader2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { useEffect, useState } from "react";
 
-export function HomeIntroduction() {
-  const supabase = createClient();
-  const [introduction, setIntroduction] = useState<Introduction | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchIntroduction = async () => {
-      const { data, error } = await supabase
-        .from("introduction")
-        .select("*")
-        .single();
-
-      if (error) {
-        console.error("Error fetching introduction:", error);
-      } else {
-        setIntroduction(data);
-      }
-      setIsLoading(false);
-    };
-
-    fetchIntroduction();
-  }, [supabase]);
+export async function HomeIntroduction() {
+  const supabase = await createClient();
+  const { data: introduction } = await supabase
+    .from("introduction")
+    .select("*")
+    .single();
 
   const contentText =
     introduction?.content && Object.keys(introduction.content).length > 0
       ? generateText(introduction.content, [StarterKit])
       : "";
 
-  const truncatedText = contentText.length > 150
-    ? contentText.slice(0, 150) + "..."
-    : contentText;
-
-  if (isLoading) {
-    return (
-      <div className="bg-muted/40 py-20 px-4 flex justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
-      </div>
-    );
-  }
+  const truncatedText =
+    contentText.length > 150 ? contentText.slice(0, 150) + "..." : contentText;
 
   return (
     <div className="bg-muted/40 py-20 px-4">
@@ -61,7 +31,9 @@ export function HomeIntroduction() {
           </p>
         )}
         <Link href="/introduction">
-          <Button variant="secondary" size="lg" className="px-12 text-lg mt-2">探索更多</Button>
+          <Button variant="secondary" size="lg" className="px-12 text-lg mt-2">
+            探索更多
+          </Button>
         </Link>
       </div>
     </div>
