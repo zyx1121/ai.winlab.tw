@@ -75,6 +75,14 @@ export function ProfilePageClient({
   const removeSocialLink = (idx: number) =>
     setSocialLinks((prev) => prev.filter((_, i) => i !== idx));
 
+  const socialFields = [
+    { key: "linkedin" as const, label: "LinkedIn", icon: Linkedin, value: linkedin, setter: setLinkedin },
+    { key: "facebook" as const, label: "Facebook", icon: Facebook, value: facebook, setter: setFacebook },
+    { key: "github" as const, label: "GitHub", icon: Github, value: github, setter: setGithub },
+    { key: "website" as const, label: "個人網站", icon: Globe, value: website, setter: setWebsite },
+    { key: "resume" as const, label: "履歷連結", icon: FileText, value: resume, setter: setResume },
+  ];
+
   const displayNameValue = profile.display_name || "未知使用者";
   const structuredLinks = [
     { key: "linkedin", label: "LinkedIn", href: profile.linkedin, icon: Linkedin },
@@ -167,8 +175,28 @@ export function ProfilePageClient({
               <p className="text-sm text-muted-foreground mb-5">尚未填寫自我介紹</p>
             )}
 
-            {/* Social link icons */}
-            {structuredLinks.length > 0 && (
+            {/* Social links */}
+            {isEditMode ? (
+              <div className="flex flex-col gap-2 mb-4">
+                {socialFields.map(({ key, label, icon: Icon, value, setter }) => (
+                  <div key={key} className="flex items-center gap-2">
+                    <Icon className="w-4 h-4 shrink-0 text-muted-foreground" />
+                    <div className="relative flex-1">
+                      <input
+                        value={value}
+                        onChange={(e) => setter(e.target.value)}
+                        onBlur={() => saveField(key, value)}
+                        placeholder={`${label} 網址`}
+                        className="w-full text-sm bg-transparent border-b border-border focus:border-foreground outline-none pb-0.5 pr-5"
+                      />
+                      {savingField === key && (
+                        <Loader2 className="w-3 h-3 animate-spin absolute right-0 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : structuredLinks.length > 0 ? (
               <div className="flex flex-wrap gap-3 mb-4">
                 {structuredLinks.map(({ key, label, href, icon: Icon }) => (
                   <a
@@ -183,7 +211,7 @@ export function ProfilePageClient({
                   </a>
                 ))}
               </div>
-            )}
+            ) : null}
 
             {/* Extra links */}
             {extraLinks.length > 0 && (
