@@ -40,7 +40,6 @@ export function ProfilePageClient({
 
   // Edit form state
   const [displayName, setDisplayName] = useState(initialProfile.display_name ?? "");
-  const [phone, setPhone] = useState(initialProfile.phone ?? "");
   const [bio, setBio] = useState(initialProfile.bio ?? "");
   const [linkedin, setLinkedin] = useState(initialProfile.linkedin ?? "");
   const [facebook, setFacebook] = useState(initialProfile.facebook ?? "");
@@ -69,12 +68,22 @@ export function ProfilePageClient({
     setSavingField(null);
   };
 
+  const saveExtraLinks = async (links: string[]) => {
+    if (!user) return;
+    setSavingField("social_links");
+    const supabase = createClient();
+    const filtered = links.filter((l) => l.trim() !== "");
+    await supabase
+      .from("profiles")
+      .update({ social_links: filtered })
+      .eq("id", user.id);
+    setSocialLinks(filtered);
+    setSavingField(null);
+  };
+
   const addSocialLink = () => setSocialLinks((prev) => [...prev, ""]);
   const updateSocialLink = (idx: number, val: string) =>
     setSocialLinks((prev) => prev.map((l, i) => (i === idx ? val : l)));
-  const removeSocialLink = (idx: number) =>
-    setSocialLinks((prev) => prev.filter((_, i) => i !== idx));
-
   const socialFields = [
     { key: "linkedin" as const, label: "LinkedIn", icon: Linkedin, value: linkedin, setter: setLinkedin },
     { key: "facebook" as const, label: "Facebook", icon: Facebook, value: facebook, setter: setFacebook },
@@ -214,7 +223,52 @@ export function ProfilePageClient({
             ) : null}
 
             {/* Extra links */}
-            {extraLinks.length > 0 && (
+            {isEditMode ? (
+              <div className="flex flex-col gap-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-medium text-muted-foreground flex items-center gap-1">
+                    <Link2 className="w-3.5 h-3.5" />
+                    額外連結
+                    {savingField === "social_links" && (
+                      <Loader2 className="w-3 h-3 animate-spin ml-1 text-muted-foreground" />
+                    )}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={addSocialLink}
+                    className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-0.5 transition-colors"
+                  >
+                    <Plus className="w-3 h-3" />
+                    新增
+                  </button>
+                </div>
+                {socialLinks.map((link, idx) => (
+                  <div key={idx} className="flex items-center gap-1.5">
+                    <input
+                      value={link}
+                      onChange={(e) => updateSocialLink(idx, e.target.value)}
+                      onBlur={() => saveExtraLinks(socialLinks)}
+                      placeholder="https://..."
+                      className="flex-1 text-sm bg-transparent border-b border-border focus:border-foreground outline-none pb-0.5"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const next = socialLinks.filter((_, i) => i !== idx);
+                        setSocialLinks(next);
+                        saveExtraLinks(next);
+                      }}
+                      className="text-muted-foreground hover:text-destructive transition-colors"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                ))}
+                {socialLinks.length === 0 && (
+                  <p className="text-xs text-muted-foreground">尚未新增</p>
+                )}
+              </div>
+            ) : extraLinks.length > 0 ? (
               <div className="flex flex-col gap-1">
                 {extraLinks.map((url: string) => (
                   <a
@@ -228,7 +282,7 @@ export function ProfilePageClient({
                   </a>
                 ))}
               </div>
-            )}
+            ) : null}
           </aside>
 
           {/* RIGHT COLUMN */}
