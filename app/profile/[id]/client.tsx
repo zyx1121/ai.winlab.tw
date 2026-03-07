@@ -17,8 +17,8 @@ import { createClient } from "@/lib/supabase/client";
 import { isExternalImage } from "@/lib/utils";
 import type { Profile, Result } from "@/lib/supabase/types";
 import {
-  Eye,
   EyeOff,
+  Pencil,
   Facebook,
   FileText,
   Github,
@@ -107,20 +107,6 @@ export function ProfilePageClient({
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-12">
-      {/* Top bar */}
-      <div className="flex items-center justify-end gap-4 mb-8">
-        {isOwner && (
-          <Button
-            variant={isEditMode ? "secondary" : "outline"}
-            size="sm"
-            onClick={() => setIsEditMode((v) => !v)}
-          >
-            {isEditMode ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-            {isEditMode ? "預覽" : "編輯"}
-          </Button>
-        )}
-      </div>
-
       {isEditMode && isOwner ? (
         /* ── Edit Mode ─────────────────────────────────────────── */
         <Card>
@@ -269,9 +255,24 @@ export function ProfilePageClient({
         <div className="flex flex-col md:flex-row md:gap-16">
           {/* LEFT COLUMN */}
           <aside className="md:w-72 shrink-0 md:sticky md:top-20 md:self-start mb-10 md:mb-0">
-            {/* Profile header */}
-            <div className="flex items-center gap-4 mb-6">
-              <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center shrink-0 overflow-hidden">
+            {/* Edit toggle — owner only */}
+            {isOwner && (
+              <div className="flex justify-end mb-4">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setIsEditMode((v) => !v)}
+                  className="text-muted-foreground hover:text-foreground"
+                >
+                  {isEditMode ? <EyeOff className="w-4 h-4 mr-1.5" /> : <Pencil className="w-4 h-4 mr-1.5" />}
+                  {isEditMode ? "完成編輯" : "編輯資料"}
+                </Button>
+              </div>
+            )}
+
+            {/* Avatar */}
+            <div className="flex flex-col items-center gap-4 mb-6">
+              <div className="w-32 h-32 rounded-full bg-muted flex items-center justify-center overflow-hidden shrink-0">
                 {profile.avatar_url ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
@@ -280,70 +281,63 @@ export function ProfilePageClient({
                     className="w-full h-full object-cover"
                   />
                 ) : (
-                  <User className="w-8 h-8 text-muted-foreground" />
+                  <User className="w-12 h-12 text-muted-foreground" />
                 )}
               </div>
-              <div>
+
+              {/* Name */}
+              <div className="text-center">
                 <h1 className="text-2xl font-bold">{displayNameValue}</h1>
-                <p className="text-sm text-muted-foreground mt-0.5">
+                <p className="text-sm text-muted-foreground mt-1">
                   {results.filter((r) => r.status === "published").length} 篇個人成果
                 </p>
               </div>
             </div>
 
-            {/* Profile details */}
-            <Card>
-              <CardHeader>
-                <CardTitle>個人資訊</CardTitle>
-              </CardHeader>
-              <CardContent className="flex flex-col gap-5">
-                {profile.bio && (
-                  <p className="text-sm leading-relaxed text-foreground whitespace-pre-wrap">
-                    {profile.bio}
-                  </p>
-                )}
-                {structuredLinks.length > 0 && (
-                  <div className="flex flex-wrap gap-2">
-                    {structuredLinks.map(({ key, label, href, icon: Icon }) => (
-                      <a
-                        key={key}
-                        href={href!}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1.5 rounded-full border border-border bg-muted/50 px-3 py-1.5 text-sm font-medium hover:bg-muted transition-colors"
-                      >
-                        <Icon className="w-3.5 h-3.5" />
-                        {label}
-                      </a>
-                    ))}
-                  </div>
-                )}
-                {extraLinks.length > 0 && (
-                  <div className="flex flex-col gap-1">
-                    <p className="text-xs font-medium text-muted-foreground flex items-center gap-1">
-                      <Link2 className="w-3.5 h-3.5" />
-                      額外連結
-                    </p>
-                    <div className="flex flex-col gap-1">
-                      {extraLinks.map((url: string, i: number) => (
-                        <a
-                          key={i}
-                          href={url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-sm text-primary underline underline-offset-2 break-all hover:opacity-80"
-                        >
-                          {url}
-                        </a>
-                      ))}
-                    </div>
-                  </div>
-                )}
-                {!profile.bio && structuredLinks.length === 0 && extraLinks.length === 0 && (
-                  <p className="text-sm text-muted-foreground">尚未填寫個人資訊</p>
-                )}
-              </CardContent>
-            </Card>
+            {/* Bio */}
+            {profile.bio && (
+              <p className="text-sm leading-relaxed text-foreground whitespace-pre-wrap mb-5">
+                {profile.bio}
+              </p>
+            )}
+            {!profile.bio && !isEditMode && (
+              <p className="text-sm text-muted-foreground mb-5">尚未填寫自我介紹</p>
+            )}
+
+            {/* Social link icons */}
+            {structuredLinks.length > 0 && (
+              <div className="flex flex-wrap gap-3 mb-4">
+                {structuredLinks.map(({ key, href, icon: Icon }) => (
+                  <a
+                    key={key}
+                    href={href!}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-muted-foreground hover:text-foreground transition-colors"
+                    aria-label={key}
+                  >
+                    <Icon className="w-5 h-5" />
+                  </a>
+                ))}
+              </div>
+            )}
+
+            {/* Extra links */}
+            {extraLinks.length > 0 && (
+              <div className="flex flex-col gap-1">
+                {extraLinks.map((url: string, i: number) => (
+                  <a
+                    key={i}
+                    href={url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm text-primary underline underline-offset-2 truncate hover:opacity-80"
+                  >
+                    {url}
+                  </a>
+                ))}
+              </div>
+            )}
           </aside>
 
           {/* RIGHT COLUMN */}
