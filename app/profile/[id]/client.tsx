@@ -27,10 +27,12 @@ export function ProfilePageClient({
   initialProfile,
   results,
   isOwner,
+  eventSlugMap,
 }: {
   initialProfile: Profile;
   results: Result[];
   isOwner: boolean;
+  eventSlugMap: Record<string, string>;
 }) {
   const { user, refreshProfile } = useAuth();
 
@@ -322,7 +324,13 @@ export function ProfilePageClient({
                 {results.map((result) => (
                   <Link
                     key={result.id}
-                    href={isOwner ? `/result/${result.id}/edit` : `/result/${result.id}`}
+                    href={(() => {
+                      const slug = result.event_id ? eventSlugMap[result.event_id] : null;
+                      if (!slug) return isOwner ? `/profile/${initialProfile.id}` : `/profile/${initialProfile.id}`;
+                      return isOwner
+                        ? `/events/${slug}/results/${result.id}/edit`
+                        : `/events/${slug}/results/${result.id}`;
+                    })()}
                     className="py-6 flex items-start justify-between gap-6 group"
                   >
                     {/* Text content */}

@@ -30,7 +30,15 @@ export default async function ProfilePage({
 
   if (profileRes.error || !profileRes.data) redirect("/");
 
-  const allResults = (resultsRes.data as Result[]) || [];
+  const rawResults = (resultsRes.data as Result[]) || [];
+  const eventIds = [...new Set(rawResults.map((r) => r.event_id).filter(Boolean))] as string[];
+  const eventSlugMap: Record<string, string> = {};
+  if (eventIds.length) {
+    const { data: events } = await supabase.from("events").select("id, slug").in("id", eventIds);
+    for (const e of events ?? []) eventSlugMap[e.id] = e.slug;
+  }
+
+  const allResults = rawResults;
   const results = isOwner ? allResults : allResults.filter((r) => r.status === "published");
 
   return (
@@ -38,6 +46,7 @@ export default async function ProfilePage({
       initialProfile={profileRes.data as Profile}
       results={results}
       isOwner={isOwner}
+      eventSlugMap={eventSlugMap}
     />
   );
 }

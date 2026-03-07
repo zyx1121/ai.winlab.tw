@@ -34,6 +34,12 @@ export default async function TeamPage({
 
   const team = teamRes.data;
   const results = (resultsRes.data as Result[]) || [];
+  const eventIds = [...new Set(results.map((r) => r.event_id).filter(Boolean))] as string[];
+  const eventSlugMap: Record<string, string> = {};
+  if (eventIds.length) {
+    const { data: events } = await supabase.from("events").select("id, slug").in("id", eventIds);
+    for (const e of events ?? []) eventSlugMap[e.id] = e.slug;
+  }
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-12">
@@ -61,7 +67,9 @@ export default async function TeamPage({
           {results.map((result) => (
             <Link
               key={result.id}
-              href={`/result/${result.id}`}
+              href={result.event_id && eventSlugMap[result.event_id]
+                ? `/events/${eventSlugMap[result.event_id]}/results/${result.id}`
+                : "#"}
               className="py-6 group flex flex-col gap-1 hover:bg-muted/30 -mx-4 px-4 transition-colors rounded-lg"
             >
               <p className="text-sm text-muted-foreground">{result.date}</p>
