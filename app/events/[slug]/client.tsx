@@ -96,17 +96,7 @@ export function EventDetailClient({
 
       {/* Event header */}
       <div className="flex flex-col gap-4">
-        {event.cover_image && (
-          <div className="relative w-full aspect-[3/1] rounded-2xl overflow-hidden">
-            <Image
-              src={event.cover_image}
-              alt={event.name}
-              fill
-              className="object-cover"
-              unoptimized={isExternalImage(event.cover_image)}
-            />
-          </div>
-        )}
+
         <div className="flex items-start justify-between gap-4">
           <div className="flex flex-col gap-1">
             <div className="flex items-center gap-3">
@@ -210,15 +200,19 @@ export function EventDetailClient({
             <div className="text-center py-12 text-muted-foreground">目前沒有成果</div>
           ) : (
             <div className="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-6">
-              {results.map((item) => (
-                <Link
-                  href={isAdmin ? `/events/${slug}/results/${item.id}/edit` : `/events/${slug}/results/${item.id}`}
-                  key={item.id}
-                  className="h-full"
-                >
-                  <ResultCard item={item} />
-                </Link>
-              ))}
+              {results.map((item) => {
+                const isOwner = user?.id === item.author_id;
+                const showStatus = isAdmin || isOwner;
+                return (
+                  <Link
+                    href={isAdmin ? `/events/${slug}/results/${item.id}/edit` : `/events/${slug}/results/${item.id}`}
+                    key={item.id}
+                    className="h-full"
+                  >
+                    <ResultCard item={item} showStatus={showStatus} />
+                  </Link>
+                );
+              })}
             </div>
           )}
         </div>

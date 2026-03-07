@@ -31,7 +31,8 @@ export default async function EventDetailPage({
     .select("*")
     .eq("event_id", event.id)
     .order("date", { ascending: false });
-  if (!isAdmin) announcementsQuery.eq("status", "published");
+  if (!user) announcementsQuery.eq("status", "published");
+  else if (!isAdmin) announcementsQuery.or(`status.eq.published,and(status.eq.draft,author_id.eq.${user.id})`);
 
   const resultsQuery = supabase
     .from("results")
@@ -39,7 +40,8 @@ export default async function EventDetailPage({
     .eq("event_id", event.id)
     .order("pinned", { ascending: false })
     .order("date", { ascending: false });
-  if (!isAdmin) resultsQuery.eq("status", "published");
+  if (!user) resultsQuery.eq("status", "published");
+  else if (!isAdmin) resultsQuery.or(`status.eq.published,and(status.eq.draft,author_id.eq.${user.id})`);
 
   const [announcementsRes, resultsRes, recruitmentsRes] = await Promise.all([
     announcementsQuery,

@@ -51,7 +51,7 @@ export function ResultDetail({ result, publisherInfo }: Props) {
               <span className="opacity-30">·</span>
             </>
           ) : null}
-          <span>{result.date}</span>
+          <span>{new Date(result.updated_at).toLocaleDateString("zh-TW")}</span>
         </div>
       </div>
 

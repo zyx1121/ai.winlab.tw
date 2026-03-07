@@ -50,7 +50,6 @@ export default function EventResultEditPage() {
   const hasChanges =
     result && savedResult
       ? result.title !== savedResult.title ||
-        result.date !== savedResult.date ||
         result.summary !== savedResult.summary ||
         (result.header_image ?? "") !== (savedResult.header_image ?? "") ||
         JSON.stringify(result.content) !== JSON.stringify(savedResult.content)
@@ -92,7 +91,7 @@ export default function EventResultEditPage() {
     if (!result) return;
     setIsSaving(true);
     const { error } = await supabase.from("results").update({
-      title: result.title, date: result.date, summary: result.summary,
+      title: result.title, summary: result.summary,
       header_image: result.header_image ?? null, content: result.content,
     }).eq("id", id);
     if (!error) setSavedResult({ ...result });
@@ -104,12 +103,15 @@ export default function EventResultEditPage() {
     setIsPublishing(true);
     const newStatus: "draft" | "published" = result.status === "published" ? "draft" : "published";
     const { error } = await supabase.from("results").update({
-      title: result.title, date: result.date, summary: result.summary,
+      title: result.title, summary: result.summary,
       header_image: result.header_image ?? null, content: result.content, status: newStatus,
     }).eq("id", id);
-    if (!error) {
+    if (error) {
+      toast.error(`發布失敗：${error.message}`);
+    } else {
       const updated: Result = { ...result, status: newStatus };
       setResult(updated); setSavedResult(updated);
+      toast.success(newStatus === "published" ? "已發布" : "已取消發布");
     }
     setIsPublishing(false);
   };
@@ -192,15 +194,9 @@ export default function EventResultEditPage() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="flex flex-col gap-1">
-              <Label htmlFor="title" className="text-sm mx-2">標題</Label>
-              <Input id="title" value={result.title} onChange={(e) => setResult({ ...result, title: e.target.value })} placeholder="請輸入成果標題" />
-            </div>
-            <div className="flex flex-col gap-1">
-              <Label htmlFor="date" className="text-sm mx-2">日期</Label>
-              <Input id="date" type="date" value={result.date} onChange={(e) => setResult({ ...result, date: e.target.value })} />
-            </div>
+          <div className="flex flex-col gap-1">
+            <Label htmlFor="title" className="text-sm mx-2">標題</Label>
+            <Input id="title" value={result.title} onChange={(e) => setResult({ ...result, title: e.target.value })} placeholder="請輸入成果標題" />
           </div>
 
           <div className="flex flex-col gap-1">

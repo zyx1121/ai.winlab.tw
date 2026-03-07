@@ -7,6 +7,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import type { Result } from "@/lib/supabase/types";
 import { isExternalImage } from "@/lib/utils";
 import { Pin, User, Users } from "lucide-react";
@@ -20,10 +21,12 @@ export type ResultWithMeta = Result & {
 export function ResultCard({
   item,
   isAdmin,
+  showStatus,
   onPinToggle,
 }: {
   item: ResultWithMeta;
   isAdmin?: boolean;
+  showStatus?: boolean;
   onPinToggle?: (id: string, pinned: boolean) => void;
 }) {
   const publisherName =
@@ -39,6 +42,14 @@ export function ResultCard({
           className="object-cover"
           unoptimized={isExternalImage(item.header_image)}
         />
+        {showStatus && (
+          <Badge
+            variant={item.status === "published" ? "default" : "secondary"}
+            className="absolute top-2 right-2"
+          >
+            {item.status === "published" ? "已發布" : "草稿"}
+          </Badge>
+        )}
         {isAdmin ? (
           <button
             type="button"
@@ -80,7 +91,7 @@ export function ResultCard({
             )}
             <span className="truncate">{publisherName}</span>
           </div>
-          <span className="shrink-0">{item.date || "—"}</span>
+          <span className="shrink-0">{new Date(item.updated_at).toLocaleDateString("zh-TW")}</span>
         </div>
       </CardFooter>
     </Card>

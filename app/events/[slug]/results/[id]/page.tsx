@@ -1,10 +1,10 @@
 import { ResultDetail, type PublisherInfo } from "@/components/result-detail";
 import { createClient } from "@/lib/supabase/server";
 import type { Result } from "@/lib/supabase/types";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Pencil } from "lucide-react";
 import Link from "next/link";
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 
 export async function generateMetadata({
   params,
@@ -29,16 +29,41 @@ export default async function EventResultDetailPage({
   const { slug, id } = await params;
   const supabase = await createClient();
 
+  const { data: { user } } = await supabase.auth.getUser();
+
   const { data, error } = await supabase
     .from("results")
     .select("*")
     .eq("id", id)
-    .eq("status", "published")
     .single();
 
   if (error || !data) notFound();
 
+  if (data.status === "draft") {
+    const { data: profile } = user
+      ? await supabase.from("profiles").select("role").eq("id", user.id).single()
+      : { data: null };
+    const isAdmin = profile?.role === "admin";
+    const isAuthor = data.author_id === user?.id;
+    if (!isAdmin && !isAuthor) notFound();
+    redirect(`/events/${slug}/results/${id}/edit`);
+  }
+
   const result = data as Result;
+
+  // Determine if current user can edit
+  let canEdit = false;
+  if (user) {
+    const { data: profile } = await supabase.from("profiles").select("role").eq("id", user.id).single();
+    const isAdmin = profile?.role === "admin";
+    const isAuthor = result.author_id === user.id;
+    let isTeamLeader = false;
+    if (result.type === "team" && result.team_id) {
+      const { data: tm } = await supabase.from("team_members").select("role").eq("team_id", result.team_id).eq("user_id", user.id).single();
+      isTeamLeader = tm?.role === "leader";
+    }
+    canEdit = isAdmin || isAuthor || isTeamLeader;
+  }
 
   let publisherInfo: PublisherInfo = null;
   if (result.type === "team" && result.team_id) {
@@ -51,13 +76,24 @@ export default async function EventResultDetailPage({
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-12">
-      <Link
-        href={`/events/${slug}?tab=results`}
-        className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-10"
-      >
-        <ArrowLeft className="w-4 h-4" />
-        返回活動
-      </Link>
+      <div className="flex items-center justify-between mb-10">
+        <Link
+          href={`/events/${slug}?tab=results`}
+          className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          返回活動
+        </Link>
+        {canEdit && (
+          <Link
+            href={`/events/${slug}/results/${id}/edit`}
+            className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <Pencil className="w-4 h-4" />
+            編輯
+          </Link>
+        )}
+      </div>
 
       <ResultDetail result={result} publisherInfo={publisherInfo} />
     </div>
