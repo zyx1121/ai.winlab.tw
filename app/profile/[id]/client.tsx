@@ -342,25 +342,36 @@ export function ProfilePageClient({
 
           {/* RIGHT COLUMN */}
           <main className="flex-1 min-w-0">
-            {/* Results */}
-            <div>
-              <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                <Trophy className="w-5 h-5" />
-                個人成果
-              </h2>
-              {results.length === 0 ? (
-                <p className="text-muted-foreground text-sm">尚無成果紀錄。</p>
-              ) : (
-                <div className="flex flex-col divide-y">
-                  {results.map((result) => (
-                    <Link
-                      key={result.id}
-                      href={isOwner ? `/result/${result.id}/edit` : `/result/${result.id}`}
-                      className="py-6 group flex flex-col gap-1 hover:bg-muted/30 -mx-4 px-4 transition-colors rounded-lg"
-                    >
-                      <div className="flex items-center gap-2">
-                        <p className="text-sm text-muted-foreground">{result.date}</p>
-                        {isOwner && (
+            {/* Header */}
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-lg font-semibold">個人成果</h2>
+              {isOwner && (
+                <Link
+                  href="/events"
+                  className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  <Plus className="w-4 h-4" />
+                  新增成果
+                </Link>
+              )}
+            </div>
+
+            {/* List */}
+            {results.length === 0 ? (
+              <p className="text-sm text-muted-foreground py-12 text-center">尚無成果紀錄</p>
+            ) : (
+              <div className="flex flex-col divide-y divide-border">
+                {results.map((result) => (
+                  <Link
+                    key={result.id}
+                    href={isOwner ? `/result/${result.id}/edit` : `/result/${result.id}`}
+                    className="py-6 flex items-start justify-between gap-6 group"
+                  >
+                    {/* Text content */}
+                    <div className="flex-1 min-w-0 flex flex-col gap-1.5">
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <span>{result.date}</span>
+                        {(isOwner || result.status === "draft") && (
                           <span
                             className={`text-xs px-1.5 py-0.5 rounded font-medium ${
                               result.status === "published"
@@ -372,30 +383,32 @@ export function ProfilePageClient({
                           </span>
                         )}
                       </div>
-                      <h3 className="text-xl font-semibold group-hover:underline underline-offset-2">
+                      <h3 className="text-xl font-bold line-clamp-2 group-hover:underline underline-offset-2">
                         {result.title || "(無標題)"}
                       </h3>
                       {result.summary && (
-                        <p className="text-sm text-muted-foreground line-clamp-2 mt-0.5">
+                        <p className="text-sm text-muted-foreground line-clamp-2">
                           {result.summary}
                         </p>
                       )}
-                      {result.header_image && (
-                        <div className="relative w-full max-w-xs aspect-video rounded-md overflow-hidden bg-muted mt-2">
-                          <Image
-                            src={result.header_image}
-                            alt={result.title}
-                            fill
-                            className="object-cover"
-                            unoptimized={isExternalImage(result.header_image)}
-                          />
-                        </div>
-                      )}
-                    </Link>
-                  ))}
-                </div>
-              )}
-            </div>
+                    </div>
+
+                    {/* Thumbnail */}
+                    {result.header_image && result.header_image !== "/placeholder.png" && (
+                      <div className="relative w-28 h-20 shrink-0 rounded-lg overflow-hidden bg-muted">
+                        <Image
+                          src={result.header_image}
+                          alt={result.title}
+                          fill
+                          className="object-cover"
+                          unoptimized={isExternalImage(result.header_image)}
+                        />
+                      </div>
+                    )}
+                  </Link>
+                ))}
+              </div>
+            )}
           </main>
         </div>
       )}
