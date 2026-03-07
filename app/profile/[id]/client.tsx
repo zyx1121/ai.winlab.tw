@@ -371,7 +371,7 @@ export function ProfilePageClient({
                     <div className="flex-1 min-w-0 flex flex-col gap-1.5">
                       <div className="flex items-center gap-2 text-sm text-muted-foreground">
                         <span>{result.date}</span>
-                        {(isOwner || result.status === "draft") && (
+                        {isOwner && (
                           <span
                             className={`text-xs px-1.5 py-0.5 rounded font-medium ${
                               result.status === "published"
