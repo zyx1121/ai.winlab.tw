@@ -307,14 +307,14 @@ export function ProfilePageClient({
             {/* Social link icons */}
             {structuredLinks.length > 0 && (
               <div className="flex flex-wrap gap-3 mb-4">
-                {structuredLinks.map(({ key, href, icon: Icon }) => (
+                {structuredLinks.map(({ key, label, href, icon: Icon }) => (
                   <a
                     key={key}
                     href={href!}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-muted-foreground hover:text-foreground transition-colors"
-                    aria-label={key}
+                    aria-label={label}
                   >
                     <Icon className="w-5 h-5" />
                   </a>
@@ -325,9 +325,9 @@ export function ProfilePageClient({
             {/* Extra links */}
             {extraLinks.length > 0 && (
               <div className="flex flex-col gap-1">
-                {extraLinks.map((url: string, i: number) => (
+                {extraLinks.map((url: string) => (
                   <a
-                    key={i}
+                    key={url}
                     href={url}
                     target="_blank"
                     rel="noopener noreferrer"
