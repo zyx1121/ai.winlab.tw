@@ -293,7 +293,7 @@ export function RecruitmentDialog({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
-        className="max-w-6xl max-h-[90vh] flex flex-col p-0"
+        className="sm:!max-w-6xl max-h-[90vh] flex flex-col p-0"
       >
         <DialogHeader className="px-8 pt-8 pb-0">
           <DialogTitle>{isEditMode ? "編輯徵才" : "新增徵才"}</DialogTitle>
