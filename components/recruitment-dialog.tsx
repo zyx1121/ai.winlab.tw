@@ -293,9 +293,9 @@ export function RecruitmentDialog({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
-        className="max-w-2xl max-h-[90vh] flex flex-col p-0"
+        className="max-w-6xl max-h-[90vh] flex flex-col p-0"
       >
-        <DialogHeader className="px-6 pt-6 pb-0">
+        <DialogHeader className="px-8 pt-8 pb-0">
           <DialogTitle>{isEditMode ? "編輯徵才" : "新增徵才"}</DialogTitle>
           <DialogDescription>
             {isEditMode ? "修改徵才資訊" : "建立新的徵才項目"}
@@ -303,11 +303,11 @@ export function RecruitmentDialog({
         </DialogHeader>
 
         {/* Scrollable form body */}
-        <div className="flex-1 overflow-y-auto px-6 py-4 space-y-6">
+        <div className="flex-1 overflow-y-auto px-8 py-6 space-y-8">
           {/* 1. Cover image */}
-          <div className="space-y-2">
+          <div className="space-y-3">
             <Label>封面圖片</Label>
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-6">
               {formData.image ? (
                 <div className="relative w-40 aspect-video rounded-md overflow-hidden border">
                   <Image
@@ -362,7 +362,7 @@ export function RecruitmentDialog({
           </div>
 
           {/* 2. Title + Link */}
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-6">
             <div className="space-y-2">
               <Label htmlFor="title">標題</Label>
               <Input
@@ -385,7 +385,7 @@ export function RecruitmentDialog({
           </div>
 
           {/* 3. Company description */}
-          <div className="space-y-2">
+          <div className="space-y-3">
             <Label htmlFor="company_description">公司簡介</Label>
             <Textarea
               id="company_description"
@@ -403,7 +403,7 @@ export function RecruitmentDialog({
           </div>
 
           {/* 4. Recruitment period */}
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-6">
             <div className="space-y-2">
               <Label htmlFor="start_date">開始日期</Label>
               <Input
@@ -427,7 +427,7 @@ export function RecruitmentDialog({
           </div>
 
           {/* 5. Positions */}
-          <div className="space-y-3">
+          <div className="space-y-4">
             <Label>職缺</Label>
             {formData.positions.map((pos, index) => (
               <Collapsible key={index} defaultOpen={!pos.name}>
@@ -461,8 +461,8 @@ export function RecruitmentDialog({
                     </button>
                   </CollapsibleTrigger>
                   <CollapsibleContent>
-                    <div className="px-3 pb-3 pt-1 space-y-3 border-t">
-                      <div className="grid grid-cols-2 gap-3">
+                    <div className="px-4 pb-4 pt-2 space-y-4 border-t">
+                      <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-1">
                           <Label className="text-xs">職缺名稱</Label>
                           <Input
@@ -488,7 +488,7 @@ export function RecruitmentDialog({
                           />
                         </div>
                       </div>
-                      <div className="grid grid-cols-3 gap-3">
+                      <div className="grid grid-cols-3 gap-4">
                         <div className="space-y-1">
                           <Label className="text-xs">類型</Label>
                           <Select
@@ -603,9 +603,9 @@ export function RecruitmentDialog({
           </div>
 
           {/* 6. Application method */}
-          <div className="space-y-2">
+          <div className="space-y-3">
             <Label>應徵方式</Label>
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-3 gap-4">
               <div className="space-y-1">
                 <Label className="text-xs">Email</Label>
                 <Input
@@ -642,9 +642,9 @@ export function RecruitmentDialog({
           </div>
 
           {/* 7. Contact */}
-          <div className="space-y-2">
+          <div className="space-y-3">
             <Label>聯絡資訊</Label>
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-3 gap-4">
               <div className="space-y-1">
                 <Label className="text-xs">姓名</Label>
                 <Input
@@ -675,7 +675,7 @@ export function RecruitmentDialog({
           </div>
 
           {/* 8. Required documents */}
-          <div className="space-y-2">
+          <div className="space-y-3">
             <Label htmlFor="required_documents">應備文件</Label>
             <Textarea
               id="required_documents"
@@ -690,7 +690,7 @@ export function RecruitmentDialog({
         </div>
 
         {/* Footer */}
-        <DialogFooter className="px-6 py-4 border-t flex-row gap-2">
+        <DialogFooter className="px-8 py-4 border-t flex-row gap-3">
           {isEditMode && (
             <AlertDialog>
               <AlertDialogTrigger asChild>
