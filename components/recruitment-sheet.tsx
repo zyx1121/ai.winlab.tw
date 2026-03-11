@@ -133,13 +133,12 @@ export function RecruitmentSheet({
   const [deleting, setDeleting] = useState(false);
   const [uploading, setUploading] = useState(false);
 
-  // Reset form when recruitment prop changes
+  // Reset form when recruitment prop changes (sync external prop → internal state)
   useEffect(() => {
-    if (recruitment) {
-      setFormData(formDataFromRecruitment(recruitment));
-    } else {
-      setFormData(getDefaults());
-    }
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setFormData(
+      recruitment ? formDataFromRecruitment(recruitment) : getDefaults(),
+    );
   }, [recruitment]);
 
   function updateField<K extends keyof FormData>(key: K, value: FormData[K]) {
