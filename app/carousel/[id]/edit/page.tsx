@@ -92,7 +92,7 @@ export default function CarouselEditPage() {
     setIsSaving(false);
   };
 
-  useAutoSave({ hasChanges, onSave: handleSave });
+  const { guardNavigation } = useAutoSave({ hasChanges, onSave: handleSave });
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -139,7 +139,7 @@ export default function CarouselEditPage() {
     <div className="max-w-6xl mx-auto px-4 flex flex-col mt-8 pb-16">
       <div className="sticky top-16 z-20 bg-background/80 backdrop-blur-sm py-4 -mx-4 px-4 flex flex-col gap-4">
         <div className="flex items-center justify-between gap-4">
-          <Button variant="ghost" size="sm" onClick={() => router.push("/carousel")}>
+          <Button variant="ghost" size="sm" onClick={() => guardNavigation(() => router.push("/carousel"))}>
             <ArrowLeft className="w-4 h-4" />
             返回列表
           </Button>

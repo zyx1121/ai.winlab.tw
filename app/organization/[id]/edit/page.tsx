@@ -102,7 +102,7 @@ export default function OrganizationMemberEditPage() {
     setIsSaving(false);
   };
 
-  useAutoSave({ hasChanges, onSave: handleSave });
+  const { guardNavigation } = useAutoSave({ hasChanges, onSave: handleSave });
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -152,7 +152,7 @@ export default function OrganizationMemberEditPage() {
         <Button
           variant="ghost"
           size="sm"
-          onClick={() => router.push("/organization")}
+          onClick={() => guardNavigation(() => router.push("/organization"))}
         >
           <ArrowLeft className="w-4 h-4" />
           返回

@@ -22,6 +22,11 @@ export function useAutoSave({
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const onSaveRef = useRef(onSave);
   const isSavingRef = useRef(false);
+  const hasChangesRef = useRef(hasChanges);
+
+  useEffect(() => {
+    hasChangesRef.current = hasChanges;
+  }, [hasChanges]);
 
   // Keep onSave ref fresh without re-triggering effects
   useEffect(() => {
@@ -67,4 +72,14 @@ export function useAutoSave({
     window.addEventListener("beforeunload", handleBeforeUnload);
     return () => window.removeEventListener("beforeunload", handleBeforeUnload);
   }, [hasChanges]);
+
+  // Guard for in-app navigation (e.g. back buttons using router.push)
+  const guardNavigation = useCallback((navigate: () => void) => {
+    if (hasChangesRef.current) {
+      if (!window.confirm("你有尚未儲存的變更，確定要離開嗎？")) return;
+    }
+    navigate();
+  }, []);
+
+  return { guardNavigation };
 }

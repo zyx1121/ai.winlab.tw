@@ -86,7 +86,7 @@ export default function ContactEditPage() {
     setIsSaving(false);
   };
 
-  useAutoSave({ hasChanges, onSave: handleSave });
+  const { guardNavigation } = useAutoSave({ hasChanges, onSave: handleSave });
 
   const handleDelete = async () => {
     if (!confirm("確定要刪除此聯絡人嗎？")) return;
@@ -114,7 +114,7 @@ export default function ContactEditPage() {
   return (
     <div className="max-w-6xl mx-auto px-4 py-8 flex flex-col gap-8">
       <div className="flex items-center justify-between gap-4">
-        <Button variant="ghost" size="sm" onClick={() => router.push("/contacts")}>
+        <Button variant="ghost" size="sm" onClick={() => guardNavigation(() => router.push("/contacts"))}>
           <ArrowLeft className="w-4 h-4" />
           返回
         </Button>

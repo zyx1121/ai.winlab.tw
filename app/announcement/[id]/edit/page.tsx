@@ -105,7 +105,7 @@ export default function AnnouncementEditPage() {
     setIsSaving(false);
   };
 
-  useAutoSave({ hasChanges, onSave: handleSave });
+  const { guardNavigation } = useAutoSave({ hasChanges, onSave: handleSave });
 
   const handlePublish = async () => {
     if (!announcement) return;
@@ -170,7 +170,7 @@ export default function AnnouncementEditPage() {
 
       <div className="sticky top-16 z-20 bg-background/80 backdrop-blur-sm py-4 -mx-4 px-4 flex flex-col gap-4">
         <div className="flex items-center justify-between gap-4">
-          <Button variant="ghost" size="sm" onClick={() => router.push("/announcement")}>
+          <Button variant="ghost" size="sm" onClick={() => guardNavigation(() => router.push("/announcement"))}>
             <ArrowLeft className="w-4 h-4" />
             返回列表
           </Button>

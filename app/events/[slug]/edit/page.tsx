@@ -105,7 +105,7 @@ export default function EventEditPage() {
     setIsSaving(false);
   };
 
-  useAutoSave({ hasChanges, onSave: handleSave });
+  const { guardNavigation } = useAutoSave({ hasChanges, onSave: handleSave });
 
   const handlePublish = async () => {
     if (!event) return;
@@ -161,7 +161,7 @@ export default function EventEditPage() {
       {/* Sticky toolbar */}
       <div className="sticky top-16 z-20 bg-background/80 backdrop-blur-sm py-4 -mx-4 px-4 flex flex-col gap-4">
         <div className="flex items-center justify-between gap-4">
-          <Button variant="ghost" size="sm" onClick={() => router.push("/events")}>
+          <Button variant="ghost" size="sm" onClick={() => guardNavigation(() => router.push("/events"))}>
             <ArrowLeft className="w-4 h-4" />
             返回列表
           </Button>
