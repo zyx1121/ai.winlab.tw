@@ -9,6 +9,7 @@ import {
   useCallback,
   useContext,
   useEffect,
+  useRef,
   useState,
 } from "react";
 
@@ -28,6 +29,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const userIdRef = useRef<string | null>(null);
   const supabase = createClient();
   const router = useRouter();
 
@@ -74,6 +76,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const {
         data: { user: u },
       } = await supabase.auth.getUser();
+      userIdRef.current = u?.id ?? null;
       setUser(u);
       if (u?.id) {
         await fetchProfile(u.id);
@@ -91,9 +94,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // During password recovery, do not update auth state —
       // the reset-password page handles this flow independently.
       if (event === "PASSWORD_RECOVERY") return;
+
+      const newUserId = session?.user?.id ?? null;
+
+      // Skip if user hasn't actually changed (e.g. token refresh on tab focus).
+      // This prevents unnecessary re-renders that reset edit page state.
+      if (newUserId === userIdRef.current) {
+        setIsLoading(false);
+        return;
+      }
+
+      userIdRef.current = newUserId;
       setUser(session?.user ?? null);
-      if (session?.user?.id) {
-        fetchProfile(session.user.id);
+      if (newUserId) {
+        fetchProfile(newUserId);
       } else {
         setProfile(null);
       }
