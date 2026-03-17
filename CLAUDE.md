@@ -2,94 +2,136 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## Commands
+## 指令
 
 ```bash
-bun dev       # Start development server
-bun build     # Build for production
-bun start     # Start production server
-bun lint      # Run ESLint
+bun dev       # 開發伺服器
+bun build     # 正式建置
+bun start     # 正式伺服器
+bun lint      # ESLint
 ```
 
-This project uses **bun** as the package manager (not npm/yarn/pnpm).
+套件管理一律使用 **bun**（不是 npm/yarn/pnpm），新增套件用 `bunx shadcn add <name>`。
 
-## Environment Variables
+## 環境變數
 
-Required in `.env.local`:
+`.env.local` 需要：
 ```
 NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY=
 ```
 
-## Architecture
+## 架構概述
 
-This is a **Next.js 16 (App Router)** website for the NYCU (國立陽明交通大學) AI Office. It uses **Supabase** as the backend (database + auth + storage) and **Tailwind CSS v4** with **shadcn/ui** components.
+**Next.js 16 App Router** + **Supabase**（DB + Auth + Storage）+ **Tailwind CSS v4** + **shadcn/ui**
 
-### Data Model (`lib/supabase/types.ts`)
+### Supabase 客戶端選擇
 
-Key entities:
-- **Announcement** — news posts with Tiptap rich-text content (JSON), `status: draft|published`
-- **Introduction** — single-record office introduction page with Tiptap content
-- **Result** — competition results, `type: personal|team`, linked to optional `team_id`
-- **Recruitment** — job postings with image and external link (DB table: `competitions`)
-- **OrganizationMember** — staff/members with `category: ai_newcomer|industry_academy|alumni`
-- **Profile** — extends `auth.users`; `role: admin|user`
-- **Team / TeamMember / TeamInvitation** — team management for competition results
+| 情境 | 匯入路徑 |
+|------|----------|
+| Client Component | `@/lib/supabase/client` |
+| Server Component / Route Handler | `@/lib/supabase/server`（async） |
+| proxy.ts（middleware） | `@/lib/supabase/proxy` |
 
-### Auth & Authorization (`components/auth-provider.tsx`)
+### 授權邏輯
 
-`AuthProvider` wraps the app (in `app/layout.tsx`) and exposes `useAuth()` which provides:
-- `user`, `profile`, `isAdmin`, `isLoading`
-- `signIn`, `signOut`, `refreshProfile`
+`AuthProvider`（`components/auth-provider.tsx`）包裹整個 app，提供 `useAuth()`：`user`, `profile`, `isAdmin`, `isLoading`, `signIn`, `signOut`。
 
-**Authorization pattern:** logged-in users see all records (including drafts); anonymous users see only `status: published` records. Admin-only actions are guarded by `isAdmin` (derived from `profile.role === 'admin'`).
+- 未登入 → 只看 `status: published` 的資料
+- 登入非 admin → 可看自己的草稿 + 所有 published
+- admin → 完整讀寫權限（`profile.role === 'admin'`）
 
-### Supabase Client Usage
+Server Component 中需自行查 `profiles` 表取得 `isAdmin`（參考 `app/events/[slug]/page.tsx`）。
 
-- **Client Components**: `import { createClient } from "@/lib/supabase/client"` (browser client)
-- **Server Components / Route Handlers**: `import { createClient } from "@/lib/supabase/server"` (async, reads cookies)
-- **Middleware**: `import { createClient } from "@/lib/supabase/proxy"` (for Next.js middleware)
+### 根 Layout 特殊行為
 
-### Rich Text Editing (`components/tiptap-editor.tsx`)
+`app/layout.tsx` 在 Server Component 中查詢 `events` 表取得 `pinned=true` 的活動，傳給 `<Header pinnedEvents={...} />`，用於在導覽列動態顯示置頂活動連結。
 
-`TiptapEditor` is a shared component used for Announcement and Result content. Content is stored as Tiptap JSON (`Record<string, unknown>`) in Supabase. Supports drag-and-drop/paste image upload (calls `uploadAnnouncementImage` from `lib/upload-image.ts`).
+## 資料模型（`lib/supabase/types.ts`）
 
-### Image Uploads (`lib/upload-image.ts`)
+主要實體：
 
-All images go to the `announcement-images` Supabase Storage bucket (public). Paths are prefixed by content type:
-- Announcement inline images: root-level
-- Recruitment cards: `recruitment/`
-- Result header images: `results/`
-- Organization member photos: `organization/`
+- **Announcement** — 公告，Tiptap JSON 內容，`status: draft|published`，`event_id`（null = 全域）
+- **Result** — 競賽/活動成果，`type: personal|team`，`pinned`，`event_id`（null = 全域）
+- **Recruitment**（DB table: `competitions`）— 招募，`event_id`，包含 JSON 欄位：`positions: RecruitmentPosition[]`、`application_method: ApplicationMethod`、`contact: ContactInfo`
+- **Event** — 活動，`slug`（unique），`status: draft|published`，`pinned`，`sort_order`
+- **Introduction** — 單筆辦公室介紹，Tiptap JSON 內容
+- **OrganizationMember** — `category: core|legal_entity|industry`
+- **Profile** — 繼承 `auth.users`，`role: admin|user`，含 `phone`, `bio`, `linkedin`, `facebook`, `github`, `website`, `resume`, `social_links`
+- **ExternalResult** — 使用者自行提交的外部成果連結
+- **Tag / ResultTag** — 成果的標籤系統（樹狀結構，`parent_id`）
+- **Team / TeamMember / TeamInvitation** — 團隊管理
+- **CarouselSlide**, **Contact** — 首頁輪播與聯絡資訊
 
-**One-time Supabase setup required:** create the `announcement-images` bucket (public) and run `supabase/storage-policies.sql`.
+`event_id IS NULL` → 屬於全域頁面；`IS NOT NULL` → 屬於特定活動。
 
-### Page Structure
+## 頁面結構
 
-**Public pages** (home sections rendered as server components, each fetches its own data):
-- `/` — home page composed of `HomeCarousel`, `HomeIntroduction`, `HomeOrganization`, `HomeAnnouncement`, `HomeResult`, `HomeRecruitment`, `HomeContacts`
+### 首頁（`/`）
+Server Components 組合，各自獨立 fetch：`HomeCarousel`, `HomeIntroduction`, `HomeOrganization`, `HomeAnnouncement`, `HomeEvents`, `HomeContacts`。
 
-**Content management pages** (all client components, require login):
-- `/announcement` — list; `/announcement/[id]` — read-only view; `/announcement/[id]/edit` — editor
-- `/result` — list; `/result/[id]` — read-only view; `/result/[id]/edit` — editor
-- `/recruitment` — list with edit-in-place (DB table: `competitions`)
-- `/introduction` — read-only; `/introduction/edit` — editor
-- `/organization` — member grid by category; `/organization/[id]/edit` — member editor
+### 活動系統（`/events`）
+- `/events` — 活動列表（client）
+- `/events/[slug]` — 活動詳情，含公告/成果/招募三分頁（server + client）
+- `/events/[slug]/edit` — admin 編輯活動 metadata
+- `/events/[slug]/announcements/[id]`、`/edit`
+- `/events/[slug]/results/[id]`、`/edit`（非 admin 可建立自己的成果）
+- `/events/[slug]/recruitment/[id]/page.tsx`（admin only）
 
-**Account pages** (require login):
-- `/account` — profile + team membership + pending invitations
-- `/account/teams` — team list/create
-- `/account/teams/[id]` — team detail + invite members
+### 內容管理（需登入）
+- `/announcement`、`/announcement/[id]`、`/announcement/[id]/edit`
+- `/result`（全域，目前未使用，成果移至活動下）
+- `/recruitment` — 全域招募列表（DB table: `competitions`）
+- `/introduction`、`/introduction/edit`
+- `/organization`、`/organization/[id]/edit`
+- `/carousel/[id]/edit`、`/contacts/[id]/edit`
 
-### Database Migrations
+### 帳號與個人頁面
+- `/account` — 個人資料 + 隊伍 + 邀請
+- `/account/teams`、`/account/teams/[id]`
+- `/profile/[id]` — 公開作者頁（個人資料 + 發布文章）
+- `/team/[id]` — 公開團隊頁
 
-SQL migrations are in `supabase/migrations/`. Apply them in order in the Supabase SQL editor. RLS is enabled on all tables — unauthenticated users can only read published content; authenticated users have broader access; admins have full write access.
+### Admin 專用
+- `/settings` — 使用者管理
 
-### UI Components
+## 共用 Hooks 與工具
 
-Uses **shadcn/ui** (`components/ui/`). Add new components via:
-```bash
-bunx shadcn add <component-name>
+### `useAutoSave`（`hooks/use-auto-save.ts`）
+所有編輯頁面都使用此 hook，自動 debounce 儲存（預設 3 秒）。提供 `guardNavigation` 防止未儲存就離開。
+
+```ts
+const { guardNavigation } = useAutoSave({ hasChanges, onSave });
 ```
 
-Fonts: **Noto Sans** + **Noto Sans Mono** (Google Fonts, via `next/font`).
+### `nuqs`
+URL 搜尋參數狀態管理，使用 `NuqsAdapter`（已在 root layout 包裹）。
+
+## 富文字編輯（`components/tiptap-editor.tsx`）
+
+`TiptapEditor` 用於 Announcement、Result、Introduction 等 content 欄位。內容儲存為 Tiptap JSON（`Record<string, unknown>`）。支援拖放/貼上圖片（呼叫 `uploadAnnouncementImage`）。
+
+## 圖片上傳（`lib/upload-image.ts`）
+
+Storage bucket：`announcement-images`（public）。路徑前綴：
+
+| 用途 | 路徑 |
+|------|------|
+| Announcement inline 圖片 | root（無前綴） |
+| Recruitment 封面 | `competitions/` |
+| Result header 圖片 | `results/` |
+| OrganizationMember 照片 | `organization/` |
+| Event 封面 | `events/` |
+
+`next/image` 已設定允許 `*.supabase.co` 的 remote pattern。
+
+## UI 套件細節
+
+- **shadcn/ui**（`components/ui/`）：基底 UI 元件
+- **`@squircle-js/react`**：`Card` 元件使用 Squircle clip-path，SSR 時會有初始矩形 flash（已知問題）
+- **`next-themes`**：`ThemeProvider` 在 root layout，預設 `light`
+- **字型**：Noto Sans（`--font-noto-sans`）、Noto Sans Mono（`--font-noto-sans-mono`）
+
+## 資料庫 Migrations
+
+SQL migrations 放在 `supabase/migrations/`，依序在 Supabase SQL editor 執行。所有表均啟用 RLS。初次設置另需建立 `announcement-images` storage bucket（public）並執行 `supabase/storage-policies.sql`。
