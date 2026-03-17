@@ -106,6 +106,7 @@ export default function OrganizationMemberEditPage() {
 
     if (error) {
       console.error("Error saving organization member:", error);
+      toast.error("儲存失敗，請稍後再試");
     } else {
       setSavedMember({ ...member });
     }
