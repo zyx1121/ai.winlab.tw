@@ -97,9 +97,9 @@ export type TeamInvitation = {
 };
 
 export type OrganizationMemberCategory =
-  | "ai_newcomer"
-  | "industry_academy"
-  | "alumni";
+  | "core"
+  | "legal_entity"
+  | "industry";
 
 export type OrganizationMember = {
   id: string;
@@ -111,6 +111,12 @@ export type OrganizationMember = {
   image: string | null;
   link: string | null;
   sort_order: number;
+  // New fields
+  school: string | null;
+  research_areas: string | null;
+  email: string | null;
+  website: string | null;
+  member_role: string | null;
 };
 
 export type Contact = {
