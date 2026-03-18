@@ -29,6 +29,8 @@ const introductionEditClient = readFileSync(resolve(process.cwd(), "app/introduc
 const carouselEditClient = readFileSync(resolve(process.cwd(), "app/carousel/[id]/edit/client.tsx"), "utf8")
 const organizationEditClient = readFileSync(resolve(process.cwd(), "app/organization/[id]/edit/client.tsx"), "utf8")
 const eventAnnouncementEditClient = readFileSync(resolve(process.cwd(), "app/events/[slug]/announcements/[id]/edit/client.tsx"), "utf8")
+const privacyEditClient = readFileSync(resolve(process.cwd(), "app/privacy/edit/client.tsx"), "utf8")
+const resultEditClient = readFileSync(resolve(process.cwd(), "app/events/[slug]/results/[id]/edit/client.tsx"), "utf8")
 
 describe("server admin page contracts", () => {
   test("carousel, contacts, and settings users pages are server-gated", () => {
@@ -127,10 +129,12 @@ describe("server admin page contracts", () => {
   test("server-wrapped admin editors do not keep depending on useAuth in the client layer", () => {
     for (const content of [
       contactEditClient,
+      privacyEditClient,
       introductionEditClient,
       carouselEditClient,
       organizationEditClient,
       eventAnnouncementEditClient,
+      resultEditClient,
     ]) {
       assert.ok(!content.includes('from "@/components/auth-provider"'))
       assert.ok(!content.includes("useAuth("))

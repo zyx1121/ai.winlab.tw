@@ -1,6 +1,5 @@
 "use client";
 
-import { useAuth } from "@/components/auth-provider";
 import { PageShell } from "@/components/page-shell";
 import { TiptapEditor } from "@/components/tiptap-editor";
 import { Button } from "@/components/ui/button";
@@ -9,10 +8,9 @@ import { createClient } from "@/lib/supabase/client";
 import { formatDate } from "@/lib/date";
 import { ArrowLeft, Check, Loader2, RotateCcw, Save } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
-type VersionRecord = {
+export type VersionRecord = {
   id: string;
   version: number;
   content: Record<string, unknown>;
@@ -21,62 +19,35 @@ type VersionRecord = {
   profiles: { display_name: string | null } | null;
 };
 
-export default function PrivacyEditPage() {
-  const { user, isAdmin, isLoading: authLoading } = useAuth();
-  const router = useRouter();
-  const supabase = createClient();
+type Props = {
+  initialUserId: string;
+  initialVersions: VersionRecord[];
+};
 
-  const [content, setContent] = useState<Record<string, unknown>>({});
-  const [savedContent, setSavedContent] = useState<Record<string, unknown>>({});
+export default function PrivacyEditPage({
+  initialUserId,
+  initialVersions,
+}: Props) {
+  const supabase = createClient();
+  const latestRecord = initialVersions[0] ?? null;
+
+  const [content, setContent] = useState<Record<string, unknown>>(latestRecord?.content ?? {});
+  const [savedContent, setSavedContent] = useState<Record<string, unknown>>(latestRecord?.content ?? {});
   const [note, setNote] = useState("");
-  const [versions, setVersions] = useState<VersionRecord[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [versions, setVersions] = useState<VersionRecord[]>(initialVersions);
   const [isSaving, setIsSaving] = useState(false);
-  const [latestVersion, setLatestVersion] = useState(0);
+  const [latestVersion, setLatestVersion] = useState(latestRecord?.version ?? 0);
 
   const hasChanges = JSON.stringify(content) !== JSON.stringify(savedContent);
 
-  useEffect(() => {
-    if (!authLoading && !user) { router.push("/login"); return; }
-    if (!authLoading && user && !isAdmin) { router.push("/privacy"); return; }
-    if (!user) return;
-
-    let cancelled = false;
-
-    async function loadPrivacyData() {
-      const { data } = await supabase
-        .from("privacy_policy")
-        .select("id, version, content, note, created_at, profiles!created_by(display_name)")
-        .order("version", { ascending: false });
-
-      if (!cancelled && data && data.length > 0) {
-        const typed = data as unknown as VersionRecord[];
-        setContent(typed[0].content);
-        setSavedContent(typed[0].content);
-        setLatestVersion(typed[0].version);
-        setVersions(typed);
-      }
-
-      if (!cancelled) {
-        setIsLoading(false);
-      }
-    }
-
-    void loadPrivacyData();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [authLoading, isAdmin, router, supabase, user]);
-
   const handleSave = async () => {
-    if (!hasChanges || !user) return;
+    if (!hasChanges) return;
     setIsSaving(true);
     const { error } = await supabase.from("privacy_policy").insert({
       content,
       version: latestVersion + 1,
       note: note.trim() || null,
-      created_by: user.id,
+      created_by: initialUserId,
     });
     if (!error) {
       setSavedContent({ ...content });
@@ -95,14 +66,6 @@ export default function PrivacyEditPage() {
     }
     setIsSaving(false);
   };
-
-  if (isLoading || authLoading) {
-    return (
-      <PageShell tone="centeredState">
-        <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
-      </PageShell>
-    );
-  }
 
   return (
     <PageShell tone="editor">

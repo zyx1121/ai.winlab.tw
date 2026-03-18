@@ -1,6 +1,5 @@
 "use client";
 
-import { useAuth } from "@/components/auth-provider";
 import { ResultDetail, type PublisherInfo } from "@/components/result-detail";
 import { TiptapEditor } from "@/components/tiptap-editor";
 import { Button } from "@/components/ui/button";
@@ -24,21 +23,27 @@ import {
   Trash2,
 } from "lucide-react";
 import Image from "next/image";
-import { useParams, useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useRef, useState } from "react";
 
-export default function EventResultEditPage() {
-  const { user, isAdmin, isLoading: authLoading } = useAuth();
+type Props = {
+  id: string;
+  slug: string;
+  initialResult: Result;
+  initialPublisherInfo: PublisherInfo;
+};
+
+export default function EventResultEditPage({
+  id,
+  slug,
+  initialResult,
+  initialPublisherInfo,
+}: Props) {
   const router = useRouter();
-  const params = useParams();
-  const slug = params.slug as string;
-  const id = params.id as string;
   const supabase = createClient();
 
-  const [result, setResult] = useState<Result | null>(null);
-  const [savedResult, setSavedResult] = useState<Result | null>(null);
-  const [canEdit, setCanEdit] = useState<boolean | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [result, setResult] = useState<Result | null>(initialResult);
+  const [savedResult, setSavedResult] = useState<Result | null>(initialResult);
   const [isSaving, setIsSaving] = useState(false);
   const [isPublishing, setIsPublishing] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -46,7 +51,7 @@ export default function EventResultEditPage() {
   const [isPreview, setIsPreview] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const [publisherInfo, setPublisherInfo] = useState<PublisherInfo>(null);
+  const [publisherInfo] = useState<PublisherInfo>(initialPublisherInfo);
 
   const hasChanges =
     result && savedResult
@@ -55,80 +60,6 @@ export default function EventResultEditPage() {
         (result.header_image ?? "") !== (savedResult.header_image ?? "") ||
         JSON.stringify(result.content) !== JSON.stringify(savedResult.content)
       : false;
-
-  useEffect(() => {
-    if (!authLoading && !user) { router.push("/login"); return; }
-    if (!user) return;
-    const currentUser = user;
-
-    let cancelled = false;
-
-    async function loadResult() {
-      const { data, error } = await supabase.from("results").select("*").eq("id", id).single();
-      if (error) {
-        router.push(`/events/${slug}?tab=results`);
-        return;
-      }
-
-      const loadedResult = {
-        ...data,
-        type: (data as Result).type ?? "personal",
-        team_id: (data as Result).team_id ?? null,
-      } as Result;
-
-      let nextPublisherInfo: PublisherInfo = null;
-
-      if (loadedResult.type === "team" && loadedResult.team_id) {
-        const { data: teamData } = await supabase
-          .from("teams")
-          .select("name")
-          .eq("id", loadedResult.team_id)
-          .single();
-        nextPublisherInfo = {
-          name: teamData?.name || "未知團隊",
-          href: `/team/${loadedResult.team_id}`,
-        };
-      } else if (loadedResult.author_id) {
-        const { data: profileData } = await supabase
-          .from("profiles")
-          .select("display_name")
-          .eq("id", loadedResult.author_id)
-          .single();
-        nextPublisherInfo = {
-          name: profileData?.display_name || "未知使用者",
-          href: `/profile/${loadedResult.author_id}`,
-        };
-      }
-
-      let nextCanEdit = false;
-
-      if (isAdmin || loadedResult.author_id === currentUser.id) {
-        nextCanEdit = true;
-      } else if (loadedResult.type === "team" && loadedResult.team_id) {
-        const { data: tm } = await supabase
-          .from("team_members")
-          .select("role")
-          .eq("team_id", loadedResult.team_id)
-          .eq("user_id", currentUser.id)
-          .single();
-        nextCanEdit = tm?.role === "leader";
-      }
-
-      if (cancelled) return;
-
-      setResult(loadedResult);
-      setSavedResult(loadedResult);
-      setPublisherInfo(nextPublisherInfo);
-      setCanEdit(nextCanEdit);
-      setIsLoading(false);
-    }
-
-    void loadResult();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [authLoading, id, isAdmin, router, slug, supabase, user]);
 
   const handleSave = async () => {
     if (!result) return;
@@ -180,15 +111,7 @@ export default function EventResultEditPage() {
     router.push(`/events/${slug}?tab=results`);
   };
 
-  if (isLoading || authLoading) {
-    return (
-      <div className="container max-w-4xl mx-auto p-4 flex justify-center items-center min-h-[50vh]">
-        <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
-      </div>
-    );
-  }
   if (!result) return null;
-  if (canEdit === false) { router.push(`/events/${slug}?tab=results`); return null; }
 
   return (
     <div className="container max-w-6xl mx-auto p-4 flex flex-col mt-8 pb-16">

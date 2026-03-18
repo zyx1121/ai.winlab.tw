@@ -1,5 +1,7 @@
 import EventResultEditPageClient from "./client";
+import { type PublisherInfo } from "@/components/result-detail";
 import { getViewer } from "@/lib/supabase/get-viewer";
+import type { Result } from "@/lib/supabase/types";
 import { redirect } from "next/navigation";
 
 export default async function EventResultEditPage({
@@ -34,5 +36,41 @@ export default async function EventResultEditPage({
     redirect(`/events/${slug}?tab=results`);
   }
 
-  return <EventResultEditPageClient />;
+  const result = {
+    ...data,
+    type: (data as Result).type ?? "personal",
+    team_id: (data as Result).team_id ?? null,
+  } as Result;
+
+  let publisherInfo: PublisherInfo = null;
+  if (result.type === "team" && result.team_id) {
+    const { data: teamData } = await supabase
+      .from("teams")
+      .select("name")
+      .eq("id", result.team_id)
+      .single();
+    publisherInfo = {
+      name: teamData?.name || "未知團隊",
+      href: `/team/${result.team_id}`,
+    };
+  } else if (result.author_id) {
+    const { data: profileData } = await supabase
+      .from("profiles")
+      .select("display_name")
+      .eq("id", result.author_id)
+      .single();
+    publisherInfo = {
+      name: profileData?.display_name || "未知使用者",
+      href: `/profile/${result.author_id}`,
+    };
+  }
+
+  return (
+    <EventResultEditPageClient
+      id={id}
+      slug={slug}
+      initialResult={result}
+      initialPublisherInfo={publisherInfo}
+    />
+  );
 }
