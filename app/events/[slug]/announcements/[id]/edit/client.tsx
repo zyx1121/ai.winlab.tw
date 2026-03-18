@@ -1,7 +1,6 @@
 "use client";
 
 import { AnnouncementDetail } from "@/components/announcement-detail";
-import { useAuth } from "@/components/auth-provider";
 import { PageShell } from "@/components/page-shell";
 import { TiptapEditor } from "@/components/tiptap-editor";
 import { Button } from "@/components/ui/button";
@@ -19,7 +18,6 @@ import { useParams, useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 
 export default function EventAnnouncementEditPage() {
-  const { user, isLoading: authLoading, isAdmin } = useAuth();
   const router = useRouter();
   const params = useParams();
   const slug = params.slug as string;
@@ -42,10 +40,6 @@ export default function EventAnnouncementEditPage() {
     : false;
 
   useEffect(() => {
-    if (!authLoading && !user) { router.push("/login"); return; }
-    if (!authLoading && user && !isAdmin) { router.push(`/events/${slug}/announcements/${id}`); return; }
-    if (!(user && isAdmin)) return;
-
     let cancelled = false;
 
     async function loadAnnouncement() {
@@ -72,7 +66,7 @@ export default function EventAnnouncementEditPage() {
     return () => {
       cancelled = true;
     };
-  }, [authLoading, id, isAdmin, router, slug, supabase, user]);
+  }, [id, router, slug, supabase]);
 
   const announcementContent = announcement?.content;
 
@@ -126,7 +120,7 @@ export default function EventAnnouncementEditPage() {
     router.push(`/events/${slug}?tab=announcements`);
   };
 
-  if (isLoading || authLoading) {
+  if (isLoading) {
     return (
       <PageShell tone="centeredState">
         <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />

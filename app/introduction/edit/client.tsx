@@ -2,7 +2,6 @@
 
 import { IntroductionDetail } from "@/components/introduction-detail";
 import { PageShell } from "@/components/page-shell";
-import { useAuth } from "@/components/auth-provider";
 import { TiptapEditor } from "@/components/tiptap-editor";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -18,7 +17,6 @@ import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 
 export default function IntroductionEditPage() {
-  const { user, isAdmin, isLoading: authLoading } = useAuth();
   const router = useRouter();
   const supabase = createClient();
 
@@ -34,16 +32,6 @@ export default function IntroductionEditPage() {
     : false;
 
   useEffect(() => {
-    if (!authLoading && !user) {
-      router.push("/login");
-      return;
-    }
-    if (!authLoading && user && !isAdmin) {
-      router.push("/introduction");
-      return;
-    }
-    if (!(user && isAdmin)) return;
-
     let cancelled = false;
 
     async function loadIntroduction() {
@@ -94,7 +82,7 @@ export default function IntroductionEditPage() {
     return () => {
       cancelled = true;
     };
-  }, [authLoading, isAdmin, router, supabase, user]);
+  }, [router, supabase]);
 
   const introductionContent = introduction?.content;
 
@@ -131,7 +119,7 @@ export default function IntroductionEditPage() {
 
   const { guardNavigation } = useAutoSave({ hasChanges, onSave: handleSave });
 
-  if (isLoading || authLoading) {
+  if (isLoading) {
     return (
       <PageShell tone="centeredState">
         <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />

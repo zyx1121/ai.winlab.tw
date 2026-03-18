@@ -1,6 +1,5 @@
 "use client";
 
-import { useAuth } from "@/components/auth-provider";
 import { PageShell } from "@/components/page-shell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,7 +16,6 @@ import { useParams, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
 export default function CarouselEditPage() {
-  const { user, isAdmin, isLoading: authLoading } = useAuth();
   const router = useRouter();
   const params = useParams();
   const id = params.id as string;
@@ -41,16 +39,6 @@ export default function CarouselEditPage() {
       : false;
 
   useEffect(() => {
-    if (!authLoading && !user) {
-      router.push("/login");
-      return;
-    }
-    if (!authLoading && user && !isAdmin) {
-      router.push("/");
-      return;
-    }
-    if (!(user && isAdmin)) return;
-
     let cancelled = false;
 
     async function loadSlide() {
@@ -78,7 +66,7 @@ export default function CarouselEditPage() {
     return () => {
       cancelled = true;
     };
-  }, [authLoading, id, isAdmin, router, supabase, user]);
+  }, [id, router, supabase]);
 
   const handleSave = async () => {
     if (!slide) return;
@@ -136,7 +124,7 @@ export default function CarouselEditPage() {
     router.push("/carousel");
   };
 
-  if (isLoading || authLoading) {
+  if (isLoading) {
     return (
       <PageShell tone="centeredState">
         <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />

@@ -1,6 +1,5 @@
 "use client";
 
-import { useAuth } from "@/components/auth-provider";
 import { PageShell } from "@/components/page-shell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -27,7 +26,6 @@ const CATEGORIES: { value: OrganizationMemberCategory; label: string }[] = [
 ];
 
 export default function OrganizationMemberEditPage() {
-  const { isAdmin, isLoading: authLoading } = useAuth();
   const router = useRouter();
   const params = useParams();
   const id = params.id as string;
@@ -57,12 +55,6 @@ export default function OrganizationMemberEditPage() {
       : false;
 
   useEffect(() => {
-    if (!authLoading && !isAdmin) {
-      router.push("/organization");
-      return;
-    }
-    if (!isAdmin) return;
-
     let cancelled = false;
 
     async function loadMember() {
@@ -90,7 +82,7 @@ export default function OrganizationMemberEditPage() {
     return () => {
       cancelled = true;
     };
-  }, [authLoading, id, isAdmin, router, supabase]);
+  }, [id, router, supabase]);
 
   const handleSave = async () => {
     if (!member) return;
