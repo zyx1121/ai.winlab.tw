@@ -1,22 +1,15 @@
-"use client";
-
-import { Squircle } from "@squircle-js/react";
 import * as React from "react";
 
 import { cn } from "@/lib/utils";
 
-function Card({ className, style, ...props }: React.ComponentProps<"div">) {
+function Card({ className, ...props }: React.ComponentProps<"div">) {
   return (
-    <Squircle
+    <div
       data-slot="card"
-      cornerRadius={32}
-      cornerSmoothing={0}
       className={cn(
-        "bg-card text-card-foreground flex flex-col gap-6 py-6",
-        "rounded-[2rem] border border-border",
+        "bg-card text-card-foreground flex flex-col gap-6 rounded-[2rem] border border-border py-6",
         className
       )}
-      style={style}
       {...props}
     />
   )
@@ -91,4 +84,3 @@ function CardFooter({ className, ...props }: React.ComponentProps<"div">) {
 export {
   Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader, CardTitle
 };
-

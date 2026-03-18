@@ -4,7 +4,6 @@ import { Footer } from "@/components/footer";
 import { Header } from "@/components/header";
 import { Toaster } from "@/components/ui/sonner";
 import { createClient } from "@/lib/supabase/server";
-import { SquircleNoScript } from "@squircle-js/react";
 import type { Metadata } from "next";
 import { ThemeProvider } from "next-themes";
 import { Noto_Sans, Noto_Sans_Mono } from "next/font/google";
@@ -44,7 +43,6 @@ export default async function RootLayout({
   return (
     <html lang="zh-TW" suppressHydrationWarning>
       <body className={`${notoSans.variable} ${notoSansMono.variable} antialiased`}>
-        <SquircleNoScript />
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
           <NuqsAdapter>
             <AuthProvider>
