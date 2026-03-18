@@ -108,12 +108,12 @@ export default function PrivacyEditPage() {
     <PageShell tone="editor">
       {/* Sticky toolbar */}
       <div className="sticky top-16 z-20 bg-background/80 backdrop-blur-sm py-4 -mx-4 px-4 flex items-center justify-between gap-4">
-        <Link href="/privacy">
-          <Button variant="ghost" size="sm">
+        <Button asChild variant="ghost" size="sm">
+          <Link href="/privacy">
             <ArrowLeft className="w-4 h-4" />
             返回頁面
-          </Button>
-        </Link>
+          </Link>
+        </Button>
         <div className="flex items-center gap-2">
           <Input
             value={note}

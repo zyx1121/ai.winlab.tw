@@ -22,11 +22,11 @@ export async function HomeAnnouncement() {
         <HomeAnnouncementTable announcements={announcements} />
       )}
       <div className="flex justify-center">
-        <Link href="/announcement">
-          <Button variant="secondary" size="lg" className="px-12 text-lg">
+        <Button asChild variant="secondary" size="lg" className="px-12 text-lg">
+          <Link href="/announcement">
             探索更多
-          </Button>
-        </Link>
+          </Link>
+        </Button>
       </div>
     </div>
   );

@@ -17,6 +17,12 @@ const loginPage = readFileSync(resolve(process.cwd(), "app/login/page.tsx"), "ut
 const forgotPasswordPage = readFileSync(resolve(process.cwd(), "app/forgot-password/page.tsx"), "utf8")
 const resetPasswordPage = readFileSync(resolve(process.cwd(), "app/reset-password/page.tsx"), "utf8")
 const usersTable = readFileSync(resolve(process.cwd(), "components/users-table.tsx"), "utf8")
+const homeEvents = readFileSync(resolve(process.cwd(), "components/home-events.tsx"), "utf8")
+const homeAnnouncement = readFileSync(resolve(process.cwd(), "components/home-announcement.tsx"), "utf8")
+const homeIntroduction = readFileSync(resolve(process.cwd(), "components/home-introduction.tsx"), "utf8")
+const homeOrganization = readFileSync(resolve(process.cwd(), "components/home-organization.tsx"), "utf8")
+const privacyEditPage = readFileSync(resolve(process.cwd(), "app/privacy/edit/page.tsx"), "utf8")
+const teamPage = readFileSync(resolve(process.cwd(), "app/team/[id]/page.tsx"), "utf8")
 
 describe("accessibility contracts", () => {
   test("root layout provides a skip link and a main landmark", () => {
@@ -70,5 +76,17 @@ describe("accessibility contracts", () => {
     assert.ok(resetPasswordPage.includes('role="status"'))
     assert.ok(resetPasswordPage.includes('role="alert"'))
     assert.ok(usersTable.includes('aria-live="polite"'))
+  })
+
+  test("buttons are not nested inside links for call-to-action navigation", () => {
+    assert.ok(!homeEvents.includes("<Link href=\"/events\">\n          <Button"))
+    assert.ok(!homeAnnouncement.includes("<Link href=\"/announcement\">\n          <Button"))
+    assert.ok(!homeIntroduction.includes("<Link href=\"/introduction\">\n          <Button"))
+    assert.ok(!homeOrganization.includes("<Link href=\"/organization\">\n            <Button"))
+    assert.ok(!privacyEditPage.includes("<Link href=\"/privacy\">\n          <Button"))
+  })
+
+  test("team result links do not fall back to dead hash hrefs", () => {
+    assert.ok(!teamPage.includes(': "#"'))
   })
 })

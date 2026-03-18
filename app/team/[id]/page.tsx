@@ -64,21 +64,39 @@ export default async function TeamPage({
         <p className="text-muted-foreground">尚無已發布的成果。</p>
       ) : (
         <div className="flex flex-col divide-y">
-          {results.map((result) => (
-            <Link
-              key={result.id}
-              href={result.event_id && eventSlugMap[result.event_id]
+          {results.map((result) => {
+            const href =
+              result.event_id && eventSlugMap[result.event_id]
                 ? `/events/${eventSlugMap[result.event_id]}/results/${result.id}`
-                : "#"}
-              className="py-6 group flex flex-col gap-1 hover:bg-muted/30 -mx-4 px-4 transition-colors rounded-lg"
-            >
-              <p className="text-sm text-muted-foreground">{result.date}</p>
-              <h2 className="text-xl font-semibold group-hover:underline underline-offset-2">{result.title}</h2>
-              {result.summary && (
-                <p className="text-sm text-muted-foreground line-clamp-2 mt-0.5">{result.summary}</p>
-              )}
-            </Link>
-          ))}
+                : null;
+
+            const content = (
+              <>
+                <p className="text-sm text-muted-foreground">{result.date}</p>
+                <h2 className="text-xl font-semibold group-hover:underline underline-offset-2">{result.title}</h2>
+                {result.summary && (
+                  <p className="text-sm text-muted-foreground line-clamp-2 mt-0.5">{result.summary}</p>
+                )}
+              </>
+            );
+
+            return href ? (
+              <Link
+                key={result.id}
+                href={href}
+                className="py-6 group flex flex-col gap-1 hover:bg-muted/30 -mx-4 px-4 transition-colors rounded-lg"
+              >
+                {content}
+              </Link>
+            ) : (
+              <div
+                key={result.id}
+                className="py-6 flex flex-col gap-1 -mx-4 px-4 rounded-lg"
+              >
+                {content}
+              </div>
+            );
+          })}
         </div>
       )}
     </div>

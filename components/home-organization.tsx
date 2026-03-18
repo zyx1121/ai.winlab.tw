@@ -62,11 +62,11 @@ export async function HomeOrganization() {
           ))}
         </div>
         <div className="flex justify-center">
-          <Link href="/organization">
-            <Button variant="secondary" size="lg" className="px-12 text-lg">
+          <Button asChild variant="secondary" size="lg" className="px-12 text-lg">
+            <Link href="/organization">
               探索更多
-            </Button>
-          </Link>
+            </Link>
+          </Button>
         </div>
       </div>
     </div>
