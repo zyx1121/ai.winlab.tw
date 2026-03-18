@@ -8,7 +8,6 @@ import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/client";
 import type { Recruitment } from "@/lib/supabase/types";
 import { Loader2, Plus } from "lucide-react";
-import Link from "next/link";
 import { useEffect, useState } from "react";
 
 export default function RecruitmentPage() {
@@ -71,9 +70,12 @@ export default function RecruitmentPage() {
       ) : (
         <div className="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-6">
           {recruitments.map((item) => (
-            <Link href={`/recruitment/${item.id}`} key={item.id} className="h-full">
-              <RecruitmentCard item={item} onEdit={isAdmin ? () => openEditSheet(item) : undefined} />
-            </Link>
+            <RecruitmentCard
+              key={item.id}
+              item={item}
+              href={`/recruitment/${item.id}`}
+              onEdit={isAdmin ? () => openEditSheet(item) : undefined}
+            />
           ))}
         </div>
       )}

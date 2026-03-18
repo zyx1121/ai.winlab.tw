@@ -226,9 +226,12 @@ export function EventDetailClient({
           ) : (
             <div className="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-6">
               {recruitments.map((item) => (
-                <Link href={`/events/${slug}/recruitment/${item.id}`} key={item.id} className="h-full">
-                  <RecruitmentCard item={item} onEdit={isAdmin ? () => openEditSheet(item) : undefined} />
-                </Link>
+                <RecruitmentCard
+                  key={item.id}
+                  item={item}
+                  href={`/events/${slug}/recruitment/${item.id}`}
+                  onEdit={isAdmin ? () => openEditSheet(item) : undefined}
+                />
               ))}
             </div>
           )}

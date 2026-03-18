@@ -8,6 +8,9 @@ const organizationClient = readFileSync(resolve(process.cwd(), "app/organization
 const announcementTable = readFileSync(resolve(process.cwd(), "components/announcement-table.tsx"), "utf8")
 const announcementClient = readFileSync(resolve(process.cwd(), "app/announcement/client.tsx"), "utf8")
 const homeAnnouncementTable = readFileSync(resolve(process.cwd(), "components/home-announcement-table.tsx"), "utf8")
+const recruitmentPage = readFileSync(resolve(process.cwd(), "app/recruitment/page.tsx"), "utf8")
+const eventClient = readFileSync(resolve(process.cwd(), "app/events/[slug]/client.tsx"), "utf8")
+const recruitmentCard = readFileSync(resolve(process.cwd(), "components/recruitment-card.tsx"), "utf8")
 
 describe("accessibility contracts", () => {
   test("root layout provides a skip link and a main landmark", () => {
@@ -26,5 +29,15 @@ describe("accessibility contracts", () => {
     assert.ok(announcementTable.includes("<AppLink"))
     assert.ok(announcementClient.includes("getHref={(item) =>"))
     assert.ok(homeAnnouncementTable.includes("getHref={(item) =>"))
+  })
+
+  test("recruitment cards own their navigation semantics", () => {
+    assert.ok(recruitmentCard.includes("href: string"))
+    assert.ok(recruitmentCard.includes("<AppLink"))
+    assert.ok(recruitmentPage.includes("RecruitmentCard"))
+    assert.ok(recruitmentPage.includes("href={`/recruitment/${item.id}`}"))
+    assert.ok(!recruitmentPage.includes("<Link href={`/recruitment/${item.id}`}"))
+    assert.ok(eventClient.includes("href={`/events/${slug}/recruitment/${item.id}`}"))
+    assert.ok(!eventClient.includes("<Link href={`/events/${slug}/recruitment/${item.id}`}"))
   })
 })
