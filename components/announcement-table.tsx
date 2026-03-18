@@ -45,27 +45,43 @@ export function AnnouncementTable({
               key={item.id}
               className="h-12 hover:bg-muted/60 transition-colors"
             >
-              <TableCell colSpan={showStatus ? 4 : 3} className="p-0">
+              <TableCell
+                className="p-0 text-base"
+                style={{ paddingLeft: "1.25rem" }}
+              >
                 <AppLink
                   href={getHref(item)}
-                  className="grid min-h-12 w-full items-center text-base [grid-template-columns:8rem_7rem_minmax(0,1fr)] sm:[grid-template-columns:8rem_7rem_minmax(0,1fr)]"
+                  className="flex min-h-12 w-full items-center px-4 py-3"
                 >
-                  <span className="px-4 py-3" style={{ paddingLeft: "1.25rem" }}>
-                    {item.date}
-                  </span>
-                  <span className="px-4 py-3">{item.category}</span>
-                  <span className="min-w-0 px-4 py-3 whitespace-normal">
-                    {item.title || "(無標題)"}
-                  </span>
-                  {showStatus && (
-                    <span
-                      className={`px-4 py-3 ${item.status === "published" ? "text-green-600" : "text-yellow-600"}`}
-                    >
-                      {item.status === "published" ? "已發布" : "草稿"}
-                    </span>
-                  )}
+                  {item.date}
                 </AppLink>
               </TableCell>
+              <TableCell className="p-0 text-base">
+                <AppLink
+                  href={getHref(item)}
+                  className="flex min-h-12 w-full items-center px-4 py-3"
+                >
+                  {item.category}
+                </AppLink>
+              </TableCell>
+              <TableCell className="p-0 text-base whitespace-normal">
+                <AppLink
+                  href={getHref(item)}
+                  className="flex min-h-12 w-full items-center px-4 py-3 whitespace-normal"
+                >
+                  {item.title || "(無標題)"}
+                </AppLink>
+              </TableCell>
+              {showStatus && (
+                <TableCell className="p-0 text-base">
+                  <AppLink
+                    href={getHref(item)}
+                    className={`flex min-h-12 w-full items-center px-4 py-3 ${item.status === "published" ? "text-green-600" : "text-yellow-600"}`}
+                  >
+                    {item.status === "published" ? "已發布" : "草稿"}
+                  </AppLink>
+                </TableCell>
+              )}
             </TableRow>
           ))}
         </TableBody>
