@@ -12,6 +12,7 @@ const recruitmentPage = readFileSync(resolve(process.cwd(), "app/recruitment/pag
 const eventClient = readFileSync(resolve(process.cwd(), "app/events/[slug]/client.tsx"), "utf8")
 const recruitmentCard = readFileSync(resolve(process.cwd(), "components/recruitment-card.tsx"), "utf8")
 const recruitmentDialog = readFileSync(resolve(process.cwd(), "components/recruitment-dialog.tsx"), "utf8")
+const tiptapEditor = readFileSync(resolve(process.cwd(), "components/tiptap-editor.tsx"), "utf8")
 
 describe("accessibility contracts", () => {
   test("root layout provides a skip link and a main landmark", () => {
@@ -44,5 +45,12 @@ describe("accessibility contracts", () => {
 
   test("interactive controls do not rely on role=button shims", () => {
     assert.ok(!recruitmentDialog.includes('role="button"'))
+  })
+
+  test("rich text editor exposes toolbar labels and visible focus affordances", () => {
+    assert.ok(tiptapEditor.includes('ariaLabel="粗體"'))
+    assert.ok(tiptapEditor.includes('ariaLabel="插入 YouTube 影片"'))
+    assert.ok(tiptapEditor.includes("focus-within:ring-2"))
+    assert.ok(tiptapEditor.includes("focus-within:ring-ring"))
   })
 })

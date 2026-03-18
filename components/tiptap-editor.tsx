@@ -27,6 +27,7 @@ import {
   Undo,
   Youtube as YoutubeIcon,
 } from "lucide-react";
+import type { ComponentProps } from "react";
 import { useCallback, useEffect } from "react";
 import { Button } from "./ui/button";
 
@@ -41,6 +42,23 @@ interface TiptapEditorProps {
   content: Record<string, unknown>;
   onChange: (content: Record<string, unknown>) => void;
   editable?: boolean;
+}
+
+function ToolbarButton({
+  ariaLabel,
+  className,
+  ...props
+}: ComponentProps<typeof Button> & { ariaLabel: string }) {
+  return (
+    <Button
+      type="button"
+      variant="ghost"
+      size="sm"
+      aria-label={ariaLabel}
+      className={className}
+      {...props}
+    />
+  );
 }
 
 export function TiptapEditor({
@@ -149,161 +167,133 @@ export function TiptapEditor({
           <div className="max-w-6xl mx-auto px-4 pb-4">
             <div className="pointer-events-auto flex flex-wrap gap-1 p-2 bg-background/80 backdrop-blur-sm border rounded-lg shadow-sm">
           
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
+          <ToolbarButton
+            ariaLabel="粗體"
             onClick={() => editor.chain().focus().toggleBold().run()}
             className={editor.isActive("bold") ? "bg-muted" : ""}
           >
             <Bold className="w-4 h-4" />
-          </Button>
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
+          </ToolbarButton>
+          <ToolbarButton
+            ariaLabel="斜體"
             onClick={() => editor.chain().focus().toggleItalic().run()}
             className={editor.isActive("italic") ? "bg-muted" : ""}
           >
             <Italic className="w-4 h-4" />
-          </Button>
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
+          </ToolbarButton>
+          <ToolbarButton
+            ariaLabel="刪除線"
             onClick={() => editor.chain().focus().toggleStrike().run()}
             className={editor.isActive("strike") ? "bg-muted" : ""}
           >
             <Strikethrough className="w-4 h-4" />
-          </Button>
+          </ToolbarButton>
           <div className="w-px h-6 bg-border mx-1 self-center" />
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
+          <ToolbarButton
+            ariaLabel="標題一"
             onClick={() =>
               editor.chain().focus().toggleHeading({ level: 1 }).run()
             }
             className={editor.isActive("heading", { level: 1 }) ? "bg-muted" : ""}
           >
             <Heading1 className="w-4 h-4" />
-          </Button>
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
+          </ToolbarButton>
+          <ToolbarButton
+            ariaLabel="標題二"
             onClick={() =>
               editor.chain().focus().toggleHeading({ level: 2 }).run()
             }
             className={editor.isActive("heading", { level: 2 }) ? "bg-muted" : ""}
           >
             <Heading2 className="w-4 h-4" />
-          </Button>
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
+          </ToolbarButton>
+          <ToolbarButton
+            ariaLabel="標題三"
             onClick={() =>
               editor.chain().focus().toggleHeading({ level: 3 }).run()
             }
             className={editor.isActive("heading", { level: 3 }) ? "bg-muted" : ""}
           >
             <Heading3 className="w-4 h-4" />
-          </Button>
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
+          </ToolbarButton>
+          <ToolbarButton
+            ariaLabel="標題四"
             onClick={() =>
               editor.chain().focus().toggleHeading({ level: 4 }).run()
             }
             className={editor.isActive("heading", { level: 4 }) ? "bg-muted" : ""}
           >
             <Heading4 className="w-4 h-4" />
-          </Button>
+          </ToolbarButton>
           <div className="w-px h-6 bg-border mx-1 self-center" />
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
+          <ToolbarButton
+            ariaLabel="項目清單"
             onClick={() => editor.chain().focus().toggleBulletList().run()}
             className={editor.isActive("bulletList") ? "bg-muted" : ""}
           >
             <List className="w-4 h-4" />
-          </Button>
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
+          </ToolbarButton>
+          <ToolbarButton
+            ariaLabel="編號清單"
             onClick={() => editor.chain().focus().toggleOrderedList().run()}
             className={editor.isActive("orderedList") ? "bg-muted" : ""}
           >
             <ListOrdered className="w-4 h-4" />
-          </Button>
+          </ToolbarButton>
           <div className="w-px h-6 bg-border mx-1 self-center" />
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
+          <ToolbarButton
+            ariaLabel="靠左對齊"
             onClick={() => editor.chain().focus().setTextAlign("left").run()}
             className={editor.isActive({ textAlign: "left" }) ? "bg-muted" : ""}
           >
             <AlignLeft className="w-4 h-4" />
-          </Button>
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
+          </ToolbarButton>
+          <ToolbarButton
+            ariaLabel="置中對齊"
             onClick={() => editor.chain().focus().setTextAlign("center").run()}
             className={editor.isActive({ textAlign: "center" }) ? "bg-muted" : ""}
           >
             <AlignCenter className="w-4 h-4" />
-          </Button>
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
+          </ToolbarButton>
+          <ToolbarButton
+            ariaLabel="靠右對齊"
             onClick={() => editor.chain().focus().setTextAlign("right").run()}
             className={editor.isActive({ textAlign: "right" }) ? "bg-muted" : ""}
           >
             <AlignRight className="w-4 h-4" />
-          </Button>
+          </ToolbarButton>
           <div className="w-px h-6 bg-border mx-1 self-center" />
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
+          <ToolbarButton
+            ariaLabel="插入 YouTube 影片"
             onClick={() => {
               const url = window.prompt("請輸入 YouTube 影片網址");
               if (url) editor.chain().focus().setYoutubeVideo({ src: url }).run();
             }}
           >
             <YoutubeIcon className="w-4 h-4" />
-          </Button>
+          </ToolbarButton>
           <div className="w-px h-6 bg-border mx-1 self-center" />
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
+          <ToolbarButton
+            ariaLabel="復原"
             onClick={() => editor.chain().focus().undo().run()}
             disabled={!editor.can().undo()}
           >
             <Undo className="w-4 h-4" />
-          </Button>
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
+          </ToolbarButton>
+          <ToolbarButton
+            ariaLabel="重做"
             onClick={() => editor.chain().focus().redo().run()}
             disabled={!editor.can().redo()}
           >
             <Redo className="w-4 h-4" />
-          </Button>
+          </ToolbarButton>
             </div>
           </div>
         </div>
       )}
-      <EditorContent editor={editor} />
+      <div className="rounded-[2rem] border border-border bg-background focus-within:border-ring focus-within:ring-2 focus-within:ring-ring">
+        <EditorContent editor={editor} />
+      </div>
     </div>
   );
 }
