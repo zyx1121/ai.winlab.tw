@@ -1,12 +1,16 @@
 import assert from "node:assert/strict"
 import { describe, test } from "node:test"
 
+import SettingsLoading from "@/app/settings/loading"
+import SettingsUsersLoading from "@/app/settings/users/loading"
 import { renderToStaticMarkup } from "react-dom/server"
 
 import { AnnouncementTableSkeleton } from "@/components/announcement-table"
 import { EventCardSkeleton } from "@/components/event-card"
 import { PageShell } from "@/components/page-shell"
 import { RecruitmentCardSkeleton } from "@/components/recruitment-card"
+import { SettingsMenuSkeleton } from "@/components/settings-menu"
+import { UsersTableSkeleton } from "@/components/users-table"
 import { BlockSkeleton } from "@/components/ui/block"
 
 describe("PageShell render contracts", () => {
@@ -73,5 +77,42 @@ describe("component-owned skeleton render contracts", () => {
     assert.ok(html.includes("<table"))
     assert.ok(html.includes('data-slot="skeleton"'))
     assert.ok(html.includes("<tbody"))
+  })
+
+  test("renders SettingsMenuSkeleton with the settings list rhythm", () => {
+    const html = renderToStaticMarkup(<SettingsMenuSkeleton items={3} />)
+
+    assert.ok(html.includes('data-slot="settings-menu-skeleton"'))
+    assert.ok(html.includes("divide-y"))
+    assert.ok(html.includes("rounded-2xl"))
+    assert.ok(html.includes('data-slot="skeleton"'))
+  })
+
+  test("renders UsersTableSkeleton with actions, table, and summary", () => {
+    const html = renderToStaticMarkup(<UsersTableSkeleton rows={5} />)
+
+    assert.ok(html.includes('data-slot="users-table-skeleton"'))
+    assert.ok(html.includes("<table"))
+    assert.ok(html.includes("justify-between"))
+    assert.ok(html.includes("text-right"))
+  })
+})
+
+describe("settings route loading contracts", () => {
+  test("renders /settings loading with the content shell and menu skeleton", () => {
+    const html = renderToStaticMarkup(<SettingsLoading />)
+
+    assert.ok(html.includes('data-slot="page-shell"'))
+    assert.ok(html.includes('data-tone="content"'))
+    assert.ok(html.includes('data-slot="settings-menu-skeleton"'))
+  })
+
+  test("renders /settings/users loading with the content shell and users table skeleton", () => {
+    const html = renderToStaticMarkup(<SettingsUsersLoading />)
+
+    assert.ok(html.includes('data-slot="page-shell"'))
+    assert.ok(html.includes('data-tone="content"'))
+    assert.ok(html.includes('data-slot="users-table-skeleton"'))
+    assert.ok(html.includes("mb-8"))
   })
 })
