@@ -1,5 +1,6 @@
 "use client";
 
+import { PageShell } from "@/components/page-shell";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -89,7 +90,7 @@ export default function ResetPasswordPage() {
   }
 
   return (
-    <div className="min-h-[calc(100vh-10rem)] flex items-center justify-center px-4 py-12 md:py-16">
+    <PageShell tone="auth">
       <div className="w-full max-w-md flex flex-col gap-6">
         <div className="text-center">
           <h1 className="text-3xl font-bold">重設密碼</h1>
@@ -150,6 +151,6 @@ export default function ResetPasswordPage() {
           )}
         </Card>
       </div>
-    </div>
+    </PageShell>
   );
 }

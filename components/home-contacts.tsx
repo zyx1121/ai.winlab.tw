@@ -1,3 +1,4 @@
+import { AppLink } from "@/components/app-link";
 import { ContactsEditButton } from "@/components/contacts-edit-button";
 import { createClient } from "@/lib/supabase/server";
 import type { Contact } from "@/lib/supabase/types";
@@ -43,17 +44,17 @@ export async function HomeContacts() {
               {c.phone && (
                 <div className="flex items-center gap-3 text-muted-foreground justify-center lg:justify-start">
                   <Phone className="w-4 h-4 shrink-0 text-muted-foreground" />
-                  <a href={`tel:${c.phone}`} className="hover:text-foreground transition-colors font-mono break-all">
+                  <AppLink href={`tel:${c.phone}`} className="font-mono break-all">
                     {c.phone}
-                  </a>
+                  </AppLink>
                 </div>
               )}
               {c.email && (
                 <div className="flex items-center gap-3 text-muted-foreground justify-center lg:justify-start">
                   <Mail className="w-4 h-4 shrink-0 text-muted-foreground" />
-                  <a href={`mailto:${c.email}`} className="hover:text-foreground transition-colors font-mono break-all">
+                  <AppLink href={`mailto:${c.email}`} className="font-mono break-all">
                     {c.email}
-                  </a>
+                  </AppLink>
                 </div>
               )}
             </div>

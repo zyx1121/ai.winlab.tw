@@ -1,6 +1,7 @@
 "use client";
 
 import { AnnouncementTable } from "@/components/announcement-table";
+import { PageShell } from "@/components/page-shell";
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/client";
 import type { Announcement } from "@/lib/supabase/types";
@@ -34,7 +35,7 @@ export function AnnouncementPageClient({
   };
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-12 flex flex-col gap-8">
+    <PageShell>
       <div className="flex items-center justify-between gap-4">
         <h1 className="text-3xl font-bold">最新公告</h1>
         {isAdmin && (
@@ -56,6 +57,6 @@ export function AnnouncementPageClient({
           }
         />
       )}
-    </div>
+    </PageShell>
   );
 }

@@ -1,3 +1,4 @@
+import { PageShell } from "@/components/page-shell";
 import { createClient } from "@/lib/supabase/server";
 import { ChevronRight, FileText, Image, Users } from "lucide-react";
 import Link from "next/link";
@@ -38,7 +39,7 @@ export default async function SettingsPage() {
   if (profile?.role !== "admin") redirect("/");
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-12">
+    <PageShell className="block">
       <h1 className="text-3xl font-bold mb-8">系統設定</h1>
       <div className="flex flex-col divide-y border rounded-2xl overflow-hidden">
         {items.map(({ href, icon: Icon, label, description }) => (
@@ -58,6 +59,6 @@ export default async function SettingsPage() {
           </Link>
         ))}
       </div>
-    </div>
+    </PageShell>
   );
 }

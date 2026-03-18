@@ -1,11 +1,13 @@
 "use client";
 
 import { useAuth } from "@/components/auth-provider";
+import { AppLink } from "@/components/app-link";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Block } from "@/components/ui/block";
 import { Button } from "@/components/ui/button";
+import { PageShell } from "@/components/page-shell";
 import {
   Dialog,
   DialogContent,
@@ -30,7 +32,6 @@ import {
   Trash2,
 } from "lucide-react";
 import Image from "next/image";
-import Link from "next/link";
 import { useRef, useState } from "react";
 
 function mergeAllLinks(profile: Profile): string[] {
@@ -218,7 +219,7 @@ export function ProfilePageClient({
 
   return (
     <main className="flex items-center justify-center">
-      <div className="max-w-6xl w-full">
+      <PageShell tone="profile">
         <div className="grid p-4 gap-4">
 
           <Block variant="ghost" className="flex items-center justify-between">
@@ -416,9 +417,9 @@ export function ProfilePageClient({
                 ) : viewLinks.length > 0 ? (
                   <div className="grid gap-2 text-sm underline">
                     {viewLinks.map(({ href, label }) => (
-                      <Link key={href} href={href!} target="_blank" rel="noopener noreferrer">
+                      <AppLink key={href} href={href!}>
                         {label}
-                      </Link>
+                      </AppLink>
                     ))}
                   </div>
                 ) : null}
@@ -434,8 +435,8 @@ export function ProfilePageClient({
                 <p className="text-sm text-muted-foreground py-12 text-center">尚無成果紀錄</p>
               ) : (
                 results.map((result) => (
-                  <Link key={result.id} href={resultHref(result)}>
-                    <Block className="overflow-hidden flex flex-col lg:grid lg:grid-cols-2 gap-4 hover:scale-101 transition-all duration-200">
+                  <AppLink key={result.id} href={resultHref(result)} className="block">
+                    <Block className="overflow-hidden flex flex-col lg:grid lg:grid-cols-2 gap-4 transition-all">
                       <div className="-mx-6 -mt-6 lg:hidden">
                         <AspectRatio ratio={16 / 9}>
                           {result.header_image && result.header_image !== "/placeholder.png" ? (
@@ -482,14 +483,14 @@ export function ProfilePageClient({
                         </AspectRatio>
                       </div>
                     </Block>
-                  </Link>
+                  </AppLink>
                 ))
               )}
 
               {/* External results */}
               {externalResults.map((ext) => {
                 const card = (
-                  <Block className="overflow-hidden flex flex-col lg:grid lg:grid-cols-2 gap-4 hover:scale-101 transition-all duration-200">
+                  <Block className="overflow-hidden flex flex-col lg:grid lg:grid-cols-2 gap-4 transition-all">
                     <div className="-mx-6 -mt-6 lg:hidden">
                       <AspectRatio ratio={16 / 9}>
                         {ext.image ? (
@@ -524,14 +525,14 @@ export function ProfilePageClient({
 
                 if (isOwner) {
                   return (
-                    <button key={ext.id} type="button" className="text-left w-full" onClick={() => openEditDialog(ext)}>
+                    <button key={ext.id} type="button" className="interactive-scale text-left w-full" onClick={() => openEditDialog(ext)}>
                       {card}
                     </button>
                   );
                 }
 
                 return ext.link ? (
-                  <Link key={ext.id} href={ext.link} target="_blank" rel="noopener noreferrer">{card}</Link>
+                  <AppLink key={ext.id} href={ext.link} className="block">{card}</AppLink>
                 ) : (
                   <div key={ext.id}>{card}</div>
                 );
@@ -541,7 +542,7 @@ export function ProfilePageClient({
           </div>
 
         </div>
-      </div>
+      </PageShell>
     </main>
   );
 }

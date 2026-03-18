@@ -47,18 +47,18 @@ function OrgNode({
   return (
     <div
       ref={nodeRef}
-      className={`flex flex-col items-center justify-center text-center px-4 py-3 bg-white min-w-[110px] border transition-all duration-200 ${
+      className={`flex flex-col items-center justify-center text-center px-4 py-3 bg-card min-w-[110px] border transition-all duration-200 ${
         highlighted
-          ? "border-gray-600 border-2 shadow-sm"
-          : "border-gray-200"
+          ? "border-foreground/40 border-2 shadow-sm"
+          : "border-border"
       } ${className}`}
     >
-      <div className={`text-sm tracking-wide ${highlighted ? "font-bold text-gray-700" : "font-medium text-gray-400"}`}>{title}</div>
+      <div className={`text-sm tracking-wide ${highlighted ? "font-bold text-foreground" : "font-medium text-muted-foreground"}`}>{title}</div>
       {person && (
-        <div className={`text-base mt-1 ${highlighted ? "font-extrabold text-gray-900" : "font-bold text-gray-900"}`}>{person}</div>
+        <div className={`text-base mt-1 ${highlighted ? "font-extrabold text-foreground" : "font-bold text-foreground"}`}>{person}</div>
       )}
       {sub && (
-        <div className={`text-sm mt-0.5 ${highlighted ? "text-gray-600" : "text-gray-400"}`}>{sub}</div>
+        <div className={`text-sm mt-0.5 ${highlighted ? "text-muted-foreground" : "text-muted-foreground/80"}`}>{sub}</div>
       )}
     </div>
   );
@@ -105,7 +105,7 @@ export function OrgChart({ activeTab = "core" }: { activeTab?: ActiveTab }) {
     );
 
     const elements: ReactNode[] = [];
-    const stroke = "rgba(0,0,0,0.2)";
+    const stroke = "var(--border)";
     const sw = 1.5;
 
     // ── Two hub points ──
@@ -145,8 +145,8 @@ export function OrgChart({ activeTab = "core" }: { activeTab?: ActiveTab }) {
     elements.push(
       <line key="le-hub" x1={leR.x} y1={lowerHubY} x2={hubX} y2={lowerHubY} stroke={stroke} strokeWidth={sw} strokeDasharray="6 4" />,
       <line key="hub-ind" x1={hubX} y1={lowerHubY} x2={indL.x} y2={lowerHubY} stroke={stroke} strokeWidth={sw} strokeDasharray="6 4" />,
-      <text key="lbl-left" x={(leR.x + hubX) / 2} y={lowerHubY - 6} textAnchor="middle" fontSize="11" fill="rgba(0,0,0,0.4)" fontWeight="bold">聯盟</text>,
-      <text key="lbl-right" x={(hubX + indL.x) / 2} y={lowerHubY - 6} textAnchor="middle" fontSize="11" fill="rgba(0,0,0,0.4)" fontWeight="bold">聯盟</text>,
+      <text key="lbl-left" x={(leR.x + hubX) / 2} y={lowerHubY - 6} textAnchor="middle" fontSize="11" fill="var(--muted-foreground)" fontWeight="bold">聯盟</text>,
+      <text key="lbl-right" x={(hubX + indL.x) / 2} y={lowerHubY - 6} textAnchor="middle" fontSize="11" fill="var(--muted-foreground)" fontWeight="bold">聯盟</text>,
     );
 
     // ── Lower hub → bus bar → 合聘 / 培訓 / 應用 ──
@@ -172,7 +172,7 @@ export function OrgChart({ activeTab = "core" }: { activeTab?: ActiveTab }) {
   }, [recalculate]);
 
   return (
-    <div className="w-full bg-white rounded-xl select-none">
+    <div className="w-full bg-background rounded-xl select-none">
       <h1 className="text-3xl font-bold">組織架構</h1>
 
       {/* ── Desktop (md+): SVG org chart with horizontal scroll fallback ── */}

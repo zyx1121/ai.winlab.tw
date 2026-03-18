@@ -1,6 +1,7 @@
 "use client";
 
 import { useAuth } from "@/components/auth-provider";
+import { PageShell } from "@/components/page-shell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -127,16 +128,16 @@ export default function CarouselEditPage() {
 
   if (isLoading || authLoading) {
     return (
-      <div className="max-w-6xl mx-auto px-4 py-12 flex justify-center items-center min-h-[50vh]">
+      <PageShell tone="centeredState">
         <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
-      </div>
+      </PageShell>
     );
   }
 
   if (!slide) return null;
 
   return (
-    <div className="max-w-6xl mx-auto px-4 flex flex-col mt-8 pb-16">
+    <PageShell tone="editor">
       <div className="sticky top-16 z-20 bg-background/80 backdrop-blur-sm py-4 -mx-4 px-4 flex flex-col gap-4">
         <div className="flex items-center justify-between gap-4">
           <Button variant="ghost" size="sm" onClick={() => guardNavigation(() => router.push("/carousel"))}>
@@ -250,6 +251,6 @@ export default function CarouselEditPage() {
           </div>
         </div>
       </div>
-    </div>
+    </PageShell>
   );
 }

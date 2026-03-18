@@ -1,3 +1,4 @@
+import { AppLink } from "@/components/app-link";
 import type {
   Recruitment,
   RecruitmentPositionType,
@@ -15,7 +16,6 @@ import {
   Wallet,
 } from "lucide-react";
 import Image from "next/image";
-import Link from "next/link";
 
 type RecruitmentDetailProps = {
   recruitment: Recruitment;
@@ -43,13 +43,13 @@ export function RecruitmentDetail({
   return (
     <div>
       {/* Back link */}
-      <Link
+      <AppLink
         href={backHref}
-        className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-10"
+        className="inline-flex items-center gap-1.5 text-sm text-muted-foreground mb-10"
       >
         <ArrowLeft className="w-4 h-4" />
         {backLabel}
-      </Link>
+      </AppLink>
 
       {/* Cover image */}
       {recruitment.image && (
@@ -72,15 +72,13 @@ export function RecruitmentDetail({
         <div className="flex items-center gap-2 text-base text-muted-foreground">
           {recruitment.link && (
             <>
-              <a
+              <AppLink
                 href={recruitment.link}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 hover:text-foreground transition-colors"
+                className="inline-flex items-center gap-1.5"
               >
                 <ExternalLink className="w-4 h-4" />
                 前往網站
-              </a>
+              </AppLink>
               <span>&middot;</span>
             </>
           )}
@@ -196,25 +194,23 @@ export function RecruitmentDetail({
               {recruitment.application_method.email && (
                 <div className="flex items-center gap-1.5">
                   <Mail className="w-4 h-4 text-muted-foreground" />
-                  <a
+                  <AppLink
                     href={`mailto:${recruitment.application_method.email}`}
                     className="hover:underline"
                   >
                     {recruitment.application_method.email}
-                  </a>
+                  </AppLink>
                 </div>
               )}
               {recruitment.application_method.url && (
                 <div className="flex items-center gap-1.5">
                   <ExternalLink className="w-4 h-4 text-muted-foreground" />
-                  <a
+                  <AppLink
                     href={recruitment.application_method.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
                     className="hover:underline"
                   >
                     {recruitment.application_method.url}
-                  </a>
+                  </AppLink>
                 </div>
               )}
               {recruitment.application_method.other && (
@@ -243,23 +239,23 @@ export function RecruitmentDetail({
               {recruitment.contact.email && (
                 <div className="flex items-center gap-1.5">
                   <Mail className="w-4 h-4 text-muted-foreground" />
-                  <a
+                  <AppLink
                     href={`mailto:${recruitment.contact.email}`}
                     className="hover:underline"
                   >
                     {recruitment.contact.email}
-                  </a>
+                  </AppLink>
                 </div>
               )}
               {recruitment.contact.phone && (
                 <div className="flex items-center gap-1.5">
                   <Phone className="w-4 h-4 text-muted-foreground" />
-                  <a
+                  <AppLink
                     href={`tel:${recruitment.contact.phone}`}
                     className="hover:underline"
                   >
                     {recruitment.contact.phone}
-                  </a>
+                  </AppLink>
                 </div>
               )}
             </div>

@@ -1,5 +1,6 @@
 import { IntroductionDetail } from "@/components/introduction-detail";
 import { IntroductionEditButton } from "@/components/introduction-edit-button";
+import { PageShell } from "@/components/page-shell";
 import { createClient } from "@/lib/supabase/server";
 import Image from "@tiptap/extension-image";
 import { generateHTML } from "@tiptap/html";
@@ -20,12 +21,12 @@ export default async function IntroductionPage() {
       : "";
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-12 flex flex-col gap-8">
+    <PageShell>
       <IntroductionDetail
         title={introduction?.title || "國立陽明交通大學 人工智慧專責辦公室"}
         contentHtml={contentHtml}
         actions={<IntroductionEditButton />}
       />
-    </div>
+    </PageShell>
   );
 }

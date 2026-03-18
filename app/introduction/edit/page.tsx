@@ -1,6 +1,7 @@
 "use client";
 
 import { IntroductionDetail } from "@/components/introduction-detail";
+import { PageShell } from "@/components/page-shell";
 import { useAuth } from "@/components/auth-provider";
 import { TiptapEditor } from "@/components/tiptap-editor";
 import { Button } from "@/components/ui/button";
@@ -118,9 +119,9 @@ export default function IntroductionEditPage() {
 
   if (isLoading || authLoading) {
     return (
-      <div className="max-w-6xl mx-auto px-4 py-12 flex justify-center items-center min-h-[50vh]">
+      <PageShell tone="centeredState">
         <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
-      </div>
+      </PageShell>
     );
   }
 
@@ -129,7 +130,7 @@ export default function IntroductionEditPage() {
   }
 
   return (
-    <div className="max-w-6xl mx-auto px-4 flex flex-col mt-8 pb-16">
+    <PageShell tone="editor">
       <div className="sticky top-16 z-20 bg-background/80 backdrop-blur-sm py-4 -mx-4 px-4 flex flex-col gap-4">
         <div className="flex items-center justify-between gap-4">
           <Button variant="ghost" size="sm" onClick={() => guardNavigation(() => router.push("/introduction"))}>
@@ -184,6 +185,6 @@ export default function IntroductionEditPage() {
           onChange={(content) => setIntroduction({ ...introduction, content })}
         />
       )}
-    </div>
+    </PageShell>
   );
 }

@@ -1,5 +1,6 @@
 import { EventCard } from "@/components/event-card";
 import { EventsCreateButton } from "@/components/events-create-button";
+import { PageShell } from "@/components/page-shell";
 import { Block } from "@/components/ui/block";
 import { SubButton } from "@/components/ui/sub-button";
 import { createClient } from "@/lib/supabase/server";
@@ -27,7 +28,7 @@ export default async function EventsPage() {
   const eventList = (events as Event[]) ?? [];
 
   return (
-    <div className="max-w-6xl mx-auto p-4 flex flex-col gap-4">
+    <PageShell tone="dashboard">
 
       <Block variant="ghost" className="flex items-center justify-between">
         <SubButton href="/">
@@ -55,7 +56,7 @@ export default async function EventsPage() {
             <div className="grid gap-4">
               {eventList.map((item) => (
                 <Link href={`/events/${item.slug}`} key={item.id} className="h-full">
-                  <EventCard item={item} isAdmin={isAdmin} compact />
+                  <EventCard item={item} compact />
                 </Link>
               ))}
             </div>
@@ -64,6 +65,6 @@ export default async function EventsPage() {
         </div>
 
       </div>
-    </div>
+    </PageShell>
   );
 }

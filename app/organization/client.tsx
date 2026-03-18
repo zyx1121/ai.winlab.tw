@@ -1,5 +1,6 @@
 "use client";
 
+import { AppLink } from "@/components/app-link";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { OrganizationMemberDialog } from "@/components/organization-member-dialog";
@@ -89,7 +90,7 @@ export function OrganizationPageClient({
                   key={member.id}
                   className={`py-0 overflow-hidden flex flex-col ${
                     isClickable
-                      ? "cursor-pointer transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98]"
+                      ? "cursor-pointer interactive-scale"
                       : ""
                   }`}
                   onClick={isClickable ? () => handleCardClick(member) : undefined}
@@ -127,14 +128,14 @@ export function OrganizationPageClient({
                           </div>
                         )}
                         {member.email && (
-                          <a
+                          <AppLink
                             href={`mailto:${member.email}`}
-                            className="flex items-center gap-2 text-base text-muted-foreground hover:text-foreground transition-colors"
+                            className="flex items-center gap-2 text-base text-muted-foreground"
                             onClick={(e) => e.stopPropagation()}
                           >
                             <Mail className="w-4 h-4 shrink-0" />
                             <span className="truncate">{member.email}</span>
-                          </a>
+                          </AppLink>
                         )}
                       </div>
                     )}

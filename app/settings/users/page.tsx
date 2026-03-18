@@ -1,6 +1,7 @@
 "use client";
 
 import { useAuth } from "@/components/auth-provider";
+import { PageShell } from "@/components/page-shell";
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/client";
 import { toast } from "sonner";
@@ -136,14 +137,14 @@ export default function SettingsUsersPage() {
 
   if (isLoading || authLoading) {
     return (
-      <div className="max-w-6xl mx-auto px-4 py-12 flex justify-center items-center min-h-[50vh]">
+      <PageShell tone="centeredState">
         <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
-      </div>
+      </PageShell>
     );
   }
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-12">
+    <PageShell className="block">
       <div className="flex items-center gap-4 mb-8">
         <Link
           href="/settings"
@@ -262,6 +263,6 @@ export default function SettingsUsersPage() {
         </pre>
         <p className="mt-2">僅需 <code className="bg-muted rounded px-1">name</code> 與 <code className="bg-muted rounded px-1">email</code> 欄位。重複 email 自動跳過，新用戶預設為一般用戶，需透過「忘記密碼」設定密碼。</p>
       </div>
-    </div>
+    </PageShell>
   );
 }

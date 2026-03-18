@@ -3,6 +3,7 @@
 import { RecruitmentCard } from "@/components/recruitment-card";
 import { RecruitmentDialog } from "@/components/recruitment-dialog";
 import { ResultCard, type ResultWithMeta } from "@/components/result-card";
+import { PageShell } from "@/components/page-shell";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/components/auth-provider";
 import { createClient } from "@/lib/supabase/client";
@@ -76,7 +77,7 @@ export function EventDetailClient({
   const openEditSheet = (r: Recruitment) => { setEditingRecruitment(r); setSheetOpen(true); };
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-12 flex flex-col gap-8">
+    <PageShell>
       {/* Back link */}
       <Link
         href="/events"
@@ -234,6 +235,6 @@ export function EventDetailClient({
           <RecruitmentDialog open={sheetOpen} onOpenChange={setSheetOpen} recruitment={editingRecruitment} eventId={event.id} />
         </div>
       )}
-    </div>
+    </PageShell>
   );
 }

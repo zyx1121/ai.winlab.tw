@@ -8,6 +8,7 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
+import { AppLink } from "@/components/app-link";
 import { useAuth } from "@/components/auth-provider";
 import type { CarouselSlide } from "@/lib/supabase/types";
 import Autoplay from "embla-carousel-autoplay";
@@ -68,8 +69,6 @@ export function CarouselClient({ slides }: { slides: CarouselSlide[] }) {
       >
         <CarouselContent className="ml-0">
           {slides.map((slide) => {
-            const isExternal =
-              slide.link?.startsWith("http://") || slide.link?.startsWith("https://");
             const slideContent = (
               <>
                 <div
@@ -92,13 +91,12 @@ export function CarouselClient({ slides }: { slides: CarouselSlide[] }) {
             return (
               <CarouselItem key={slide.id} className="pl-0">
                 {slide.link ? (
-                  <a
+                  <AppLink
                     href={slide.link}
                     className="relative block w-full aspect-video min-h-[200px] cursor-pointer"
-                    {...(isExternal && { target: "_blank", rel: "noopener noreferrer" })}
                   >
                     {slideContent}
-                  </a>
+                  </AppLink>
                 ) : (
                   <div className="relative block w-full aspect-video min-h-[200px]">
                     {slideContent}
@@ -110,13 +108,13 @@ export function CarouselClient({ slides }: { slides: CarouselSlide[] }) {
         </CarouselContent>
         <CarouselPrevious
           variant="ghost"
-          className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 h-10 w-10 md:h-12 md:w-12 rounded-full bg-black/30 hover:bg-black/50 text-white border-none opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+          className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 h-10 w-10 md:h-12 md:w-12 rounded-full bg-black/30 hover:bg-black/50 text-white border-none opacity-0 group-hover:opacity-100 interactive-opacity"
         >
           <ChevronLeft className="h-6 w-6 md:h-8 md:w-8" />
         </CarouselPrevious>
         <CarouselNext
           variant="ghost"
-          className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 h-10 w-10 md:h-12 md:w-12 rounded-full bg-black/30 hover:bg-black/50 text-white border-none opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+          className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 h-10 w-10 md:h-12 md:w-12 rounded-full bg-black/30 hover:bg-black/50 text-white border-none opacity-0 group-hover:opacity-100 interactive-opacity"
         >
           <ChevronRight className="h-6 w-6 md:h-8 md:w-8" />
         </CarouselNext>

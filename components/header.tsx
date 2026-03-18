@@ -1,8 +1,8 @@
 "use client";
 
+import { AppLink } from "@/components/app-link";
 import { useAuth } from "@/components/auth-provider";
 import { Loader2, TextAlignJustify } from "lucide-react";
-import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
@@ -51,11 +51,11 @@ export function Header({ pinnedEvents }: { pinnedEvents: { name: string; slug: s
     const profileHref = user ? `/profile/${user.id}` : "/account";
     const profileActive = isActive(profileHref);
     const profileClass = isMobile
-      ? `rounded-lg px-3 py-2 hover:bg-black/10 text-left w-full transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98] ${profileActive ? "bg-black/15" : ""}`
-      : `nav-bracket inline-block transition-transform duration-200 active:scale-[0.98] ${profileActive ? "nav-bracket-active" : ""}`;
+      ? `interactive-scale rounded-lg px-3 py-2 hover:bg-black/10 text-left w-full ${profileActive ? "bg-black/15" : ""}`
+      : `interactive-scale nav-bracket inline-block ${profileActive ? "nav-bracket-active" : ""}`;
     const btnClass = isMobile
-      ? "rounded-lg px-3 py-2 hover:bg-black/10 text-left w-full transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98]"
-      : "nav-bracket inline-block transition-transform duration-200 active:scale-[0.98] cursor-pointer";
+      ? "interactive-scale rounded-lg px-3 py-2 hover:bg-black/10 text-left w-full"
+      : "interactive-scale nav-bracket inline-block cursor-pointer";
 
     if (user) {
       const displayLabel = profile?.display_name || user.email || "帳號";
@@ -65,13 +65,13 @@ export function Header({ pinnedEvents }: { pinnedEvents: { name: string; slug: s
             isMobile ? "flex flex-col" : "flex items-center gap-8"
           }
         >
-          <Link
+          <AppLink
             href={profileHref}
             className={profileClass}
             onClick={isMobile ? () => setOpen(false) : undefined}
           >
             {displayLabel}
-          </Link>
+          </AppLink>
           <button
             type="button"
             onClick={() => {
@@ -92,41 +92,41 @@ export function Header({ pinnedEvents }: { pinnedEvents: { name: string; slug: s
     }
 
     return (
-      <Link
+      <AppLink
         href="/login"
         className={btnClass}
         onClick={isMobile ? () => setOpen(false) : undefined}
       >
         登入
-      </Link>
+      </AppLink>
     );
   };
 
   return (
     <header className="sticky top-0 z-50 bg-nycu text-white">
       <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between gap-6 text-xl font-bold">
-        <Link href="/" className="inline-block text-2xl tracking-widest transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98]">
+        <AppLink href="/" className="inline-block text-2xl tracking-widest">
           人工智慧專責辦公室
-        </Link>
+        </AppLink>
 
         <nav className="hidden min-[1152px]:flex items-center gap-8 text-lg">
           {staticNavItems.map((item) => (
-            <Link key={item.href} href={item.href} className={`nav-bracket inline-block transition-transform duration-200 active:scale-[0.98] ${isActive(item.href) ? "nav-bracket-active" : ""}`}>
+            <AppLink key={item.href} href={item.href} className={`nav-bracket inline-block ${isActive(item.href) ? "nav-bracket-active" : ""}`}>
               {item.label}
-            </Link>
+            </AppLink>
           ))}
           {pinnedEvents.map((event) => (
-            <Link key={event.slug} href={`/events/${event.slug}`} className={`nav-bracket inline-block transition-transform duration-200 active:scale-[0.98] ${isActive(`/events/${event.slug}`) ? "nav-bracket-active" : ""}`}>
+            <AppLink key={event.slug} href={`/events/${event.slug}`} className={`nav-bracket inline-block ${isActive(`/events/${event.slug}`) ? "nav-bracket-active" : ""}`}>
               {event.name}
-            </Link>
+            </AppLink>
           ))}
-          <Link href="/events" className={`nav-bracket inline-block transition-transform duration-200 active:scale-[0.98] ${isActive("/events") ? "nav-bracket-active" : ""}`}>
+          <AppLink href="/events" className={`nav-bracket inline-block ${isActive("/events") ? "nav-bracket-active" : ""}`}>
             活動
-          </Link>
+          </AppLink>
           {isAdmin && (
-            <Link href="/settings" className={`nav-bracket inline-block transition-transform duration-200 active:scale-[0.98] ${isActive("/settings") ? "nav-bracket-active" : ""}`}>
+            <AppLink href="/settings" className={`nav-bracket inline-block ${isActive("/settings") ? "nav-bracket-active" : ""}`}>
               設定
-            </Link>
+            </AppLink>
           )}
           {renderAuthSection()}
         </nav>
@@ -134,7 +134,7 @@ export function Header({ pinnedEvents }: { pinnedEvents: { name: string; slug: s
         <button
           ref={buttonRef}
           type="button"
-          className="min-[1152px]:hidden inline-flex items-center justify-center rounded-lg p-2 hover:bg-black/10 transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98]"
+          className="interactive-scale min-[1152px]:hidden inline-flex items-center justify-center rounded-lg p-2 hover:bg-black/10"
           aria-label="開啟選單"
           aria-expanded={open}
           aria-controls="mobile-menu"
@@ -153,40 +153,40 @@ export function Header({ pinnedEvents }: { pinnedEvents: { name: string; slug: s
         <div ref={panelRef} className="max-w-6xl mx-auto px-4 pb-4">
           <div className="flex flex-col text-lg font-bold">
             {staticNavItems.map((item) => (
-              <Link
+              <AppLink
                 key={item.href}
                 href={item.href}
-                className={`rounded-lg px-3 py-2 hover:bg-black/10 transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98] ${isActive(item.href) ? "bg-black/15" : ""}`}
+                className={`rounded-lg px-3 py-2 hover:bg-black/10 ${isActive(item.href) ? "bg-black/15" : ""}`}
                 onClick={() => setOpen(false)}
               >
                 {item.label}
-              </Link>
+              </AppLink>
             ))}
             {pinnedEvents.map((event) => (
-              <Link
+              <AppLink
                 key={event.slug}
                 href={`/events/${event.slug}`}
-                className={`rounded-lg px-3 py-2 hover:bg-black/10 transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98] ${isActive(`/events/${event.slug}`) ? "bg-black/15" : ""}`}
+                className={`rounded-lg px-3 py-2 hover:bg-black/10 ${isActive(`/events/${event.slug}`) ? "bg-black/15" : ""}`}
                 onClick={() => setOpen(false)}
               >
                 {event.name}
-              </Link>
+              </AppLink>
             ))}
-            <Link
+            <AppLink
               href="/events"
-              className={`rounded-lg px-3 py-2 hover:bg-black/10 transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98] ${isActive("/events") ? "bg-black/15" : ""}`}
+              className={`rounded-lg px-3 py-2 hover:bg-black/10 ${isActive("/events") ? "bg-black/15" : ""}`}
               onClick={() => setOpen(false)}
             >
               活動
-            </Link>
+            </AppLink>
             {isAdmin && (
-              <Link
+              <AppLink
                 href="/settings"
-                className={`rounded-lg px-3 py-2 hover:bg-black/10 transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98] ${isActive("/settings") ? "bg-black/15" : ""}`}
+                className={`rounded-lg px-3 py-2 hover:bg-black/10 ${isActive("/settings") ? "bg-black/15" : ""}`}
                 onClick={() => setOpen(false)}
               >
                 設定
-              </Link>
+              </AppLink>
             )}
             {renderAuthSection(true)}
           </div>

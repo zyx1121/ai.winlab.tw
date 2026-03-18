@@ -1,5 +1,6 @@
 "use client";
 
+import { PageShell } from "@/components/page-shell";
 import { useAuth } from "@/components/auth-provider";
 import { RecruitmentCard } from "@/components/recruitment-card";
 import { RecruitmentDialog } from "@/components/recruitment-dialog";
@@ -38,7 +39,7 @@ export default function RecruitmentPage() {
   const openEditSheet = (r: Recruitment) => { setEditingRecruitment(r); setSheetOpen(true); };
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-12 flex flex-col gap-8">
+    <PageShell>
       <div className="flex items-center justify-between gap-4">
         <h1 className="text-3xl font-bold">企業徵才</h1>
         {isAdmin && (
@@ -66,6 +67,6 @@ export default function RecruitmentPage() {
       )}
 
       <RecruitmentDialog open={sheetOpen} onOpenChange={setSheetOpen} recruitment={editingRecruitment} eventId={null} />
-    </div>
+    </PageShell>
   );
 }

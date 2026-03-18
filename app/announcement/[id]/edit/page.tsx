@@ -2,6 +2,7 @@
 
 import { AnnouncementDetail } from "@/components/announcement-detail";
 import { useAuth } from "@/components/auth-provider";
+import { PageShell } from "@/components/page-shell";
 import { TiptapEditor } from "@/components/tiptap-editor";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -155,9 +156,9 @@ export default function AnnouncementEditPage() {
 
   if (isLoading || authLoading) {
     return (
-      <div className="max-w-6xl mx-auto px-4 py-12 flex justify-center items-center min-h-[50vh]">
+      <PageShell tone="centeredState">
         <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
-      </div>
+      </PageShell>
     );
   }
 
@@ -166,7 +167,7 @@ export default function AnnouncementEditPage() {
   }
 
   return (
-    <div className="max-w-6xl mx-auto px-4 flex flex-col mt-8 pb-16">
+    <PageShell tone="editor">
 
       <div className="sticky top-16 z-20 bg-background/80 backdrop-blur-sm py-4 -mx-4 px-4 flex flex-col gap-4">
         <div className="flex items-center justify-between gap-4">
@@ -272,6 +273,6 @@ export default function AnnouncementEditPage() {
           onChange={(content) => setAnnouncement({ ...announcement, content })}
         />
       )}
-    </div>
+    </PageShell>
   );
 }

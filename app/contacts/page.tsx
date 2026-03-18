@@ -1,6 +1,7 @@
 "use client";
 
 import { useAuth } from "@/components/auth-provider";
+import { PageShell } from "@/components/page-shell";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { createClient } from "@/lib/supabase/client";
@@ -77,16 +78,16 @@ export default function ContactsAdminPage() {
 
   if (authLoading || !user) {
     return (
-      <div className="max-w-6xl mx-auto px-4 py-12 flex justify-center items-center min-h-[50vh]">
+      <PageShell tone="centeredState">
         <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
-      </div>
+      </PageShell>
     );
   }
 
   if (!isAdmin) return null;
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-12 flex flex-col gap-8">
+    <PageShell>
       <div className="flex items-center justify-between gap-4">
         <Link
           href="/"
@@ -165,7 +166,6 @@ export default function ContactsAdminPage() {
           ))}
         </div>
       )}
-    </div>
+    </PageShell>
   );
 }
-
