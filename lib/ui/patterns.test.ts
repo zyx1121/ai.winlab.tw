@@ -1,5 +1,5 @@
 import assert from "node:assert/strict"
-import { readFileSync } from "node:fs"
+import { readdirSync, readFileSync, statSync } from "node:fs"
 import { resolve } from "node:path"
 import { describe, test } from "node:test"
 
@@ -7,6 +7,23 @@ import { getAutoLinkProps, pageSectionVariants, pageShellVariants } from "./patt
 
 const globalsCss = readFileSync(resolve(process.cwd(), "app/globals.css"), "utf8")
 const agentsMd = readFileSync(resolve(process.cwd(), "AGENTS.md"), "utf8")
+
+function collectProjectFiles(directory: string): string[] {
+  return readdirSync(directory).flatMap((entry) => {
+    const filePath = resolve(directory, entry)
+    const stats = statSync(filePath)
+
+    if (stats.isDirectory()) {
+      return collectProjectFiles(filePath)
+    }
+
+    if (!/\.(css|ts|tsx)$/.test(filePath)) {
+      return []
+    }
+
+    return [filePath]
+  })
+}
 
 describe("global UI patterns", () => {
   test("defines a shared interactive scale utility with duration-200", () => {
@@ -38,6 +55,24 @@ describe("global UI patterns", () => {
     assert.ok(pageShellVariants({ tone: "auth" }).includes("min-h-[calc(100vh-10rem)]"))
     assert.ok(pageShellVariants({ tone: "profile" }).includes("max-w-6xl"))
     assert.ok(pageShellVariants({ tone: "profile" }).includes("w-full"))
+  })
+
+  test("does not allow transition-all in app, components, or lib source files", () => {
+    const sourceFiles = [
+      ...collectProjectFiles(resolve(process.cwd(), "app")),
+      ...collectProjectFiles(resolve(process.cwd(), "components")),
+      ...collectProjectFiles(resolve(process.cwd(), "lib")),
+    ]
+
+    const offenders = sourceFiles.filter((filePath) => {
+      if (filePath.endsWith("/lib/ui/patterns.test.ts")) {
+        return false
+      }
+      const content = readFileSync(filePath, "utf8")
+      return content.includes("transition-all") || content.includes("transition: all")
+    })
+
+    assert.deepEqual(offenders, [])
   })
 })
 

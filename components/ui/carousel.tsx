@@ -257,7 +257,7 @@ function CarouselIndicators({ className, ...props }: React.ComponentProps<"div">
         <button
           key={index}
           className={cn(
-            "interactive-scale h-3 w-3 rounded-full border-2 border-white/80 transition-all",
+            "interactive-scale h-3 w-3 rounded-full border-2 border-white/80 transition-[background-color,transform]",
             current === index
               ? "bg-white scale-110"
               : "bg-transparent hover:bg-white/50"

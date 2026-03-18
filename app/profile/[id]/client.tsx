@@ -436,7 +436,7 @@ export function ProfilePageClient({
               ) : (
                 results.map((result) => (
                   <AppLink key={result.id} href={resultHref(result)} className="block">
-                    <Block className="overflow-hidden flex flex-col lg:grid lg:grid-cols-2 gap-4 transition-all">
+                    <Block className="overflow-hidden flex flex-col lg:grid lg:grid-cols-2 gap-4">
                       <div className="-mx-6 -mt-6 lg:hidden">
                         <AspectRatio ratio={16 / 9}>
                           {result.header_image && result.header_image !== "/placeholder.png" ? (
@@ -490,7 +490,7 @@ export function ProfilePageClient({
               {/* External results */}
               {externalResults.map((ext) => {
                 const card = (
-                  <Block className="overflow-hidden flex flex-col lg:grid lg:grid-cols-2 gap-4 transition-all">
+                  <Block className="overflow-hidden flex flex-col lg:grid lg:grid-cols-2 gap-4">
                     <div className="-mx-6 -mt-6 lg:hidden">
                       <AspectRatio ratio={16 / 9}>
                         {ext.image ? (
