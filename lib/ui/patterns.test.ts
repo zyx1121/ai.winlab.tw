@@ -74,6 +74,24 @@ describe("global UI patterns", () => {
 
     assert.deepEqual(offenders, [])
   })
+
+  test("does not allow scattered toLocaleDateString calls in app, components, or lib source files", () => {
+    const sourceFiles = [
+      ...collectProjectFiles(resolve(process.cwd(), "app")),
+      ...collectProjectFiles(resolve(process.cwd(), "components")),
+      ...collectProjectFiles(resolve(process.cwd(), "lib")),
+    ]
+
+    const offenders = sourceFiles.filter((filePath) => {
+      if (filePath.endsWith("/lib/ui/patterns.test.ts")) {
+        return false
+      }
+      const content = readFileSync(filePath, "utf8")
+      return content.includes("toLocaleDateString(")
+    })
+
+    assert.deepEqual(offenders, [])
+  })
 })
 
 describe("getAutoLinkProps", () => {

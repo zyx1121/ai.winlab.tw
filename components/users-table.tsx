@@ -4,6 +4,7 @@ import { Download, Upload } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
+import { formatDate } from "@/lib/date"
 import {
   Table,
   TableBody,
@@ -119,11 +120,7 @@ function UsersTable({
                   </span>
                 </TableCell>
                 <TableCell className="px-4 py-3 text-muted-foreground">
-                  {new Date(user.created_at).toLocaleDateString("zh-TW", {
-                    year: "numeric",
-                    month: "long",
-                    day: "numeric",
-                  })}
+                  {formatDate(user.created_at, "long")}
                 </TableCell>
               </TableRow>
             ))}

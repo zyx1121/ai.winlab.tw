@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { formatDate } from "@/lib/date";
 import type { Result } from "@/lib/supabase/types";
 import { isExternalImage } from "@/lib/utils";
 import { Pin, User, Users } from "lucide-react";
@@ -92,7 +93,7 @@ export function ResultCard({
             )}
             <span className="truncate">{publisherName}</span>
           </div>
-          <span className="shrink-0">{new Date(item.updated_at).toLocaleDateString("zh-TW")}</span>
+          <span className="shrink-0">{formatDate(item.updated_at)}</span>
         </div>
       </CardFooter>
     </Card>

@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { formatDate } from "@/lib/date";
 import type { JSONContent } from "@tiptap/core";
 import TiptapImage from "@tiptap/extension-image";
 import { generateHTML } from "@tiptap/html";
@@ -29,11 +30,7 @@ export default async function PrivacyPage() {
     : null;
 
   const updatedAt = data?.created_at
-    ? new Date(data.created_at).toLocaleDateString("zh-TW", {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-      })
+    ? formatDate(data.created_at, "long")
     : null;
 
   return (

@@ -6,6 +6,7 @@ import { TiptapEditor } from "@/components/tiptap-editor";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { createClient } from "@/lib/supabase/client";
+import { formatDate } from "@/lib/date";
 import { ArrowLeft, Check, Loader2, RotateCcw, Save } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -165,11 +166,7 @@ export default function PrivacyEditPage() {
                   <tr key={v.id} className="hover:bg-muted/30 transition-colors">
                     <td className="px-4 py-3 font-mono text-muted-foreground">v{v.version}</td>
                     <td className="px-4 py-3 text-muted-foreground">
-                      {new Date(v.created_at).toLocaleDateString("zh-TW", {
-                        year: "numeric",
-                        month: "short",
-                        day: "numeric",
-                      })}
+                      {formatDate(v.created_at, "long")}
                     </td>
                     <td className="px-4 py-3">{v.profiles?.display_name || "—"}</td>
                     <td className="px-4 py-3 text-muted-foreground">{v.note || "—"}</td>

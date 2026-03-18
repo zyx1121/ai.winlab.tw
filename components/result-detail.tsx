@@ -1,4 +1,5 @@
 import type { Result } from "@/lib/supabase/types";
+import { formatDate } from "@/lib/date";
 import TiptapImage from "@tiptap/extension-image";
 import Youtube from "@tiptap/extension-youtube";
 import { generateHTML } from "@tiptap/html";
@@ -51,7 +52,7 @@ export function ResultDetail({ result, publisherInfo }: Props) {
               <span className="opacity-30">·</span>
             </>
           ) : null}
-          <span>{new Date(result.updated_at).toLocaleDateString("zh-TW")}</span>
+          <span>{formatDate(result.updated_at)}</span>
         </div>
       </div>
 
