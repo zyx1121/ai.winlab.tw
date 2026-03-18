@@ -9,6 +9,7 @@ const announcementTable = readFileSync(resolve(process.cwd(), "components/announ
 const announcementClient = readFileSync(resolve(process.cwd(), "app/announcement/client.tsx"), "utf8")
 const homeAnnouncementTable = readFileSync(resolve(process.cwd(), "components/home-announcement-table.tsx"), "utf8")
 const recruitmentPage = readFileSync(resolve(process.cwd(), "app/recruitment/page.tsx"), "utf8")
+const recruitmentClient = readFileSync(resolve(process.cwd(), "app/recruitment/client.tsx"), "utf8")
 const eventClient = readFileSync(resolve(process.cwd(), "app/events/[slug]/client.tsx"), "utf8")
 const recruitmentCard = readFileSync(resolve(process.cwd(), "components/recruitment-card.tsx"), "utf8")
 const recruitmentDialog = readFileSync(resolve(process.cwd(), "components/recruitment-dialog.tsx"), "utf8")
@@ -23,6 +24,8 @@ const homeIntroduction = readFileSync(resolve(process.cwd(), "components/home-in
 const homeOrganization = readFileSync(resolve(process.cwd(), "components/home-organization.tsx"), "utf8")
 const privacyEditPage = readFileSync(resolve(process.cwd(), "app/privacy/edit/page.tsx"), "utf8")
 const teamPage = readFileSync(resolve(process.cwd(), "app/team/[id]/page.tsx"), "utf8")
+const profileClient = readFileSync(resolve(process.cwd(), "app/profile/[id]/client.tsx"), "utf8")
+const organizationMemberDialog = readFileSync(resolve(process.cwd(), "components/organization-member-dialog.tsx"), "utf8")
 
 describe("accessibility contracts", () => {
   test("root layout provides a skip link and a main landmark", () => {
@@ -48,8 +51,9 @@ describe("accessibility contracts", () => {
   test("recruitment cards own their navigation semantics", () => {
     assert.ok(recruitmentCard.includes("href: string"))
     assert.ok(recruitmentCard.includes("<AppLink"))
-    assert.ok(recruitmentPage.includes("RecruitmentCard"))
-    assert.ok(recruitmentPage.includes("href={`/recruitment/${item.id}`}"))
+    assert.ok(recruitmentPage.includes("RecruitmentPageClient"))
+    assert.ok(recruitmentClient.includes("RecruitmentCard"))
+    assert.ok(recruitmentClient.includes("href={`/recruitment/${item.id}`}"))
     assert.ok(!recruitmentPage.includes("<Link href={`/recruitment/${item.id}`}"))
     assert.ok(eventClient.includes("href={`/events/${slug}/recruitment/${item.id}`}"))
     assert.ok(!eventClient.includes("<Link href={`/events/${slug}/recruitment/${item.id}`}"))
@@ -88,5 +92,17 @@ describe("accessibility contracts", () => {
 
   test("team result links do not fall back to dead hash hrefs", () => {
     assert.ok(!teamPage.includes(': "#"'))
+  })
+
+  test("profile edit mode does not rely on placeholders as the only field labels", () => {
+    assert.ok(profileClient.includes('aria-label="姓名"'))
+    assert.ok(profileClient.includes('aria-label="個人簡介"'))
+    assert.ok(profileClient.includes('aria-label={`連結 ${idx + 1}`}'))
+    assert.ok(profileClient.includes('aria-label={`刪除連結 ${idx + 1}`}'))
+  })
+
+  test("icon-only destructive controls expose aria labels", () => {
+    assert.ok(recruitmentDialog.includes('aria-label={`刪除職缺 ${index + 1}`}'))
+    assert.ok(organizationMemberDialog.includes('aria-label="移除照片"'))
   })
 })

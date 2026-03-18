@@ -108,7 +108,7 @@ export function TiptapEditor({
     extensions: [
       StarterKit,
       Placeholder.configure({
-        placeholder: "開始撰寫公告內容...",
+        placeholder: "開始撰寫公告內容…",
       }),
       TextAlign.configure({
         types: ["heading", "paragraph"],

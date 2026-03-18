@@ -337,6 +337,7 @@ export function ProfilePageClient({
                   {isEditMode ? (
                     <div className="relative">
                       <input
+                        aria-label="姓名"
                         value={displayName}
                         onChange={(e) => setDisplayName(e.target.value)}
                         onBlur={() => saveField("display_name", displayName)}
@@ -354,6 +355,7 @@ export function ProfilePageClient({
                   {isEditMode ? (
                     <div className="relative">
                       <textarea
+                        aria-label="個人簡介"
                         value={bio}
                         onChange={(e) => setBio(e.target.value)}
                         onBlur={() => saveField("bio", bio)}
@@ -392,6 +394,7 @@ export function ProfilePageClient({
                     {links.map((link, idx) => (
                       <div key={idx} className="flex items-center gap-1.5">
                         <input
+                          aria-label={`連結 ${idx + 1}`}
                           value={link}
                           onChange={(e) => updateLink(idx, e.target.value)}
                           onBlur={(e) => {
@@ -403,6 +406,7 @@ export function ProfilePageClient({
                         />
                         <button
                           type="button"
+                          aria-label={`刪除連結 ${idx + 1}`}
                           onClick={() => removeLink(idx)}
                           className="text-muted-foreground hover:text-destructive transition-colors"
                         >

@@ -334,7 +334,7 @@ export function RecruitmentDialog({
                   {uploading ? (
                     <>
                       <Loader2 className="size-4 animate-spin mr-1" />
-                      上傳中...
+                      上傳中…
                     </>
                   ) : (
                     "上傳圖片"
@@ -448,6 +448,7 @@ export function RecruitmentDialog({
                       <div className="flex items-center gap-1">
                         <button
                           type="button"
+                          aria-label={`刪除職缺 ${index + 1}`}
                           className="p-1 hover:bg-destructive/10 hover:text-destructive rounded"
                           onClick={(e) => {
                             e.stopPropagation();

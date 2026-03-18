@@ -209,7 +209,7 @@ export function OrganizationMemberDialog({ open, onOpenChange, member, defaultCa
                   onClick={() => fileInputRef.current?.click()}
                 >
                   {uploading ? (
-                    <><Loader2 className="size-4 animate-spin mr-1" />上傳中...</>
+                    <><Loader2 className="size-4 animate-spin mr-1" />上傳中…</>
                   ) : (
                     <><ImagePlus className="size-4 mr-1" />上傳照片</>
                   )}
@@ -219,6 +219,7 @@ export function OrganizationMemberDialog({ open, onOpenChange, member, defaultCa
                     type="button"
                     variant="ghost"
                     size="sm"
+                    aria-label="移除照片"
                     onClick={() => update("image", null)}
                   >
                     移除照片
