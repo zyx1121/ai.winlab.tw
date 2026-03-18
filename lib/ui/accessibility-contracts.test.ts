@@ -34,6 +34,7 @@ describe("accessibility contracts", () => {
     assert.ok(announcementTable.includes("getHref"))
     assert.ok(announcementTable.includes("<AppLink"))
     assert.ok(!announcementTable.includes("colSpan={showStatus ? 4 : 3}"))
+    assert.ok(!announcementTable.includes('paddingLeft: "1.25rem"'))
     assert.ok(announcementClient.includes("getHref={(item) =>"))
     assert.ok(homeAnnouncementTable.includes("getHref={(item) =>"))
   })
