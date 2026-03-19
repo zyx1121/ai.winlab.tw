@@ -19,6 +19,10 @@ const tiptapEditorSource = readFileSync(resolve(process.cwd(), "components/tipta
 const tiptapSharedCommandsPath = resolve(process.cwd(), "components/tiptap-editor-shared.tsx")
 const tiptapDesktopBubbleMenuPath = resolve(process.cwd(), "components/tiptap-desktop-bubble-menu.tsx")
 const tiptapDesktopFloatingMenuPath = resolve(process.cwd(), "components/tiptap-desktop-floating-menu.tsx")
+const tiptapMobileToolbarPath = resolve(process.cwd(), "components/tiptap-mobile-toolbar.tsx")
+const tiptapMobileToolbarSource = existsSync(tiptapMobileToolbarPath)
+  ? readFileSync(tiptapMobileToolbarPath, "utf8")
+  : ""
 
 describe("PageShell render contracts", () => {
   test("renders the dashboard shell classes", () => {
@@ -134,6 +138,17 @@ describe("tiptap editor render contracts", () => {
     assert.ok(existsSync(tiptapDesktopFloatingMenuPath))
     assert.ok(tiptapEditorSource.includes('from "./tiptap-desktop-floating-menu"'))
     assert.ok(tiptapEditorSource.includes("<TiptapDesktopFloatingMenu"))
+  })
+
+  test("composes a dedicated mobile toolbar component", () => {
+    assert.ok(existsSync(tiptapMobileToolbarPath))
+    assert.ok(tiptapEditorSource.includes('from "./tiptap-mobile-toolbar"'))
+    assert.ok(tiptapEditorSource.includes("<TiptapMobileToolbar"))
+  })
+
+  test("mobile toolbar exposes a dedicated block insertion trigger", () => {
+    assert.ok(tiptapMobileToolbarSource.includes('data-slot="tiptap-mobile-insert-trigger"'))
+    assert.ok(tiptapMobileToolbarSource.includes("開啟插入選單"))
   })
 })
 

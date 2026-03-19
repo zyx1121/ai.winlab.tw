@@ -4,16 +4,10 @@ import {
   uploadAnnouncementImage,
 } from "@/lib/upload-image";
 import {
-  alignmentCommands,
-  headingCommands,
-  historyCommands,
-  listCommands,
-  mediaCommands,
-  textFormattingCommands,
-  ToolbarButton,
 } from "./tiptap-editor-shared";
 import { TiptapDesktopBubbleMenu } from "./tiptap-desktop-bubble-menu";
 import { TiptapDesktopFloatingMenu } from "./tiptap-desktop-floating-menu";
+import { TiptapMobileToolbar } from "./tiptap-mobile-toolbar";
 import FileHandler from "@tiptap/extension-file-handler";
 import Image from "@tiptap/extension-image";
 import Placeholder from "@tiptap/extension-placeholder";
@@ -139,95 +133,7 @@ export function TiptapEditor({
     <div data-slot="tiptap-editor" className="flex flex-col gap-4">
       {editable && <TiptapDesktopBubbleMenu editor={editor} />}
       {editable && <TiptapDesktopFloatingMenu editor={editor} />}
-      {editable && (
-        <div className="overflow-x-auto">
-          <div className="flex min-w-max flex-wrap gap-1 rounded-lg border bg-background/80 p-2 shadow-sm backdrop-blur-sm">
-            {textFormattingCommands.map((command) => {
-              const Icon = command.icon;
-              return (
-                <ToolbarButton
-                  key={command.ariaLabel}
-                  ariaLabel={command.ariaLabel}
-                  onClick={() => command.onClick(editor)}
-                  className={command.isActive?.(editor) ? "bg-muted" : ""}
-                  disabled={command.isDisabled?.(editor)}
-                >
-                  <Icon className="w-4 h-4" />
-                </ToolbarButton>
-              );
-            })}
-            <div className="w-px h-6 bg-border mx-1 self-center" />
-            {headingCommands.map((command) => {
-              const Icon = command.icon;
-              return (
-                <ToolbarButton
-                  key={command.ariaLabel}
-                  ariaLabel={command.ariaLabel}
-                  onClick={() => command.onClick(editor)}
-                  className={command.isActive?.(editor) ? "bg-muted" : ""}
-                >
-                  <Icon className="w-4 h-4" />
-                </ToolbarButton>
-              );
-            })}
-            <div className="w-px h-6 bg-border mx-1 self-center" />
-            {listCommands.map((command) => {
-              const Icon = command.icon;
-              return (
-                <ToolbarButton
-                  key={command.ariaLabel}
-                  ariaLabel={command.ariaLabel}
-                  onClick={() => command.onClick(editor)}
-                  className={command.isActive?.(editor) ? "bg-muted" : ""}
-                >
-                  <Icon className="w-4 h-4" />
-                </ToolbarButton>
-              );
-            })}
-            <div className="w-px h-6 bg-border mx-1 self-center" />
-            {alignmentCommands.map((command) => {
-              const Icon = command.icon;
-              return (
-                <ToolbarButton
-                  key={command.ariaLabel}
-                  ariaLabel={command.ariaLabel}
-                  onClick={() => command.onClick(editor)}
-                  className={command.isActive?.(editor) ? "bg-muted" : ""}
-                >
-                  <Icon className="w-4 h-4" />
-                </ToolbarButton>
-              );
-            })}
-            <div className="w-px h-6 bg-border mx-1 self-center" />
-            {mediaCommands.map((command) => {
-              const Icon = command.icon;
-              return (
-                <ToolbarButton
-                  key={command.ariaLabel}
-                  ariaLabel={command.ariaLabel}
-                  onClick={() => command.onClick(editor)}
-                >
-                  <Icon className="w-4 h-4" />
-                </ToolbarButton>
-              );
-            })}
-            <div className="w-px h-6 bg-border mx-1 self-center" />
-            {historyCommands.map((command) => {
-              const Icon = command.icon;
-              return (
-                <ToolbarButton
-                  key={command.ariaLabel}
-                  ariaLabel={command.ariaLabel}
-                  onClick={() => command.onClick(editor)}
-                  disabled={command.isDisabled?.(editor)}
-                >
-                  <Icon className="w-4 h-4" />
-                </ToolbarButton>
-              );
-            })}
-          </div>
-        </div>
-      )}
+      {editable && <TiptapMobileToolbar editor={editor} />}
       <div
         data-slot="tiptap-canvas"
         className="rounded-[2rem] bg-background focus-within:ring-2 focus-within:ring-ring"
