@@ -3,6 +3,15 @@
 import {
   uploadAnnouncementImage,
 } from "@/lib/upload-image";
+import {
+  alignmentCommands,
+  headingCommands,
+  historyCommands,
+  listCommands,
+  mediaCommands,
+  textFormattingCommands,
+  ToolbarButton,
+} from "./tiptap-editor-shared";
 import FileHandler from "@tiptap/extension-file-handler";
 import Image from "@tiptap/extension-image";
 import Placeholder from "@tiptap/extension-placeholder";
@@ -10,26 +19,7 @@ import TextAlign from "@tiptap/extension-text-align";
 import Youtube from "@tiptap/extension-youtube";
 import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
-import {
-  AlignCenter,
-  AlignLeft,
-  AlignRight,
-  Bold,
-  Heading1,
-  Heading2,
-  Heading3,
-  Heading4,
-  Italic,
-  List,
-  ListOrdered,
-  Redo,
-  Strikethrough,
-  Undo,
-  Youtube as YoutubeIcon,
-} from "lucide-react";
-import type { ComponentProps } from "react";
 import { useCallback, useEffect } from "react";
-import { Button } from "./ui/button";
 
 const IMAGE_MIME_TYPES = [
   "image/jpeg",
@@ -42,23 +32,6 @@ interface TiptapEditorProps {
   content: Record<string, unknown>;
   onChange: (content: Record<string, unknown>) => void;
   editable?: boolean;
-}
-
-function ToolbarButton({
-  ariaLabel,
-  className,
-  ...props
-}: ComponentProps<typeof Button> & { ariaLabel: string }) {
-  return (
-    <Button
-      type="button"
-      variant="ghost"
-      size="sm"
-      aria-label={ariaLabel}
-      className={className}
-      {...props}
-    />
-  );
 }
 
 export function TiptapEditor({
@@ -165,127 +138,89 @@ export function TiptapEditor({
       {editable && (
         <div className="overflow-x-auto">
           <div className="flex min-w-max flex-wrap gap-1 rounded-lg border bg-background/80 p-2 shadow-sm backdrop-blur-sm">
-          
-          <ToolbarButton
-            ariaLabel="粗體"
-            onClick={() => editor.chain().focus().toggleBold().run()}
-            className={editor.isActive("bold") ? "bg-muted" : ""}
-          >
-            <Bold className="w-4 h-4" />
-          </ToolbarButton>
-          <ToolbarButton
-            ariaLabel="斜體"
-            onClick={() => editor.chain().focus().toggleItalic().run()}
-            className={editor.isActive("italic") ? "bg-muted" : ""}
-          >
-            <Italic className="w-4 h-4" />
-          </ToolbarButton>
-          <ToolbarButton
-            ariaLabel="刪除線"
-            onClick={() => editor.chain().focus().toggleStrike().run()}
-            className={editor.isActive("strike") ? "bg-muted" : ""}
-          >
-            <Strikethrough className="w-4 h-4" />
-          </ToolbarButton>
-          <div className="w-px h-6 bg-border mx-1 self-center" />
-          <ToolbarButton
-            ariaLabel="標題一"
-            onClick={() =>
-              editor.chain().focus().toggleHeading({ level: 1 }).run()
-            }
-            className={editor.isActive("heading", { level: 1 }) ? "bg-muted" : ""}
-          >
-            <Heading1 className="w-4 h-4" />
-          </ToolbarButton>
-          <ToolbarButton
-            ariaLabel="標題二"
-            onClick={() =>
-              editor.chain().focus().toggleHeading({ level: 2 }).run()
-            }
-            className={editor.isActive("heading", { level: 2 }) ? "bg-muted" : ""}
-          >
-            <Heading2 className="w-4 h-4" />
-          </ToolbarButton>
-          <ToolbarButton
-            ariaLabel="標題三"
-            onClick={() =>
-              editor.chain().focus().toggleHeading({ level: 3 }).run()
-            }
-            className={editor.isActive("heading", { level: 3 }) ? "bg-muted" : ""}
-          >
-            <Heading3 className="w-4 h-4" />
-          </ToolbarButton>
-          <ToolbarButton
-            ariaLabel="標題四"
-            onClick={() =>
-              editor.chain().focus().toggleHeading({ level: 4 }).run()
-            }
-            className={editor.isActive("heading", { level: 4 }) ? "bg-muted" : ""}
-          >
-            <Heading4 className="w-4 h-4" />
-          </ToolbarButton>
-          <div className="w-px h-6 bg-border mx-1 self-center" />
-          <ToolbarButton
-            ariaLabel="項目清單"
-            onClick={() => editor.chain().focus().toggleBulletList().run()}
-            className={editor.isActive("bulletList") ? "bg-muted" : ""}
-          >
-            <List className="w-4 h-4" />
-          </ToolbarButton>
-          <ToolbarButton
-            ariaLabel="編號清單"
-            onClick={() => editor.chain().focus().toggleOrderedList().run()}
-            className={editor.isActive("orderedList") ? "bg-muted" : ""}
-          >
-            <ListOrdered className="w-4 h-4" />
-          </ToolbarButton>
-          <div className="w-px h-6 bg-border mx-1 self-center" />
-          <ToolbarButton
-            ariaLabel="靠左對齊"
-            onClick={() => editor.chain().focus().setTextAlign("left").run()}
-            className={editor.isActive({ textAlign: "left" }) ? "bg-muted" : ""}
-          >
-            <AlignLeft className="w-4 h-4" />
-          </ToolbarButton>
-          <ToolbarButton
-            ariaLabel="置中對齊"
-            onClick={() => editor.chain().focus().setTextAlign("center").run()}
-            className={editor.isActive({ textAlign: "center" }) ? "bg-muted" : ""}
-          >
-            <AlignCenter className="w-4 h-4" />
-          </ToolbarButton>
-          <ToolbarButton
-            ariaLabel="靠右對齊"
-            onClick={() => editor.chain().focus().setTextAlign("right").run()}
-            className={editor.isActive({ textAlign: "right" }) ? "bg-muted" : ""}
-          >
-            <AlignRight className="w-4 h-4" />
-          </ToolbarButton>
-          <div className="w-px h-6 bg-border mx-1 self-center" />
-          <ToolbarButton
-            ariaLabel="插入 YouTube 影片"
-            onClick={() => {
-              const url = window.prompt("請輸入 YouTube 影片網址");
-              if (url) editor.chain().focus().setYoutubeVideo({ src: url }).run();
-            }}
-          >
-            <YoutubeIcon className="w-4 h-4" />
-          </ToolbarButton>
-          <div className="w-px h-6 bg-border mx-1 self-center" />
-          <ToolbarButton
-            ariaLabel="復原"
-            onClick={() => editor.chain().focus().undo().run()}
-            disabled={!editor.can().undo()}
-          >
-            <Undo className="w-4 h-4" />
-          </ToolbarButton>
-          <ToolbarButton
-            ariaLabel="重做"
-            onClick={() => editor.chain().focus().redo().run()}
-            disabled={!editor.can().redo()}
-          >
-            <Redo className="w-4 h-4" />
-          </ToolbarButton>
+            {textFormattingCommands.map((command) => {
+              const Icon = command.icon;
+              return (
+                <ToolbarButton
+                  key={command.ariaLabel}
+                  ariaLabel={command.ariaLabel}
+                  onClick={() => command.onClick(editor)}
+                  className={command.isActive?.(editor) ? "bg-muted" : ""}
+                  disabled={command.isDisabled?.(editor)}
+                >
+                  <Icon className="w-4 h-4" />
+                </ToolbarButton>
+              );
+            })}
+            <div className="w-px h-6 bg-border mx-1 self-center" />
+            {headingCommands.map((command) => {
+              const Icon = command.icon;
+              return (
+                <ToolbarButton
+                  key={command.ariaLabel}
+                  ariaLabel={command.ariaLabel}
+                  onClick={() => command.onClick(editor)}
+                  className={command.isActive?.(editor) ? "bg-muted" : ""}
+                >
+                  <Icon className="w-4 h-4" />
+                </ToolbarButton>
+              );
+            })}
+            <div className="w-px h-6 bg-border mx-1 self-center" />
+            {listCommands.map((command) => {
+              const Icon = command.icon;
+              return (
+                <ToolbarButton
+                  key={command.ariaLabel}
+                  ariaLabel={command.ariaLabel}
+                  onClick={() => command.onClick(editor)}
+                  className={command.isActive?.(editor) ? "bg-muted" : ""}
+                >
+                  <Icon className="w-4 h-4" />
+                </ToolbarButton>
+              );
+            })}
+            <div className="w-px h-6 bg-border mx-1 self-center" />
+            {alignmentCommands.map((command) => {
+              const Icon = command.icon;
+              return (
+                <ToolbarButton
+                  key={command.ariaLabel}
+                  ariaLabel={command.ariaLabel}
+                  onClick={() => command.onClick(editor)}
+                  className={command.isActive?.(editor) ? "bg-muted" : ""}
+                >
+                  <Icon className="w-4 h-4" />
+                </ToolbarButton>
+              );
+            })}
+            <div className="w-px h-6 bg-border mx-1 self-center" />
+            {mediaCommands.map((command) => {
+              const Icon = command.icon;
+              return (
+                <ToolbarButton
+                  key={command.ariaLabel}
+                  ariaLabel={command.ariaLabel}
+                  onClick={() => command.onClick(editor)}
+                >
+                  <Icon className="w-4 h-4" />
+                </ToolbarButton>
+              );
+            })}
+            <div className="w-px h-6 bg-border mx-1 self-center" />
+            {historyCommands.map((command) => {
+              const Icon = command.icon;
+              return (
+                <ToolbarButton
+                  key={command.ariaLabel}
+                  ariaLabel={command.ariaLabel}
+                  onClick={() => command.onClick(editor)}
+                  disabled={command.isDisabled?.(editor)}
+                >
+                  <Icon className="w-4 h-4" />
+                </ToolbarButton>
+              );
+            })}
           </div>
         </div>
       )}

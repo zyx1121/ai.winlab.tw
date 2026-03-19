@@ -1,5 +1,5 @@
 import assert from "node:assert/strict"
-import { readFileSync } from "node:fs"
+import { existsSync, readFileSync } from "node:fs"
 import { resolve } from "node:path"
 import { describe, test } from "node:test"
 
@@ -16,6 +16,7 @@ import { UsersTableSkeleton } from "@/components/users-table"
 import { BlockSkeleton } from "@/components/ui/block"
 
 const tiptapEditorSource = readFileSync(resolve(process.cwd(), "components/tiptap-editor.tsx"), "utf8")
+const tiptapSharedCommandsPath = resolve(process.cwd(), "components/tiptap-editor-shared.tsx")
 
 describe("PageShell render contracts", () => {
   test("renders the dashboard shell classes", () => {
@@ -114,6 +115,11 @@ describe("tiptap editor render contracts", () => {
     assert.ok(tiptapEditorSource.includes("[&_img]:pt-4"))
     assert.ok(tiptapEditorSource.includes("py-6"))
     assert.ok(!tiptapEditorSource.includes("min-h-[300px] focus:outline-none p-4"))
+  })
+
+  test("extracts shared tiptap command definitions for future desktop and mobile controls", () => {
+    assert.ok(existsSync(tiptapSharedCommandsPath))
+    assert.ok(tiptapEditorSource.includes('from "./tiptap-editor-shared"'))
   })
 })
 
