@@ -12,6 +12,7 @@ import {
   textFormattingCommands,
   ToolbarButton,
 } from "./tiptap-editor-shared";
+import { TiptapDesktopBubbleMenu } from "./tiptap-desktop-bubble-menu";
 import FileHandler from "@tiptap/extension-file-handler";
 import Image from "@tiptap/extension-image";
 import Placeholder from "@tiptap/extension-placeholder";
@@ -135,6 +136,7 @@ export function TiptapEditor({
 
   return (
     <div data-slot="tiptap-editor" className="flex flex-col gap-4">
+      {editable && <TiptapDesktopBubbleMenu editor={editor} />}
       {editable && (
         <div className="overflow-x-auto">
           <div className="flex min-w-max flex-wrap gap-1 rounded-lg border bg-background/80 p-2 shadow-sm backdrop-blur-sm">
