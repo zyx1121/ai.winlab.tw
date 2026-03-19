@@ -162,6 +162,15 @@ Defined in `app/globals.css`:
 - Route-level loading wrappers should mirror the real page wrapper exactly, including `max-width`, padding, and gap values. Do not substitute a generic container if the actual page uses a different layout shell.
 - Avoid page-owned skeleton abstractions that compete with component-owned skeletons.
 
+### Rich text editor interaction
+
+- Desktop Tiptap editing should use contextual controls instead of a persistent full toolbar.
+- Desktop inline formatting should use `BubbleMenu`.
+- Desktop block insertion should use `FloatingMenu`.
+- Mobile Tiptap editing should use a dedicated compact toolbar instead of desktop-style floating controls.
+- The editor canvas should stay visually close to read mode so editing and reading share the same document feel.
+- Prefer the editor canvas as the primary writing surface; do not reintroduce preview-first editing flows unless there is a route-specific product reason.
+
 ### Color tokens
 
 - Do not hardcode grayscale UI colors such as `text-gray-*`, `border-gray-*`, or `bg-white` in feature components.

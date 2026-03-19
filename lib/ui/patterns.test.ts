@@ -13,6 +13,9 @@ const organizationMemberDialog = readFileSync(resolve(process.cwd(), "components
 const tiptapEditor = readFileSync(resolve(process.cwd(), "components/tiptap-editor.tsx"), "utf8")
 const profileClient = readFileSync(resolve(process.cwd(), "app/profile/[id]/client.tsx"), "utf8")
 const resultTagSidebar = readFileSync(resolve(process.cwd(), "components/result-tag-sidebar.tsx"), "utf8")
+const tiptapDesktopBubbleMenu = readFileSync(resolve(process.cwd(), "components/tiptap-desktop-bubble-menu.tsx"), "utf8")
+const tiptapDesktopFloatingMenu = readFileSync(resolve(process.cwd(), "components/tiptap-desktop-floating-menu.tsx"), "utf8")
+const tiptapMobileToolbar = readFileSync(resolve(process.cwd(), "components/tiptap-mobile-toolbar.tsx"), "utf8")
 const carouselClient = readFileSync(resolve(process.cwd(), "components/carousel-client.tsx"), "utf8")
 const introductionEditButton = readFileSync(resolve(process.cwd(), "components/introduction-edit-button.tsx"), "utf8")
 const contactsEditButton = readFileSync(resolve(process.cwd(), "components/contacts-edit-button.tsx"), "utf8")
@@ -152,5 +155,18 @@ describe("skeleton architecture guidance", () => {
   test("documents component-owned skeletons instead of page-owned skeleton abstractions", () => {
     assert.ok(agentsMd.includes("High-level UI components should own their matching skeleton components"))
     assert.ok(agentsMd.includes("Route-level loading files should compose layout with component-owned skeletons"))
+  })
+
+  test("documents the notion-like editor split between desktop contextual controls and mobile toolbar controls", () => {
+    assert.ok(agentsMd.includes("Desktop Tiptap editing should use contextual controls"))
+    assert.ok(agentsMd.includes("BubbleMenu"))
+    assert.ok(agentsMd.includes("FloatingMenu"))
+    assert.ok(agentsMd.includes("Mobile Tiptap editing should use a dedicated compact toolbar"))
+    assert.ok(tiptapEditor.includes("<TiptapDesktopBubbleMenu"))
+    assert.ok(tiptapEditor.includes("<TiptapDesktopFloatingMenu"))
+    assert.ok(tiptapEditor.includes("<TiptapMobileToolbar"))
+    assert.ok(tiptapDesktopBubbleMenu.includes("BubbleMenu"))
+    assert.ok(tiptapDesktopFloatingMenu.includes("FloatingMenu"))
+    assert.ok(tiptapMobileToolbar.includes('data-slot="tiptap-mobile-toolbar"'))
   })
 })
