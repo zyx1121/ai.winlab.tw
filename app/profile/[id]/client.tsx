@@ -252,7 +252,7 @@ export function ProfilePageClient({
                   <Textarea
                     value={exForm.description}
                     onChange={(e) => setExForm((f) => ({ ...f, description: e.target.value }))}
-                    placeholder="簡短說明..."
+                    placeholder="簡短說明…"
                   />
                 </div>
                 <div className="grid gap-2">

@@ -684,7 +684,7 @@ export function RecruitmentDialog({
               onChange={(e) =>
                 updateField("required_documents", e.target.value || null)
               }
-              placeholder="例：履歷、作品集、成績單..."
+              placeholder="例：履歷、作品集、成績單…"
               rows={2}
             />
           </div>

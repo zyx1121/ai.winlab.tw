@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { createClient } from "@/lib/supabase/client";
 import type { Tag } from "@/lib/supabase/types";
 import { Check, Loader2, Pencil, Plus, Tag as TagIcon, Trash2, X } from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 type Props = {
   selectedTagIds: Set<string>;
@@ -330,10 +330,17 @@ function InlineInput({
   placeholder: string;
   className?: string;
 }) {
+  const inputRef = useRef<HTMLInputElement | null>(null);
+
+  useEffect(() => {
+    inputRef.current?.focus();
+    inputRef.current?.select();
+  }, []);
+
   return (
     <div className={`flex items-center gap-1 ${className}`}>
       <Input
-        autoFocus
+        ref={inputRef}
         value={value}
         onChange={(e) => onChange(e.target.value)}
         onKeyDown={(e) => {

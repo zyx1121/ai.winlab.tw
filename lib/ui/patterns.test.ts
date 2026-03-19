@@ -11,6 +11,8 @@ const homeIntroduction = readFileSync(resolve(process.cwd(), "components/home-in
 const recruitmentDialog = readFileSync(resolve(process.cwd(), "components/recruitment-dialog.tsx"), "utf8")
 const organizationMemberDialog = readFileSync(resolve(process.cwd(), "components/organization-member-dialog.tsx"), "utf8")
 const tiptapEditor = readFileSync(resolve(process.cwd(), "components/tiptap-editor.tsx"), "utf8")
+const profileClient = readFileSync(resolve(process.cwd(), "app/profile/[id]/client.tsx"), "utf8")
+const resultTagSidebar = readFileSync(resolve(process.cwd(), "components/result-tag-sidebar.tsx"), "utf8")
 const carouselClient = readFileSync(resolve(process.cwd(), "components/carousel-client.tsx"), "utf8")
 const introductionEditButton = readFileSync(resolve(process.cwd(), "components/introduction-edit-button.tsx"), "utf8")
 const contactsEditButton = readFileSync(resolve(process.cwd(), "components/contacts-edit-button.tsx"), "utf8")
@@ -105,8 +107,14 @@ describe("global UI patterns", () => {
   test("uses typographic ellipsis in user-facing copy where the repo already standardizes it", () => {
     assert.ok(!homeIntroduction.includes('+ "..."'))
     assert.ok(!recruitmentDialog.includes("上傳中..."))
+    assert.ok(!recruitmentDialog.includes("例：履歷、作品集、成績單..."))
     assert.ok(!organizationMemberDialog.includes("上傳中..."))
     assert.ok(!tiptapEditor.includes("開始撰寫公告內容..."))
+    assert.ok(!profileClient.includes("簡短說明..."))
+  })
+
+  test("prefers managed focus over autoFocus in application components", () => {
+    assert.ok(!resultTagSidebar.includes("autoFocus"))
   })
 
   test("lightweight auth-aware client components do not depend on useAuth when server props can provide the same state", () => {

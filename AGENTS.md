@@ -136,6 +136,7 @@ Defined in `app/globals.css`:
 - Every clickable UI element should expose the shared hover and active feedback pattern: `hover:scale-[1.02]` and `active:scale-[0.98]`.
 - Reuse the shared `.interactive-scale` utility or high-level wrappers built on it instead of hand-writing motion classes repeatedly.
 - Prefer Tailwind animation utilities for UI animation behavior.
+- Prefer managed focus with refs/effects over raw `autoFocus` in application components unless the focus jump is both intentional and documented.
 
 ### Page layout spacing
 
