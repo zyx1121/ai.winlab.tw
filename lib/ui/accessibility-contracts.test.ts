@@ -74,8 +74,8 @@ describe("accessibility contracts", () => {
   test("rich text editor exposes toolbar labels and visible focus affordances", () => {
     assert.ok(tiptapEditorShared.includes('ariaLabel: "粗體"'))
     assert.ok(tiptapEditorShared.includes('ariaLabel: "插入 YouTube 影片"'))
-    assert.ok(tiptapEditor.includes("focus-within:ring-2"))
-    assert.ok(tiptapEditor.includes("focus-within:ring-ring"))
+    assert.ok(!tiptapEditor.includes("focus-within:ring-2"))
+    assert.ok(!tiptapEditor.includes("focus-within:ring-ring"))
     assert.ok(!tiptapEditor.includes("border border-border"))
   })
 

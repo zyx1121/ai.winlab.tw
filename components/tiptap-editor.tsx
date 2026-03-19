@@ -136,7 +136,7 @@ export function TiptapEditor({
       {editable && <TiptapMobileToolbar editor={editor} />}
       <div
         data-slot="tiptap-canvas"
-        className="rounded-[2rem] bg-background focus-within:ring-2 focus-within:ring-ring"
+        className="rounded-[2rem] bg-background"
       >
         <EditorContent editor={editor} />
       </div>
