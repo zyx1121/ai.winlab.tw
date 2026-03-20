@@ -118,6 +118,8 @@ describe("accessibility contracts", () => {
 
   test("icon-only destructive controls expose aria labels", () => {
     assert.ok(recruitmentDialog.includes('aria-label={`刪除職缺 ${index + 1}`}'))
+    assert.ok(recruitmentDialog.includes("onClick={() => removePosition(index)}"))
+    assert.ok(!recruitmentDialog.includes("onClick={(e) => {\n                            e.stopPropagation();"))
     assert.ok(organizationMemberDialog.includes('aria-label="移除照片"'))
   })
 

@@ -481,35 +481,32 @@ export function RecruitmentDialog({
             {formData.positions.map((pos, index) => (
               <Collapsible key={index} defaultOpen={!pos.name}>
                 <div className="border rounded-md">
-                  <CollapsibleTrigger asChild>
+                  <div className="flex items-center gap-2 px-3 py-2">
+                    <CollapsibleTrigger asChild>
+                      <button
+                        type="button"
+                        className="flex min-w-0 flex-1 items-center justify-between rounded-md px-0 py-0 text-sm hover:bg-accent"
+                      >
+                        <div className="flex min-w-0 items-center gap-2">
+                          <span className="truncate font-medium">
+                            {pos.name || "新職缺"}
+                          </span>
+                          <span className="rounded bg-muted px-1.5 py-0.5 text-xs">
+                            {getPositionTypeLabel(pos.type)}
+                          </span>
+                        </div>
+                        <ChevronDown className="size-4 shrink-0 transition-transform [[data-state=open]_&]:rotate-180" />
+                      </button>
+                    </CollapsibleTrigger>
                     <button
                       type="button"
-                      className="flex w-full items-center justify-between px-3 py-2 text-sm hover:bg-accent rounded-md"
+                      aria-label={`刪除職缺 ${index + 1}`}
+                      className="rounded p-1 hover:bg-destructive/10 hover:text-destructive"
+                      onClick={() => removePosition(index)}
                     >
-                      <div className="flex items-center gap-2">
-                        <span className="font-medium">
-                          {pos.name || "新職缺"}
-                        </span>
-                        <span className="text-xs bg-muted px-1.5 py-0.5 rounded">
-                          {getPositionTypeLabel(pos.type)}
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <button
-                          type="button"
-                          aria-label={`刪除職缺 ${index + 1}`}
-                          className="p-1 hover:bg-destructive/10 hover:text-destructive rounded"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            removePosition(index);
-                          }}
-                        >
-                          <Trash2 className="size-3.5" />
-                        </button>
-                        <ChevronDown className="size-4 transition-transform [[data-state=open]_&]:rotate-180" />
-                      </div>
+                      <Trash2 className="size-3.5" />
                     </button>
-                  </CollapsibleTrigger>
+                  </div>
                   <CollapsibleContent>
                     <div className="px-4 pb-4 pt-2 space-y-4 border-t">
                       <div className="grid grid-cols-2 gap-4">
