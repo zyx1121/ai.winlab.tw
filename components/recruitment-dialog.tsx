@@ -74,7 +74,6 @@ function getPositionTypeLabel(type: RecruitmentPositionType): string {
 
 type FormData = {
   title: string;
-  link: string;
   image: string | null;
   company_description: string | null;
   start_date: string;
@@ -88,7 +87,6 @@ type FormData = {
 function getDefaults(): FormData {
   return {
     title: "",
-    link: "",
     image: null,
     company_description: null,
     start_date: new Date().toISOString().slice(0, 10),
@@ -103,13 +101,12 @@ function getDefaults(): FormData {
 function formDataFromRecruitment(r: Recruitment): FormData {
   return {
     title: r.title,
-    link: r.link,
     image: r.image,
     company_description: r.company_description,
     start_date: r.start_date,
     end_date: r.end_date,
     positions: r.positions ?? [],
-    application_method: normalizeApplicationMethod(r.application_method),
+    application_method: normalizeApplicationMethod(r.application_method, r.link),
     contact: r.contact,
     required_documents: r.required_documents,
   };
@@ -284,7 +281,7 @@ export function RecruitmentDialog({
 
     const payload = {
       title: formData.title.trim(),
-      link: formData.link.trim(),
+      link: am?.links?.[0]?.url ?? "",
       image: formData.image,
       company_description: formData.company_description?.trim() || null,
       start_date: formData.start_date,
@@ -410,27 +407,15 @@ export function RecruitmentDialog({
             </div>
           </div>
 
-          {/* 2. Title + Link */}
-          <div className="grid grid-cols-2 gap-6">
-            <div className="space-y-2">
-              <Label htmlFor="title">標題</Label>
-              <Input
-                id="title"
-                value={formData.title}
-                onChange={(e) => updateField("title", e.target.value)}
-                placeholder="公司 / 組織名稱"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="link">連結</Label>
-              <Input
-                id="link"
-                type="url"
-                value={formData.link}
-                onChange={(e) => updateField("link", e.target.value)}
-                placeholder="https://..."
-              />
-            </div>
+          {/* 2. Title */}
+          <div className="space-y-2">
+            <Label htmlFor="title">標題</Label>
+            <Input
+              id="title"
+              value={formData.title}
+              onChange={(e) => updateField("title", e.target.value)}
+              placeholder="公司 / 組織名稱"
+            />
           </div>
 
           {/* 3. Company description */}

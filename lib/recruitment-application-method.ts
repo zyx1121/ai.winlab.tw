@@ -3,7 +3,8 @@ import type {
   ApplicationMethodLink,
 } from "@/lib/supabase/types"
 
-const LEGACY_LINK_LABEL = "網站"
+const LEGACY_APPLICATION_LINK_LABEL = "網站"
+const LEGACY_RECRUITMENT_LINK_LABEL = "官方網站"
 
 function trimOptional(value?: string): string | undefined {
   const trimmed = value?.trim()
@@ -11,39 +12,37 @@ function trimOptional(value?: string): string | undefined {
 }
 
 export function getApplicationMethodLinks(
-  applicationMethod: ApplicationMethod | null | undefined
+  applicationMethod: ApplicationMethod | null | undefined,
+  legacyRecruitmentLink?: string | null
 ): ApplicationMethodLink[] {
-  if (!applicationMethod) {
-    return []
-  }
-
-  const links = (applicationMethod.links ?? [])
-    .map((link) => ({
-      label: link.label.trim(),
-      url: link.url.trim(),
-    }))
+  const links = (applicationMethod?.links ?? [])
+    .map((link) => sanitizeLink(link))
     .filter((link) => link.label && link.url)
 
-  if (links.length > 0) {
-    return links
+  const legacyApplicationUrl = trimOptional(applicationMethod?.url)
+  if (legacyApplicationUrl && !links.some((link) => link.url === legacyApplicationUrl)) {
+    links.push({ label: LEGACY_APPLICATION_LINK_LABEL, url: legacyApplicationUrl })
   }
 
-  const legacyUrl = trimOptional(applicationMethod.url)
-  return legacyUrl
-    ? [{ label: LEGACY_LINK_LABEL, url: legacyUrl }]
-    : []
+  const legacyRecruitmentUrl = trimOptional(legacyRecruitmentLink ?? undefined)
+  if (legacyRecruitmentUrl && !links.some((link) => link.url === legacyRecruitmentUrl)) {
+    links.push({ label: LEGACY_RECRUITMENT_LINK_LABEL, url: legacyRecruitmentUrl })
+  }
+
+  return links
 }
 
 export function normalizeApplicationMethod(
-  applicationMethod: ApplicationMethod | null | undefined
+  applicationMethod: ApplicationMethod | null | undefined,
+  legacyRecruitmentLink?: string | null
 ): ApplicationMethod | null {
-  if (!applicationMethod) {
+  if (!applicationMethod && !trimOptional(legacyRecruitmentLink ?? undefined)) {
     return null
   }
 
-  const email = trimOptional(applicationMethod.email)
-  const other = trimOptional(applicationMethod.other)
-  const links = getApplicationMethodLinks(applicationMethod)
+  const email = trimOptional(applicationMethod?.email)
+  const other = trimOptional(applicationMethod?.other)
+  const links = getApplicationMethodLinks(applicationMethod, legacyRecruitmentLink)
 
   if (!email && !other && links.length === 0) {
     return null
@@ -53,5 +52,12 @@ export function normalizeApplicationMethod(
     ...(email ? { email } : {}),
     ...(links.length > 0 ? { links } : {}),
     ...(other ? { other } : {}),
+  }
+}
+
+function sanitizeLink(link: ApplicationMethodLink): ApplicationMethodLink {
+  return {
+    label: link.label.trim(),
+    url: link.url.trim(),
   }
 }

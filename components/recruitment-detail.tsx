@@ -40,7 +40,10 @@ export function RecruitmentDetail({
     recruitment.end_date && new Date(recruitment.end_date) < new Date();
 
   const positionCount = recruitment.positions?.length ?? 0;
-  const applicationLinks = getApplicationMethodLinks(recruitment.application_method);
+  const applicationLinks = getApplicationMethodLinks(
+    recruitment.application_method,
+    recruitment.link,
+  );
   const hasApplicationMethod = !!(
     recruitment.application_method?.email ||
     recruitment.application_method?.other ||
@@ -77,18 +80,6 @@ export function RecruitmentDetail({
           {recruitment.title}
         </h1>
         <div className="flex items-center gap-2 text-base text-muted-foreground">
-          {recruitment.link && (
-            <>
-              <AppLink
-                href={recruitment.link}
-                className="inline-flex items-center gap-1.5"
-              >
-                <ExternalLink className="w-4 h-4" />
-                前往網站
-              </AppLink>
-              <span>&middot;</span>
-            </>
-          )}
           <span className="inline-flex items-center gap-1.5">
             <Calendar className="w-4 h-4" />
             {recruitment.start_date} ~ {recruitment.end_date ?? "截止日未定"}
@@ -191,42 +182,42 @@ export function RecruitmentDetail({
       )}
 
       {/* Application method */}
-      {recruitment.application_method && hasApplicationMethod && (
-          <div className="mt-8">
-            <h2 className="text-lg font-semibold mb-3">應徵方式</h2>
-            <div className="space-y-2 text-sm">
-              {recruitment.application_method.email && (
-                <div className="flex items-center gap-1.5">
-                  <Mail className="w-4 h-4 text-muted-foreground" />
-                  <AppLink
-                    href={`mailto:${recruitment.application_method.email}`}
-                    className="hover:underline"
-                  >
-                    {recruitment.application_method.email}
+      {hasApplicationMethod && (
+        <div className="mt-8">
+          <h2 className="text-lg font-semibold mb-3">應徵方式</h2>
+          <div className="space-y-2 text-sm">
+            {recruitment.application_method?.email && (
+              <div className="flex items-center gap-1.5">
+                <Mail className="w-4 h-4 text-muted-foreground" />
+                <AppLink
+                  href={`mailto:${recruitment.application_method.email}`}
+                  className="hover:underline"
+                >
+                  {recruitment.application_method.email}
+                </AppLink>
+              </div>
+            )}
+            {applicationLinks.map((link) => (
+              <div key={`${link.label}-${link.url}`} className="flex items-start gap-1.5">
+                <ExternalLink className="mt-0.5 h-4 w-4 text-muted-foreground" />
+                <div className="min-w-0">
+                  <AppLink href={link.url} className="font-medium hover:underline">
+                    {link.label}
                   </AppLink>
+                  <p className="break-all text-muted-foreground">
+                    {link.url}
+                  </p>
                 </div>
-              )}
-              {applicationLinks.map((link) => (
-                <div key={`${link.label}-${link.url}`} className="flex items-start gap-1.5">
-                  <ExternalLink className="w-4 h-4 text-muted-foreground mt-0.5" />
-                  <div className="min-w-0">
-                    <AppLink href={link.url} className="font-medium hover:underline">
-                      {link.label}
-                    </AppLink>
-                    <p className="text-muted-foreground break-all">
-                      {link.url}
-                    </p>
-                  </div>
-                </div>
-              ))}
-              {recruitment.application_method.other && (
-                <p className="text-muted-foreground">
-                  {recruitment.application_method.other}
-                </p>
-              )}
-            </div>
+              </div>
+            ))}
+            {recruitment.application_method?.other && (
+              <p className="text-muted-foreground">
+                {recruitment.application_method.other}
+              </p>
+            )}
           </div>
-        )}
+        </div>
+      )}
 
       {/* Contact section */}
       {recruitment.contact &&

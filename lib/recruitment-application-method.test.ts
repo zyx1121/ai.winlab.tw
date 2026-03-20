@@ -38,6 +38,29 @@ describe("getApplicationMethodLinks", () => {
       ]
     )
   })
+
+  test("includes the legacy recruitment link when normalizing all recruitment links", () => {
+    assert.deepEqual(
+      getApplicationMethodLinks(
+        {
+          links: [
+            { label: "104", url: "https://www.104.com.tw/company/5ucjyv4" },
+          ],
+        },
+        " https://www.jumbogames.com.tw "
+      ),
+      [
+        {
+          label: "104",
+          url: "https://www.104.com.tw/company/5ucjyv4",
+        },
+        {
+          label: "官方網站",
+          url: "https://www.jumbogames.com.tw",
+        },
+      ]
+    )
+  })
 })
 
 describe("normalizeApplicationMethod", () => {
@@ -57,6 +80,25 @@ describe("normalizeApplicationMethod", () => {
           },
         ],
         other: "請註明來源",
+      }
+    )
+  })
+
+  test("merges the legacy recruitment link into named links for form editing", () => {
+    assert.deepEqual(
+      normalizeApplicationMethod(
+        {
+          email: "hr@example.com",
+          links: [{ label: "104", url: "https://www.104.com.tw/company/5ucjyv4" }],
+        },
+        " https://www.jumbogames.com.tw "
+      ),
+      {
+        email: "hr@example.com",
+        links: [
+          { label: "104", url: "https://www.104.com.tw/company/5ucjyv4" },
+          { label: "官方網站", url: "https://www.jumbogames.com.tw" },
+        ],
       }
     )
   })
