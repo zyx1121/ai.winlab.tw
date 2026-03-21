@@ -1,4 +1,5 @@
 import { EventDetailClient } from "./client";
+import { JsonLd } from "@/components/json-ld";
 import { getViewer } from "@/lib/supabase/get-viewer";
 import { composeRecruitment } from "@/lib/recruitment-records";
 import type {
@@ -101,15 +102,32 @@ export default async function EventDetailPage({
     );
   }
 
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "Event",
+    name: (event as Event).name,
+    description: (event as Event).description ?? `${(event as Event).name} 活動頁面`,
+    url: `https://ai.winlab.tw/events/${slug}`,
+    eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode",
+    organizer: {
+      "@type": "Organization",
+      name: "國立陽明交通大學 人工智慧專責辦公室",
+      url: "https://ai.winlab.tw",
+    },
+  };
+
   return (
-    <EventDetailClient
-      event={event as Event}
-      slug={slug}
-      isAdmin={isAdmin}
-      viewerUserId={user?.id ?? null}
-      announcements={(announcementsRes.data as Announcement[]) ?? []}
-      results={results}
-      recruitments={recruitments}
-    />
+    <>
+      <JsonLd data={structuredData} />
+      <EventDetailClient
+        event={event as Event}
+        slug={slug}
+        isAdmin={isAdmin}
+        viewerUserId={user?.id ?? null}
+        announcements={(announcementsRes.data as Announcement[]) ?? []}
+        results={results}
+        recruitments={recruitments}
+      />
+    </>
   );
 }

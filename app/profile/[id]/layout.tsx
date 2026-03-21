@@ -1,3 +1,4 @@
+import { JsonLd } from "@/components/json-ld";
 import { createClient } from "@/lib/supabase/server";
 import type { Metadata } from "next";
 
@@ -29,6 +30,38 @@ export async function generateMetadata({
   };
 }
 
-export default function Layout({ children }: { children: React.ReactNode }) {
-  return children;
+export default async function Layout({
+  children,
+  params,
+}: {
+  children: React.ReactNode;
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("public_profiles")
+    .select("display_name")
+    .eq("id", id)
+    .single();
+  const name = data?.display_name ?? "個人頁面";
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    name,
+    url: `https://ai.winlab.tw/profile/${id}`,
+    mainEntityOfPage: `https://ai.winlab.tw/profile/${id}`,
+    worksFor: {
+      "@type": "Organization",
+      name: "國立陽明交通大學 人工智慧專責辦公室",
+      url: "https://ai.winlab.tw",
+    },
+  };
+
+  return (
+    <>
+      <JsonLd data={structuredData} />
+      {children}
+    </>
+  );
 }

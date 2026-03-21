@@ -1,4 +1,5 @@
 import { RecruitmentDetail } from "@/components/recruitment-detail";
+import { JsonLd } from "@/components/json-ld";
 import { composeRecruitment } from "@/lib/recruitment-records";
 import { createClient } from "@/lib/supabase/server";
 import type {
@@ -6,7 +7,38 @@ import type {
   RecruitmentPrivateDetails,
   RecruitmentSummary,
 } from "@/lib/supabase/types";
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string; id: string }>;
+}): Promise<Metadata> {
+  const { slug, id } = await params;
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("competitions")
+    .select("title, company_description")
+    .eq("id", id)
+    .single();
+  const title = data?.title ?? "徵才資訊";
+  const description =
+    data?.company_description ?? `${title}｜國立陽明交通大學人工智慧專責辦公室活動徵才資訊`;
+
+  return {
+    title: `${title}｜人工智慧專責辦公室`,
+    description,
+    alternates: {
+      canonical: `/events/${slug}/recruitment/${id}`,
+    },
+    openGraph: {
+      title: `${title}｜人工智慧專責辦公室`,
+      description,
+      url: `/events/${slug}/recruitment/${id}`,
+    },
+  };
+}
 
 export default async function EventRecruitmentDetailPage({
   params,
@@ -41,9 +73,25 @@ export default async function EventRecruitmentDetailPage({
     summary as RecruitmentSummary,
     details
   );
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "JobPosting",
+    title: recruitment.title,
+    description:
+      recruitment.company_description ?? `${recruitment.title}｜活動徵才資訊`,
+    datePosted: recruitment.start_date,
+    validThrough: recruitment.end_date ?? undefined,
+    url: `https://ai.winlab.tw/events/${slug}/recruitment/${id}`,
+    hiringOrganization: {
+      "@type": "Organization",
+      name: "國立陽明交通大學 人工智慧專責辦公室",
+      url: "https://ai.winlab.tw",
+    },
+  };
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-12">
+      <JsonLd data={structuredData} />
       <RecruitmentDetail
         recruitment={recruitment as Recruitment}
         backHref={`/events/${slug}?tab=recruitment`}

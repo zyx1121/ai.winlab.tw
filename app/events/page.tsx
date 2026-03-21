@@ -1,5 +1,6 @@
 import { EventCard } from "@/components/event-card";
 import { EventsCreateButton } from "@/components/events-create-button";
+import { JsonLd } from "@/components/json-ld";
 import { PageShell } from "@/components/page-shell";
 import { Block } from "@/components/ui/block";
 import { SubButton } from "@/components/ui/sub-button";
@@ -33,9 +34,21 @@ export default async function EventsPage() {
   if (!isAdmin) query.eq("status", "published");
   const { data: events } = await query;
   const eventList = (events as Event[]) ?? [];
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    name: "人工智慧專責辦公室活動列表",
+    itemListElement: eventList.map((item, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      url: `https://ai.winlab.tw/events/${item.slug}`,
+      name: item.name,
+    })),
+  };
 
   return (
     <PageShell tone="dashboard">
+      <JsonLd data={structuredData} />
 
       <Block variant="ghost" className="flex items-center justify-between">
         <SubButton href="/">

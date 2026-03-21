@@ -1,3 +1,4 @@
+import { JsonLd } from "@/components/json-ld";
 import { AnnouncementPageClient } from "./client";
 import { getViewer } from "@/lib/supabase/get-viewer";
 import type { Announcement } from "@/lib/supabase/types";
@@ -26,12 +27,27 @@ export default async function AnnouncementPage() {
     .order("date", { ascending: false });
   if (!isAdmin) query.eq("status", "published");
   const { data: announcements } = await query;
+  const announcementList = (announcements as Announcement[]) ?? [];
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    name: "人工智慧專責辦公室公告列表",
+    itemListElement: announcementList.map((item, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      url: `https://ai.winlab.tw/announcement/${item.id}`,
+      name: item.title,
+    })),
+  };
 
   return (
-    <AnnouncementPageClient
-      announcements={(announcements as Announcement[]) ?? []}
-      isAdmin={isAdmin}
-      userId={user?.id ?? null}
-    />
+    <>
+      <JsonLd data={structuredData} />
+      <AnnouncementPageClient
+        announcements={announcementList}
+        isAdmin={isAdmin}
+        userId={user?.id ?? null}
+      />
+    </>
   );
 }

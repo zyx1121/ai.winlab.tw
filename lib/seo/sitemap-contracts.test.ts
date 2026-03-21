@@ -29,6 +29,7 @@ describe("sitemap contracts", () => {
     assert.ok(sitemapFile.includes('url: announcement.event_id && eventSlugMap[announcement.event_id]'))
     assert.ok(sitemapFile.includes('`${BASE_URL}/events/${eventSlugMap[announcement.event_id]}/announcements/${announcement.id}`'))
     assert.ok(sitemapFile.includes('url: `${BASE_URL}/events/${eventSlugMap[result.event_id!]}/results/${result.id}`'))
+    assert.ok(!sitemapFile.includes('url: `${BASE_URL}/recruitment`'))
     assert.ok(!sitemapFile.includes('url: `${BASE_URL}/team/${team.id}`'))
   })
 })

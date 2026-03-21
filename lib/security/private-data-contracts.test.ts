@@ -1,5 +1,5 @@
 import assert from "node:assert/strict"
-import { readFileSync } from "node:fs"
+import { existsSync, readFileSync } from "node:fs"
 import { resolve } from "node:path"
 import { describe, test } from "node:test"
 
@@ -17,8 +17,6 @@ const eventResultPage = readFileSync(
   resolve(process.cwd(), "app/events/[slug]/results/[id]/page.tsx"),
   "utf8"
 )
-const recruitmentPage = readFileSync(resolve(process.cwd(), "app/recruitment/page.tsx"), "utf8")
-const recruitmentDetailPage = readFileSync(resolve(process.cwd(), "app/recruitment/[id]/page.tsx"), "utf8")
 const eventRecruitmentDetailPage = readFileSync(
   resolve(process.cwd(), "app/events/[slug]/recruitment/[id]/page.tsx"),
   "utf8"
@@ -48,8 +46,8 @@ describe("private data contracts", () => {
   })
 
   test("recruitment pages fetch summary rows separately from private details", () => {
-    assert.ok(recruitmentPage.includes('.from("competition_private_details")'))
-    assert.ok(recruitmentDetailPage.includes('.from("competition_private_details")'))
+    assert.ok(!existsSync(resolve(process.cwd(), "app/recruitment/page.tsx")))
+    assert.ok(!existsSync(resolve(process.cwd(), "app/recruitment/[id]/page.tsx")))
     assert.ok(eventRecruitmentDetailPage.includes('.from("competition_private_details")'))
     assert.ok(recruitmentDialog.includes('.from("competition_private_details")'))
   })

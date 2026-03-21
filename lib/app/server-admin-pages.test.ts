@@ -7,7 +7,6 @@ const carouselPage = readFileSync(resolve(process.cwd(), "app/carousel/page.tsx"
 const contactsPage = readFileSync(resolve(process.cwd(), "app/contacts/page.tsx"), "utf8")
 const settingsUsersPage = readFileSync(resolve(process.cwd(), "app/settings/users/page.tsx"), "utf8")
 const homeOrganization = readFileSync(resolve(process.cwd(), "components/home-organization.tsx"), "utf8")
-const recruitmentPage = readFileSync(resolve(process.cwd(), "app/recruitment/page.tsx"), "utf8")
 const announcementPage = readFileSync(resolve(process.cwd(), "app/announcement/page.tsx"), "utf8")
 const eventsPage = readFileSync(resolve(process.cwd(), "app/events/page.tsx"), "utf8")
 const eventDetailPage = readFileSync(resolve(process.cwd(), "app/events/[slug]/page.tsx"), "utf8")
@@ -58,13 +57,9 @@ describe("server admin page contracts", () => {
     assert.ok(homeOrganization.includes("await createClient()"))
   })
 
-  test("recruitment listing is server-renderable with a client island for admin actions", () => {
-    assert.ok(!recruitmentPage.includes('"use client"'))
-    assert.ok(recruitmentPage.includes('from "@/lib/supabase/server"'))
-    assert.ok(!recruitmentPage.includes('from "@/lib/supabase/client"'))
-    assert.ok(!recruitmentPage.includes("useEffect("))
-    assert.ok(recruitmentPage.includes('from "./client"'))
-    assert.ok(existsSync(resolve(process.cwd(), "app/recruitment/client.tsx")))
+  test("global recruitment route is removed in favor of event-scoped recruitment", () => {
+    assert.ok(!existsSync(resolve(process.cwd(), "app/recruitment/page.tsx")))
+    assert.ok(!existsSync(resolve(process.cwd(), "app/recruitment/client.tsx")))
   })
 
   test("shared viewer helper exists and is used by server pages that branch on role", () => {

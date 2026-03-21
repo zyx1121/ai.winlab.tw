@@ -1,5 +1,5 @@
 import assert from "node:assert/strict"
-import { readFileSync } from "node:fs"
+import { existsSync, readFileSync } from "node:fs"
 import { resolve } from "node:path"
 import { describe, test } from "node:test"
 
@@ -9,13 +9,17 @@ const announcementPage = readFileSync(resolve(process.cwd(), "app/announcement/p
 const eventsPage = readFileSync(resolve(process.cwd(), "app/events/page.tsx"), "utf8")
 const introductionPage = readFileSync(resolve(process.cwd(), "app/introduction/page.tsx"), "utf8")
 const organizationPage = readFileSync(resolve(process.cwd(), "app/organization/page.tsx"), "utf8")
-const recruitmentPage = readFileSync(resolve(process.cwd(), "app/recruitment/page.tsx"), "utf8")
 const privacyPage = readFileSync(resolve(process.cwd(), "app/privacy/page.tsx"), "utf8")
 const eventLayout = readFileSync(resolve(process.cwd(), "app/events/[slug]/layout.tsx"), "utf8")
 const profileLayout = readFileSync(resolve(process.cwd(), "app/profile/[id]/layout.tsx"), "utf8")
 const announcementDetailPage = readFileSync(resolve(process.cwd(), "app/announcement/[id]/page.tsx"), "utf8")
 const eventAnnouncementDetailPage = readFileSync(
   resolve(process.cwd(), "app/events/[slug]/announcements/[id]/page.tsx"),
+  "utf8"
+)
+const eventPage = readFileSync(resolve(process.cwd(), "app/events/[slug]/page.tsx"), "utf8")
+const eventRecruitmentDetailPage = readFileSync(
+  resolve(process.cwd(), "app/events/[slug]/recruitment/[id]/page.tsx"),
   "utf8"
 )
 const eventResultDetailPage = readFileSync(
@@ -36,7 +40,6 @@ describe("metadata contracts", () => {
       eventsPage,
       introductionPage,
       organizationPage,
-      recruitmentPage,
       privacyPage,
     ]) {
       assert.ok(content.includes("alternates:"))
@@ -57,5 +60,20 @@ describe("metadata contracts", () => {
       assert.ok(content.includes("canonical:"))
       assert.ok(content.includes("openGraph:"))
     }
+  })
+
+  test("global recruitment route is removed from public metadata surfaces", () => {
+    assert.ok(!existsSync(resolve(process.cwd(), "app/recruitment/page.tsx")))
+    assert.ok(!existsSync(resolve(process.cwd(), "app/recruitment/[id]/page.tsx")))
+  })
+
+  test("public pages render the expected structured data types", () => {
+    assert.ok(homePage.includes('"@type": "Organization"'))
+    assert.ok(announcementPage.includes('"@type": "ItemList"'))
+    assert.ok(eventsPage.includes('"@type": "ItemList"'))
+    assert.ok(profileLayout.includes('"@type": "Person"'))
+    assert.ok(announcementDetailPage.includes('"@type": "NewsArticle"'))
+    assert.ok(eventPage.includes('"@type": "Event"'))
+    assert.ok(eventRecruitmentDetailPage.includes('"@type": "JobPosting"'))
   })
 })
