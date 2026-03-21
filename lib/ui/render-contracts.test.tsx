@@ -227,11 +227,35 @@ describe("component-owned skeleton render contracts", () => {
 
   test("renders public team result cards with a visible publisher name", () => {
     const html = renderToStaticMarkup(
-      <ResultCard item={{ ...teamResultFixture, team_name: "AI Rising Star 團隊" }} />
+      <ResultCard
+        item={{ ...teamResultFixture, team_name: "AI Rising Star 團隊" }}
+        href="/events/ai-rising-star/results/res_1"
+      />
     )
 
     assert.ok(html.includes("AI Rising Star 團隊"))
     assert.ok(!html.includes("未知隊伍"))
+  })
+
+  test("renders personal result cards with a clickable publisher link", () => {
+    const html = renderToStaticMarkup(
+      <ResultCard
+        item={{
+          ...teamResultFixture,
+          type: "personal",
+          author_id: "user_1",
+          team_id: null,
+          author_name: "蕭哲安",
+        }}
+        href="/events/ai-rising-star/results/res_1"
+        publisherHref="/profile/user_1"
+      />
+    )
+
+    assert.ok(html.includes('href="/events/ai-rising-star/results/res_1"'))
+    assert.ok(html.includes('href="/profile/user_1"'))
+    assert.ok(html.includes("蕭哲安"))
+    assert.ok(!html.includes("匿名"))
   })
 })
 

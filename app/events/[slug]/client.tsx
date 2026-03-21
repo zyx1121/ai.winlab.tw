@@ -197,13 +197,13 @@ export function EventDetailClient({
                 const isOwner = viewerUserId === item.author_id;
                 const showStatus = isAdmin || isOwner;
                 return (
-                  <Link
-                    href={isAdmin ? `/events/${slug}/results/${item.id}/edit` : `/events/${slug}/results/${item.id}`}
+                  <ResultCard
                     key={item.id}
-                    className="h-full"
-                  >
-                    <ResultCard item={item} showStatus={showStatus} />
-                  </Link>
+                    item={item}
+                    href={isAdmin ? `/events/${slug}/results/${item.id}/edit` : `/events/${slug}/results/${item.id}`}
+                    publisherHref={item.type === "personal" && item.author_id ? `/profile/${item.author_id}` : null}
+                    showStatus={showStatus}
+                  />
                 );
               })}
             </div>

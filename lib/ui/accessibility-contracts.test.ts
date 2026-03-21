@@ -8,6 +8,7 @@ const organizationClient = readFileSync(resolve(process.cwd(), "app/organization
 const announcementTable = readFileSync(resolve(process.cwd(), "components/announcement-table.tsx"), "utf8")
 const announcementClient = readFileSync(resolve(process.cwd(), "app/announcement/client.tsx"), "utf8")
 const homeAnnouncementTable = readFileSync(resolve(process.cwd(), "components/home-announcement-table.tsx"), "utf8")
+const resultCard = readFileSync(resolve(process.cwd(), "components/result-card.tsx"), "utf8")
 const eventClient = readFileSync(resolve(process.cwd(), "app/events/[slug]/client.tsx"), "utf8")
 const recruitmentCard = readFileSync(resolve(process.cwd(), "components/recruitment-card.tsx"), "utf8")
 const recruitmentDialog = readFileSync(resolve(process.cwd(), "components/recruitment-dialog.tsx"), "utf8")
@@ -65,6 +66,15 @@ describe("accessibility contracts", () => {
     assert.ok(!existsSync(resolve(process.cwd(), "app/recruitment/client.tsx")))
     assert.ok(eventClient.includes("href={`/events/${slug}/recruitment/${item.id}`}"))
     assert.ok(!eventClient.includes("<Link href={`/events/${slug}/recruitment/${item.id}`}"))
+  })
+
+  test("result cards own navigation and expose a separate publisher profile link", () => {
+    assert.ok(resultCard.includes("href: string"))
+    assert.ok(resultCard.includes("publisherHref?: string | null"))
+    assert.ok(resultCard.includes("<AppLink"))
+    assert.ok(eventClient.includes("href={isAdmin ? `/events/${slug}/results/${item.id}/edit` : `/events/${slug}/results/${item.id}`}"))
+    assert.ok(eventClient.includes('publisherHref={item.type === "personal" && item.author_id ? `/profile/${item.author_id}` : null}'))
+    assert.ok(!eventClient.includes("<Link\n                    href={isAdmin ? `/events/${slug}/results/${item.id}/edit` : `/events/${slug}/results/${item.id}`}"))
   })
 
   test("interactive controls do not rely on role=button shims", () => {
