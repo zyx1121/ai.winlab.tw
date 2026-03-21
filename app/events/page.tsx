@@ -16,7 +16,7 @@ export default async function EventsPage() {
     .select("*")
     .order("sort_order", { ascending: true })
     .order("created_at", { ascending: false });
-  if (!user) query.eq("status", "published");
+  if (!isAdmin) query.eq("status", "published");
   const { data: events } = await query;
   const eventList = (events as Event[]) ?? [];
 

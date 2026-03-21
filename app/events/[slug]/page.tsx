@@ -22,7 +22,7 @@ export default async function EventDetailPage({
 
   // Fetch event
   const eventQuery = supabase.from("events").select("*").eq("slug", slug);
-  if (!user) eventQuery.eq("status", "published");
+  if (!isAdmin) eventQuery.eq("status", "published");
   const { data: event, error: eventError } = await eventQuery.single();
   if (eventError || !event) redirect("/events");
 

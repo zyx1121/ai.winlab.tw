@@ -23,6 +23,9 @@ const organizationEditPage = readFileSync(resolve(process.cwd(), "app/organizati
 const eventAnnouncementEditPage = readFileSync(resolve(process.cwd(), "app/events/[slug]/announcements/[id]/edit/page.tsx"), "utf8")
 const resultEditPage = readFileSync(resolve(process.cwd(), "app/events/[slug]/results/[id]/edit/page.tsx"), "utf8")
 const rootLayout = readFileSync(resolve(process.cwd(), "app/layout.tsx"), "utf8")
+const homePage = readFileSync(resolve(process.cwd(), "app/page.tsx"), "utf8")
+const homeCarousel = readFileSync(resolve(process.cwd(), "components/home-carousel.tsx"), "utf8")
+const homeContacts = readFileSync(resolve(process.cwd(), "components/home-contacts.tsx"), "utf8")
 const authProvider = readFileSync(resolve(process.cwd(), "components/auth-provider.tsx"), "utf8")
 const contactEditClient = readFileSync(resolve(process.cwd(), "app/contacts/[id]/edit/client.tsx"), "utf8")
 const introductionEditClient = readFileSync(resolve(process.cwd(), "app/introduction/edit/client.tsx"), "utf8")
@@ -124,6 +127,15 @@ describe("server admin page contracts", () => {
     assert.ok(authProvider.includes("initialProfile?: Profile | null"))
     assert.ok(authProvider.includes("useState<User | null>(initialUser ?? null)"))
     assert.ok(authProvider.includes("useState<Profile | null>(initialProfile ?? null)"))
+  })
+
+  test("homepage sections do not re-fetch viewer state on the server", () => {
+    assert.ok(!homePage.includes('from "@/lib/supabase/get-viewer"'))
+    assert.ok(!homePage.includes("getViewer("))
+    assert.ok(!homeCarousel.includes('from "@/lib/supabase/get-viewer"'))
+    assert.ok(!homeContacts.includes('from "@/lib/supabase/get-viewer"'))
+    assert.ok(!homeCarousel.includes("getViewer("))
+    assert.ok(!homeContacts.includes("getViewer("))
   })
 
   test("server-wrapped admin editors do not keep depending on useAuth in the client layer", () => {
