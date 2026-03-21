@@ -1,5 +1,5 @@
 import assert from "node:assert/strict"
-import { readFileSync } from "node:fs"
+import { existsSync, readFileSync } from "node:fs"
 import { resolve } from "node:path"
 import { describe, test } from "node:test"
 
@@ -24,7 +24,11 @@ const homeAnnouncement = readFileSync(resolve(process.cwd(), "components/home-an
 const homeIntroduction = readFileSync(resolve(process.cwd(), "components/home-introduction.tsx"), "utf8")
 const homeOrganization = readFileSync(resolve(process.cwd(), "components/home-organization.tsx"), "utf8")
 const privacyEditPage = readFileSync(resolve(process.cwd(), "app/privacy/edit/page.tsx"), "utf8")
-const teamPage = readFileSync(resolve(process.cwd(), "app/team/[id]/page.tsx"), "utf8")
+const teamPagePath = resolve(process.cwd(), "app/team/[id]/page.tsx")
+const eventResultPage = readFileSync(
+  resolve(process.cwd(), "app/events/[slug]/results/[id]/page.tsx"),
+  "utf8"
+)
 const profileClient = readFileSync(resolve(process.cwd(), "app/profile/[id]/client.tsx"), "utf8")
 const organizationMemberDialog = readFileSync(resolve(process.cwd(), "components/organization-member-dialog.tsx"), "utf8")
 const carouselEditClient = readFileSync(resolve(process.cwd(), "app/carousel/[id]/edit/client.tsx"), "utf8")
@@ -101,8 +105,9 @@ describe("accessibility contracts", () => {
     assert.ok(!privacyEditPage.includes("<Link href=\"/privacy\">\n          <Button"))
   })
 
-  test("team result links do not fall back to dead hash hrefs", () => {
-    assert.ok(!teamPage.includes(': "#"'))
+  test("team pages are removed and result publishers do not link to dead team routes", () => {
+    assert.ok(!existsSync(teamPagePath))
+    assert.ok(!eventResultPage.includes("href: `/team/${result.team_id}`"))
   })
 
   test("profile edit mode does not rely on placeholders as the only field labels", () => {
