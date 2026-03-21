@@ -1,4 +1,5 @@
 import { ProfilePageClient } from "./client";
+import { getVisibleProfileForViewer } from "@/lib/profile-visibility";
 import { createClient } from "@/lib/supabase/server";
 import type { ExternalResult, Profile, Result } from "@/lib/supabase/types";
 import { redirect } from "next/navigation";
@@ -13,6 +14,7 @@ export default async function ProfilePage({
   const { data: { user } } = await supabase.auth.getUser();
 
   const isOwner = user?.id === id;
+  const canViewPrivateProfile = Boolean(user);
 
   const [profileRes, resultsRes, externalResultsRes] = await Promise.all([
     supabase
@@ -45,12 +47,17 @@ export default async function ProfilePage({
 
   const results = isOwner ? rawResults : rawResults.filter((r) => r.status === "published");
   const externalResults = (externalResultsRes.data as ExternalResult[]) || [];
+  const visibleProfile = getVisibleProfileForViewer(
+    profileRes.data as Profile,
+    canViewPrivateProfile
+  );
 
   return (
     <ProfilePageClient
-      initialProfile={profileRes.data as Profile}
+      initialProfile={visibleProfile}
       results={results}
       isOwner={isOwner}
+      canViewPrivateProfile={canViewPrivateProfile}
       eventSlugMap={eventSlugMap}
       initialExternalResults={externalResults}
     />

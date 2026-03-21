@@ -69,12 +69,14 @@ export function ProfilePageClient({
   initialProfile,
   results,
   isOwner,
+  canViewPrivateProfile,
   eventSlugMap,
   initialExternalResults,
 }: {
   initialProfile: Profile;
   results: Result[];
   isOwner: boolean;
+  canViewPrivateProfile: boolean;
   eventSlugMap: Record<string, string>;
   initialExternalResults: ExternalResult[];
 }) {
@@ -328,10 +330,12 @@ export function ProfilePageClient({
                   </div>
                 )}
 
-                <Avatar size="3xl">
-                  {profile.avatar_url && <AvatarImage src={profile.avatar_url} alt={displayNameValue} />}
-                  <AvatarFallback>{displayNameValue.slice(0, 1)}</AvatarFallback>
-                </Avatar>
+                {canViewPrivateProfile && (
+                  <Avatar size="3xl">
+                    {profile.avatar_url && <AvatarImage src={profile.avatar_url} alt={displayNameValue} />}
+                    <AvatarFallback>{displayNameValue.slice(0, 1)}</AvatarFallback>
+                  </Avatar>
+                )}
 
                 <div className="grid gap-2">
                   {isEditMode ? (
@@ -370,6 +374,12 @@ export function ProfilePageClient({
                   ) : profile.bio ? (
                     <p className="text-sm whitespace-pre-wrap">{profile.bio}</p>
                   ) : null}
+
+                  {!canViewPrivateProfile && (
+                    <p className="text-sm text-muted-foreground">
+                      其餘個人資訊僅限登入後查看。
+                    </p>
+                  )}
                 </div>
 
                 {/* Links */}
@@ -418,7 +428,7 @@ export function ProfilePageClient({
                       <p className="text-xs text-muted-foreground">尚未新增連結</p>
                     )}
                   </div>
-                ) : viewLinks.length > 0 ? (
+                ) : canViewPrivateProfile && viewLinks.length > 0 ? (
                   <div className="grid gap-2 text-sm underline">
                     {viewLinks.map(({ href, label }) => (
                       <AppLink key={href} href={href!}>
