@@ -6,18 +6,17 @@ const BASE_URL = "https://ai.winlab.tw";
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const supabase = await createClient();
 
-  const [announcementsRes, eventsRes, resultsRes, teamsRes, profilesRes] = await Promise.all([
+  const [announcementsRes, eventsRes, resultsRes, profilesRes] = await Promise.all([
     supabase
       .from("announcements")
-      .select("id, date")
+      .select("id, date, event_id")
       .eq("status", "published")
-      .is("event_id", null),
+      ,
     supabase.from("events").select("id, slug, updated_at").eq("status", "published"),
     supabase
       .from("results")
       .select("id, date, event_id")
       .eq("status", "published"),
-    supabase.from("teams").select("id"),
     supabase.from("public_profiles").select("id"),
   ]);
 
@@ -31,12 +30,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${BASE_URL}/privacy`, priority: 0.3 },
   ];
 
-  const announcementRoutes: MetadataRoute.Sitemap = (announcementsRes.data ?? []).map((a) => ({
-    url: `${BASE_URL}/announcement/${a.id}`,
-    lastModified: a.date ?? undefined,
-    priority: 0.6,
-  }));
-
   const eventRoutes: MetadataRoute.Sitemap = (eventsRes.data ?? []).map((e) => ({
     url: `${BASE_URL}/events/${e.slug}`,
     lastModified: e.updated_at ?? undefined,
@@ -47,6 +40,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     (eventsRes.data ?? []).map((event) => [event.id, event.slug])
   );
 
+  const announcementRoutes: MetadataRoute.Sitemap = (announcementsRes.data ?? []).map((announcement) => ({
+    url: announcement.event_id && eventSlugMap[announcement.event_id]
+      ? `${BASE_URL}/events/${eventSlugMap[announcement.event_id]}/announcements/${announcement.id}`
+      : `${BASE_URL}/announcement/${announcement.id}`,
+    lastModified: announcement.date ?? undefined,
+    priority: 0.6,
+  }));
+
   const resultRoutes: MetadataRoute.Sitemap = (resultsRes.data ?? [])
     .filter((result) => result.event_id && eventSlugMap[result.event_id])
     .map((result) => ({
@@ -54,11 +55,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: result.date ?? undefined,
       priority: 0.6,
     }));
-
-  const teamRoutes: MetadataRoute.Sitemap = (teamsRes.data ?? []).map((team) => ({
-    url: `${BASE_URL}/team/${team.id}`,
-    priority: 0.5,
-  }));
 
   const profileRoutes: MetadataRoute.Sitemap = (profilesRes.data ?? []).map((profile) => ({
     url: `${BASE_URL}/profile/${profile.id}`,
@@ -70,7 +66,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...announcementRoutes,
     ...eventRoutes,
     ...resultRoutes,
-    ...teamRoutes,
     ...profileRoutes,
   ];
 }

@@ -66,12 +66,13 @@ export function RecruitmentDetail({
 
       {/* Cover image */}
       {recruitment.image && (
-        <div className="relative w-full max-h-80 aspect-video rounded-lg overflow-hidden mb-8">
+        <div className="w-full rounded-lg overflow-hidden mb-8 bg-muted">
           <Image
             src={recruitment.image}
             alt={recruitment.title}
-            fill
-            className="object-cover"
+            width={1600}
+            height={900}
+            className="h-auto w-full object-contain"
             unoptimized={isExternalImage(recruitment.image)}
           />
         </div>

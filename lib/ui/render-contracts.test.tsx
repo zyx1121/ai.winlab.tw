@@ -162,6 +162,23 @@ describe("component-owned skeleton render contracts", () => {
     assert.ok(!html.includes("登入後可查看"))
   })
 
+  test("renders recruitment cover images at full width without forcing a video crop", () => {
+    const html = renderToStaticMarkup(
+      <RecruitmentDetail
+        recruitment={{ ...recruitmentFixture, image: "https://example.com/poster.png" }}
+        backHref="/recruitment"
+        backLabel="返回列表"
+        canViewPrivateDetails
+      />
+    )
+
+    assert.ok(html.includes("w-full"))
+    assert.ok(html.includes("h-auto"))
+    assert.ok(html.includes("object-contain"))
+    assert.ok(!html.includes("aspect-video"))
+    assert.ok(!html.includes("object-cover"))
+  })
+
   test("renders AnnouncementTableSkeleton rows in the table structure", () => {
     const html = renderToStaticMarkup(
       <AnnouncementTableSkeleton rows={3} showStatus />

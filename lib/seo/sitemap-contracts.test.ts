@@ -10,7 +10,6 @@ const eventsPage = readFileSync(resolve(process.cwd(), "app/events/page.tsx"), "
 const introductionPage = readFileSync(resolve(process.cwd(), "app/introduction/page.tsx"), "utf8")
 const organizationPage = readFileSync(resolve(process.cwd(), "app/organization/page.tsx"), "utf8")
 const profileLayout = readFileSync(resolve(process.cwd(), "app/profile/[id]/layout.tsx"), "utf8")
-const teamPage = readFileSync(resolve(process.cwd(), "app/team/[id]/page.tsx"), "utf8")
 const eventLayout = readFileSync(resolve(process.cwd(), "app/events/[slug]/layout.tsx"), "utf8")
 const eventResultPage = readFileSync(
   resolve(process.cwd(), "app/events/[slug]/results/[id]/page.tsx"),
@@ -22,13 +21,15 @@ describe("sitemap contracts", () => {
     assert.ok(!sitemapFile.includes('url: `${BASE_URL}/result/${r.id}`'))
   })
 
-  test("sitemap includes public profile, team, and event result routes", () => {
+  test("sitemap includes public profile, announcement, and event result routes, but not team routes", () => {
     assert.ok(sitemapFile.includes('.from("public_profiles")'))
-    assert.ok(sitemapFile.includes('.from("teams")'))
+    assert.ok(sitemapFile.includes('.from("announcements")'))
     assert.ok(sitemapFile.includes('.from("results")'))
     assert.ok(sitemapFile.includes('url: `${BASE_URL}/profile/${profile.id}`'))
-    assert.ok(sitemapFile.includes('url: `${BASE_URL}/team/${team.id}`'))
+    assert.ok(sitemapFile.includes('url: announcement.event_id && eventSlugMap[announcement.event_id]'))
+    assert.ok(sitemapFile.includes('`${BASE_URL}/events/${eventSlugMap[announcement.event_id]}/announcements/${announcement.id}`'))
     assert.ok(sitemapFile.includes('url: `${BASE_URL}/events/${eventSlugMap[result.event_id!]}/results/${result.id}`'))
+    assert.ok(!sitemapFile.includes('url: `${BASE_URL}/team/${team.id}`'))
   })
 })
 
@@ -43,8 +44,11 @@ describe("metadata contracts", () => {
 
   test("public detail pages describe the entity in metadata", () => {
     assert.ok(profileLayout.includes("description:"))
-    assert.ok(teamPage.includes("description:"))
     assert.ok(eventLayout.includes("description:"))
     assert.ok(eventResultPage.includes("description:"))
+  })
+
+  test("event result pages no longer link publisher metadata to removed team pages", () => {
+    assert.ok(!eventResultPage.includes("href: `/team/${result.team_id}`"))
   })
 })
