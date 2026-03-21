@@ -129,9 +129,10 @@ describe("server admin page contracts", () => {
     assert.ok(authProvider.includes("useState<Profile | null>(initialProfile ?? null)"))
   })
 
-  test("homepage sections do not re-fetch viewer state on the server", () => {
-    assert.ok(!homePage.includes('from "@/lib/supabase/get-viewer"'))
-    assert.ok(!homePage.includes("getViewer("))
+  test("homepage reads viewer state once and passes admin state down to sections", () => {
+    assert.ok(homePage.includes('from "@/lib/supabase/get-viewer"'))
+    assert.ok(homePage.includes("await getViewer()"))
+    assert.ok(homePage.includes("isAdmin={isAdmin}"))
     assert.ok(!homeCarousel.includes('from "@/lib/supabase/get-viewer"'))
     assert.ok(!homeContacts.includes('from "@/lib/supabase/get-viewer"'))
     assert.ok(!homeCarousel.includes("getViewer("))

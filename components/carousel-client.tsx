@@ -1,6 +1,5 @@
 "use client";
 
-import { useAuth } from "@/components/auth-provider";
 import {
   Carousel,
   CarouselContent,
@@ -18,10 +17,11 @@ import * as React from "react";
 
 export function CarouselClient({
   slides,
+  isAdmin,
 }: {
   slides: CarouselSlide[];
+  isAdmin: boolean;
 }) {
-  const { isAdmin } = useAuth();
   const plugin = React.useRef(
     Autoplay({ delay: 5000, stopOnInteraction: true })
   );

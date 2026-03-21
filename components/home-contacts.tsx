@@ -15,7 +15,7 @@ const FALLBACK_CONTACT: Contact = {
   sort_order: 0,
 };
 
-export async function HomeContacts() {
+export async function HomeContacts({ isAdmin }: { isAdmin: boolean }) {
   const supabase = await createClient();
   const { data } = await supabase
     .from("contacts")
@@ -31,7 +31,7 @@ export async function HomeContacts() {
         <div className="flex flex-col gap-3 w-full lg:w-auto">
           <div className="flex items-center gap-3">
             <h2 className="text-2xl font-bold border-l-4 border-primary pl-3">聯絡我們</h2>
-            <ContactsEditButton />
+            <ContactsEditButton isAdmin={isAdmin} />
           </div>
         </div>
         <div className="flex flex-col gap-8 shrink-0 w-full max-w-md mx-auto lg:mx-0 items-center lg:items-start text-center lg:text-left">

@@ -2,7 +2,7 @@ import { CarouselClient } from "@/components/carousel-client";
 import { createClient } from "@/lib/supabase/server";
 import type { CarouselSlide } from "@/lib/supabase/types";
 
-export async function HomeCarousel() {
+export async function HomeCarousel({ isAdmin }: { isAdmin: boolean }) {
   const supabase = await createClient();
   const { data: slides } = await supabase
     .from("carousel_slides")
@@ -10,5 +10,5 @@ export async function HomeCarousel() {
     .order("sort_order", { ascending: true })
     .order("created_at", { ascending: true });
 
-  return <CarouselClient slides={(slides as CarouselSlide[]) ?? []} />;
+  return <CarouselClient slides={(slides as CarouselSlide[]) ?? []} isAdmin={isAdmin} />;
 }
