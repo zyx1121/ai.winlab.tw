@@ -21,7 +21,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { createClient } from "@/lib/supabase/client";
 import type { ExternalResult, Profile, Result } from "@/lib/supabase/types";
 import { uploadExternalResultImage } from "@/lib/upload-image";
-import { isExternalImage } from "@/lib/utils";
+import { hasCustomImage, isExternalImage } from "@/lib/utils";
 import {
   ArrowLeftIcon,
   EyeOff,
@@ -453,9 +453,9 @@ export function ProfilePageClient({
                     <Block className="overflow-hidden flex flex-col lg:grid lg:grid-cols-2 gap-4">
                       <div className="-mx-6 -mt-6 lg:hidden">
                         <AspectRatio ratio={16 / 9}>
-                          {result.header_image && result.header_image !== "/placeholder.png" ? (
+                          {hasCustomImage(result.header_image) ? (
                             <Image
-                              src={result.header_image}
+                              src={result.header_image!}
                               alt={result.title}
                               fill
                               className="object-cover"
@@ -483,9 +483,9 @@ export function ProfilePageClient({
                       </div>
                       <div className="hidden lg:block -my-6 -mr-6">
                         <AspectRatio ratio={16 / 9}>
-                          {result.header_image && result.header_image !== "/placeholder.png" ? (
+                          {hasCustomImage(result.header_image) ? (
                             <Image
-                              src={result.header_image}
+                              src={result.header_image!}
                               alt={result.title}
                               fill
                               className="object-cover"

@@ -62,7 +62,7 @@ export function EventDetailClient({
     const supabase = createClient();
     const { data, error } = await supabase.from("results").insert({
       title: "新成果", date: new Date().toISOString().slice(0, 10),
-      header_image: "/placeholder.png", summary: "", content: {},
+      header_image: null, summary: "", content: {},
       status: "draft", author_id: viewerUserId, type: "personal", team_id: null,
       event_id: event.id,
     }).select().single();

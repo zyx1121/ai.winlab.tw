@@ -8,7 +8,7 @@ import { toast } from "sonner";
 
 import { createClient } from "@/lib/supabase/client";
 import { uploadOrganizationImage } from "@/lib/upload-image";
-import { isExternalImage } from "@/lib/utils";
+import { isExternalImage, resolveImageSrc } from "@/lib/utils";
 import type { OrganizationMember, OrganizationMemberCategory } from "@/lib/supabase/types";
 
 import {
@@ -193,7 +193,7 @@ export function OrganizationMemberDialog({ open, onOpenChange, member, defaultCa
             <div className="flex items-center gap-5">
               <div className="relative w-24 h-24 rounded-lg overflow-hidden border border-input bg-muted shrink-0">
                 <Image
-                  src={formData.image || "/placeholder.png"}
+                  src={resolveImageSrc(formData.image)}
                   alt={formData.name || "成員照片"}
                   fill
                   className="object-cover"

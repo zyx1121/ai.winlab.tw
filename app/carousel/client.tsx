@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/card";
 import { createClient } from "@/lib/supabase/client";
 import type { CarouselSlide } from "@/lib/supabase/types";
-import { isExternalImage } from "@/lib/utils";
+import { isExternalImage, resolveImageSrc } from "@/lib/utils";
 import { ArrowLeft, Loader2, Pencil, Plus, Trash2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -111,7 +111,7 @@ export function CarouselPageClient({
               <div className="flex flex-col sm:flex-row gap-4 p-4">
                 <div className="relative w-full sm:w-48 aspect-video shrink-0 rounded-md overflow-hidden bg-muted">
                   <Image
-                    src={slide.image || "/placeholder.png"}
+                    src={resolveImageSrc(slide.image)}
                     alt={slide.title}
                     fill
                     className="object-cover"

@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { createClient } from "@/lib/supabase/client";
 import type { Result } from "@/lib/supabase/types";
 import { uploadResultImage } from "@/lib/upload-image";
-import { isExternalImage } from "@/lib/utils";
+import { isExternalImage, resolveImageSrc } from "@/lib/utils";
 import { useAutoSave } from "@/hooks/use-auto-save";
 import { toast } from "sonner";
 import {
@@ -135,7 +135,7 @@ export default function EventResultEditPage({
           <Label className="text-sm mx-2">封面圖片</Label>
           <div className="flex items-start gap-4">
             <div className="relative w-40 aspect-video rounded-lg overflow-hidden bg-muted shrink-0">
-              <Image src={result.header_image || "/placeholder.png"} alt={result.title} fill className="object-cover"
+              <Image src={resolveImageSrc(result.header_image)} alt={result.title} fill className="object-cover"
                 unoptimized={isExternalImage(result.header_image)} />
             </div>
             <div className="flex flex-col gap-2">

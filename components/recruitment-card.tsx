@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { RecruitmentSummary } from "@/lib/supabase/types";
-import { isExternalImage } from "@/lib/utils";
+import { isExternalImage, resolveImageSrc } from "@/lib/utils";
 import { Pencil } from "lucide-react";
 import Image from "next/image";
 
@@ -27,7 +27,7 @@ export function RecruitmentCard({ item, href, onEdit }: RecruitmentCardProps) {
       <AppLink href={href} className="flex h-full flex-col gap-4">
         <div className="relative w-full aspect-video shrink-0">
           <Image
-            src={item.image || "/placeholder.png"}
+            src={resolveImageSrc(item.image)}
             alt={item.title}
             fill
             className="object-cover"

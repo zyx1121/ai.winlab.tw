@@ -8,7 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { createClient } from "@/lib/supabase/client";
 import type { Event } from "@/lib/supabase/types";
 import { uploadEventImage } from "@/lib/upload-image";
-import { isExternalImage } from "@/lib/utils";
+import { isExternalImage, resolveImageSrc } from "@/lib/utils";
 import { useAutoSave } from "@/hooks/use-auto-save";
 import { toast } from "sonner";
 import {
@@ -164,7 +164,7 @@ export function EventEditClient({
           <div className="flex items-start gap-4">
             <div className="relative w-48 aspect-video rounded-lg overflow-hidden bg-muted shrink-0">
               <Image
-                src={event.cover_image || "/placeholder.png"}
+                src={resolveImageSrc(event.cover_image)}
                 alt={event.name}
                 fill
                 className="object-cover"

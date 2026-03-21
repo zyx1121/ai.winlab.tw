@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/carousel";
 import { AppLink } from "@/components/app-link";
 import type { CarouselSlide } from "@/lib/supabase/types";
+import { resolveImageSrc } from "@/lib/utils";
 import Autoplay from "embla-carousel-autoplay";
 import { ChevronLeft, ChevronRight, Pencil } from "lucide-react";
 import Link from "next/link";
@@ -76,7 +77,7 @@ export function CarouselClient({
               <>
                 <div
                   className="absolute inset-0 bg-cover bg-center bg-no-repeat bg-muted"
-                  style={{ backgroundImage: `url(${slide.image || "/placeholder.png"})` }}
+                  style={{ backgroundImage: `url(${resolveImageSrc(slide.image)})` }}
                 />
                 <div className="absolute inset-x-0 bottom-0 h-1/2 bg-linear-to-t from-black/60 to-transparent" />
                 <div className="absolute inset-0 flex flex-col items-center justify-end text-white px-4 md:px-8 pb-12 md:pb-16 pointer-events-none">

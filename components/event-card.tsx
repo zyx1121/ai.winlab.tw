@@ -3,7 +3,7 @@
 import { Skeleton } from "@/components/ui/skeleton";
 import { Block } from "@/components/ui/block";
 import type { Event } from "@/lib/supabase/types";
-import { isExternalImage } from "@/lib/utils";
+import { isExternalImage, resolveImageSrc } from "@/lib/utils";
 import { AspectRatio } from "@radix-ui/react-aspect-ratio";
 import Image from "next/image";
 
@@ -19,7 +19,7 @@ export function EventCard({
       <div className="-mx-6 -mt-6 lg:hidden">
         <AspectRatio ratio={16 / 9}>
           <Image
-            src={item.cover_image || "/placeholder.png"}
+            src={resolveImageSrc(item.cover_image)}
             alt={item.name}
             fill
             className="object-cover"
@@ -38,7 +38,7 @@ export function EventCard({
       <div className="hidden lg:block -my-6 -mr-6">
         <AspectRatio ratio={16 / 9}>
           <Image
-            src={item.cover_image || "/placeholder.png"}
+            src={resolveImageSrc(item.cover_image)}
             alt={item.name}
             fill
             className="object-cover"

@@ -7,7 +7,7 @@ import {
 } from "@/components/ui/card";
 import { createClient } from "@/lib/supabase/server";
 import type { OrganizationMember } from "@/lib/supabase/types";
-import { isExternalImage } from "@/lib/utils";
+import { isExternalImage, resolveImageSrc } from "@/lib/utils";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -40,7 +40,7 @@ export async function HomeOrganization() {
               <Card className="py-0 h-full flex flex-col overflow-hidden transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98]">
                 <div className="relative w-full aspect-square shrink-0 overflow-hidden">
                   <Image
-                    src={member.image || "/placeholder.png"}
+                    src={resolveImageSrc(member.image)}
                     alt={member.name}
                     fill
                     className="object-cover"

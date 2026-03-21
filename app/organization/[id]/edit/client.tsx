@@ -11,7 +11,7 @@ import type {
   OrganizationMemberCategory,
 } from "@/lib/supabase/types";
 import { uploadOrganizationImage } from "@/lib/upload-image";
-import { isExternalImage } from "@/lib/utils";
+import { isExternalImage, resolveImageSrc } from "@/lib/utils";
 import { toast } from "sonner";
 import { useAutoSave } from "@/hooks/use-auto-save";
 import { ArrowLeft, ImagePlus, Loader2, Save, Trash2 } from "lucide-react";
@@ -220,7 +220,7 @@ export default function OrganizationMemberEditPage() {
           <div className="flex items-center gap-4">
             <div className="relative w-24 h-24 rounded-lg overflow-hidden border border-input bg-muted">
               <Image
-                src={member.image || "/placeholder.png"}
+                src={resolveImageSrc(member.image)}
                 alt={member.name}
                 fill
                 className="object-cover"

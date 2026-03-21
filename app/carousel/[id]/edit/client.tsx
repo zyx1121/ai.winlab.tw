@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { createClient } from "@/lib/supabase/client";
 import type { CarouselSlide } from "@/lib/supabase/types";
 import { uploadCarouselImage } from "@/lib/upload-image";
-import { isExternalImage } from "@/lib/utils";
+import { isExternalImage, resolveImageSrc } from "@/lib/utils";
 import { toast } from "sonner";
 import { useAutoSave } from "@/hooks/use-auto-save";
 import { ArrowLeft, Check, ImagePlus, Loader2, Save, Trash2 } from "lucide-react";
@@ -219,7 +219,7 @@ export default function CarouselEditPage() {
           <div className="flex flex-col sm:flex-row gap-4 items-start">
             <div className="relative w-full sm:w-64 aspect-video rounded-md overflow-hidden bg-muted shrink-0">
               <Image
-                src={slide.image || "/placeholder.png"}
+                src={resolveImageSrc(slide.image)}
                 alt={slide.title}
                 fill
                 className="object-cover"

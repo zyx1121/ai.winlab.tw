@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { OrganizationMemberDialog } from "@/components/organization-member-dialog";
 import type { OrganizationMember, OrganizationMemberCategory } from "@/lib/supabase/types";
-import { isExternalImage } from "@/lib/utils";
+import { isExternalImage, resolveImageSrc } from "@/lib/utils";
 import { GraduationCap, Mail, Microscope, Plus } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
@@ -80,7 +80,7 @@ export function OrganizationPageClient({
                 <>
                   <div className="relative w-full aspect-square shrink-0 overflow-hidden">
                     <Image
-                      src={member.image || "/placeholder.png"}
+                      src={resolveImageSrc(member.image)}
                       alt={member.name}
                       fill
                       className="object-cover"

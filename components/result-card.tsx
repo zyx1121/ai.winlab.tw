@@ -11,7 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatDate } from "@/lib/date";
 import type { Result } from "@/lib/supabase/types";
-import { isExternalImage } from "@/lib/utils";
+import { isExternalImage, resolveImageSrc } from "@/lib/utils";
 import { Pin, User, Users } from "lucide-react";
 import Image from "next/image";
 
@@ -38,7 +38,7 @@ export function ResultCard({
     <Card className="interactive-scale py-0 h-full flex flex-col gap-4 overflow-hidden">
       <div className="relative w-full aspect-video shrink-0">
         <Image
-          src={item.header_image || "/placeholder.png"}
+          src={resolveImageSrc(item.header_image)}
           alt={item.title}
           fill
           className="object-cover"
