@@ -408,21 +408,24 @@ export function ProfilePageClient({
                       )}
                     </span>
                     {profile.resume ? (
-                      <div className="flex items-center gap-2">
+                      <div className="grid gap-1.5">
                         <AppLink
-                          href={profile.resume}
-                          className="text-sm text-foreground underline truncate flex-1 min-w-0"
+                          href={`/profile/${profile.id}/resume`}
+                          className="text-sm text-foreground underline break-all"
                         >
-                          {displayLinkLabel(profile.resume)}
+                          /profile/{profile.id}/resume
                         </AppLink>
-                        <button
+                        <Button
                           type="button"
-                          aria-label="移除履歷"
+                          variant="outline"
+                          size="sm"
+                          className="w-fit"
                           onClick={() => saveField("resume", null)}
-                          className="text-muted-foreground hover:text-destructive transition-colors duration-200"
+                          disabled={savingField === "resume"}
                         >
-                          <Trash2 className="size-3.5" />
-                        </button>
+                          <Trash2 className="size-4" />
+                          移除履歷
+                        </Button>
                       </div>
                     ) : (
                       <p className="text-xs text-muted-foreground">尚未上傳履歷</p>
@@ -450,7 +453,7 @@ export function ProfilePageClient({
                   <div className="grid gap-1.5">
                     <span className="text-xs font-medium text-muted-foreground">履歷</span>
                     <AppLink
-                      href={profile.resume}
+                      href={`/profile/${profile.id}/resume`}
                       className="text-sm text-foreground underline"
                     >
                       查看履歷
