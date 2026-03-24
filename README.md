@@ -47,11 +47,7 @@ NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY=
 | `/organization`                     | Organization member listing                                                |
 | `/announcement`                     | Global announcements list                                                  |
 | `/announcement/[id]`                | Announcement detail                                                        |
-| `/result`                           | Global results list                                                        |
-| `/result/[id]`                      | Result detail                                                              |
-| `/recruitment`                      | Global recruitment listing                                                 |
 | `/profile/[id]`                     | Author profile page                                                        |
-| `/team/[id]`                        | Team detail page                                                           |
 | `/privacy`                          | Privacy policy                                                             |
 | `/events`                           | Events listing                                                             |
 | `/events/[slug]`                    | Event detail page (announcements / results / recruitment tabs via `?tab=`) |
@@ -63,13 +59,11 @@ NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY=
 | Route                                    | Description              |
 | ---------------------------------------- | ------------------------ |
 | `/announcement/[id]/edit`                | Edit announcement        |
-| `/result/[id]/edit`                      | Edit result              |
-| `/recruitment/[id]/edit`                 | Edit recruitment         |
 | `/introduction/edit`                     | Edit office introduction |
 | `/events/[slug]/edit`                    | Edit event metadata      |
 | `/events/[slug]/announcements/[id]/edit` | Edit event announcement  |
 | `/events/[slug]/results/[id]/edit`       | Edit event result        |
-| `/events/[slug]/recruitment/[id]/edit`   | Edit event recruitment   |
+| `/events/[slug]/recruitment/[id]/edit`   | Edit event recruitment (admin only) |
 
 ### Account Pages (Login Required)
 
@@ -93,8 +87,8 @@ NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY=
 ## Data Model
 
 - **Announcement**: Global (`event_id IS NULL`) or event-scoped (`event_id IS NOT NULL`). Event-scoped announcements are excluded from the global `/announcement` page.
-- **Result**: `type: personal | team`, optionally linked to an event via `event_id`.
-- **Recruitment** (DB table: `competitions`): Job postings, optionally linked to an event. Event-scoped entries are excluded from the global `/recruitment` page.
+- **Result**: `type: personal | team`, optionally linked to an event via `event_id`. All results live under `/events/[slug]/results/[id]`; there is no global result listing page.
+- **Recruitment** (DB table: `competitions`): Job postings are always event-scoped (`event_id IS NOT NULL`). Accessed at `/events/[slug]/recruitment/[id]` (admin only). There is no global recruitment page.
 - **Event**: Container with `slug`, `pinned`, and `sort_order`. Pinned events appear directly in the header navigation.
 
 ## Supabase Storage Setup (One-time)

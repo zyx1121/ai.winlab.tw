@@ -65,8 +65,10 @@ Core entities defined in `lib/supabase/types.ts`:
 
 Conventions:
 
-- `event_id IS NULL` means global content.
+- `event_id IS NULL` means global content (applies to Announcement only).
 - `event_id IS NOT NULL` means content belongs to a specific event.
+- Recruitment entries are always event-scoped; there is no global recruitment page.
+- Results have no global listing page; all result detail pages are under `/events/[slug]/results/[id]`.
 
 ## Database and storage
 
@@ -100,18 +102,16 @@ Conventions:
 ### Content management
 
 - `/announcement`, `/announcement/[id]`, `/announcement/[id]/edit`
-- `/result`: global result list, currently unused because results moved under events
-- `/recruitment`: global recruitment list using `competitions`
 - `/introduction`, `/introduction/edit`
 - `/organization`, `/organization/[id]/edit`
 - `/carousel/[id]/edit`, `/contacts/[id]/edit`
+- Note: there are no global `/result` or `/recruitment` listing pages — all results and recruitment entries are event-scoped
 
 ### Account and public profile pages
 
 - `/account`: profile, teams, invitations
 - `/account/teams`, `/account/teams/[id]`
 - `/profile/[id]`: public author page
-- `/team/[id]`: public team page
 
 ### Admin-only pages
 
