@@ -10,14 +10,19 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     supabase
       .from("announcements")
       .select("id, date, event_id")
-      .eq("status", "published")
-      ,
+      .eq("status", "published"),
     supabase.from("events").select("id, slug, updated_at").eq("status", "published"),
     supabase
       .from("results")
-      .select("id, date, event_id")
+      .select("id, date, event_id, author_id")
       .eq("status", "published"),
-    supabase.from("public_profiles").select("id"),
+    // 只納入有 published 個人成果的作者，避免大量空 profile 稀釋爬取品質
+    supabase
+      .from("results")
+      .select("author_id")
+      .eq("status", "published")
+      .eq("type", "personal")
+      .not("author_id", "is", null),
   ]);
 
   const staticRoutes: MetadataRoute.Sitemap = [
@@ -55,8 +60,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.6,
     }));
 
-  const profileRoutes: MetadataRoute.Sitemap = (profilesRes.data ?? []).map((profile) => ({
-    url: `${BASE_URL}/profile/${profile.id}`,
+  const authorIds = [...new Set((profilesRes.data ?? []).map((r) => r.author_id as string))];
+  const profileRoutes: MetadataRoute.Sitemap = authorIds.map((id) => ({
+    url: `${BASE_URL}/profile/${id}`,
     priority: 0.5,
   }));
 
