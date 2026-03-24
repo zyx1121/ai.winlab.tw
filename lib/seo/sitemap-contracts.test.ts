@@ -22,10 +22,11 @@ describe("sitemap contracts", () => {
   })
 
   test("sitemap includes public profile, announcement, and event result routes, but not team routes", () => {
-    assert.ok(sitemapFile.includes('.from("public_profiles")'))
-    assert.ok(sitemapFile.includes('.from("announcements")'))
+    // profile routes: only authors with published personal results are included
     assert.ok(sitemapFile.includes('.from("results")'))
-    assert.ok(sitemapFile.includes('url: `${BASE_URL}/profile/${profile.id}`'))
+    assert.ok(sitemapFile.includes('author_id'))
+    assert.ok(sitemapFile.includes('`${BASE_URL}/profile/${'))
+    assert.ok(sitemapFile.includes('.from("announcements")'))
     assert.ok(sitemapFile.includes('url: announcement.event_id && eventSlugMap[announcement.event_id]'))
     assert.ok(sitemapFile.includes('`${BASE_URL}/events/${eventSlugMap[announcement.event_id]}/announcements/${announcement.id}`'))
     assert.ok(sitemapFile.includes('url: `${BASE_URL}/events/${eventSlugMap[result.event_id!]}/results/${result.id}`'))
