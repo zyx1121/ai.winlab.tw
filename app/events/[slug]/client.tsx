@@ -72,6 +72,12 @@ export function EventDetailClient({
     router.push(`/events/${slug}/results/${data.id}/edit`);
   };
 
+  const handlePinToggle = async (id: string, pinned: boolean) => {
+    const supabase = createClient();
+    const { error } = await supabase.from("results").update({ pinned }).eq("id", id);
+    if (!error) router.refresh();
+  };
+
   const [sheetOpen, setSheetOpen] = useState(false);
   const [editingRecruitment, setEditingRecruitment] = useState<Recruitment | null>(null);
 
@@ -205,6 +211,8 @@ export function EventDetailClient({
                     href={isAdmin ? `/events/${slug}/results/${item.id}/edit` : `/events/${slug}/results/${item.id}`}
                     publisherHref={item.type === "personal" && item.author_id ? `/profile/${item.author_id}` : null}
                     showStatus={showStatus}
+                    isAdmin={isAdmin}
+                    onPinToggle={isAdmin ? handlePinToggle : undefined}
                   />
                 );
               })}
