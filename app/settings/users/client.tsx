@@ -65,15 +65,21 @@ export default function SettingsUsersPageClient({
     setIsImporting(true);
     setImportResult(null);
 
-    const { data: result, error } = await supabase.functions.invoke("import-users", {
-      body: { users: rows },
-    });
-
-    if (error) {
-      toast.error(error.message ?? "匯入失敗");
-    } else {
-      setImportResult(result);
-      await refreshUsers();
+    try {
+      const res = await fetch("/api/admin/import-users", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ users: rows }),
+      });
+      const result = await res.json();
+      if (!res.ok) {
+        toast.error(result.error ?? "匯入失敗");
+      } else {
+        setImportResult(result);
+        await refreshUsers();
+      }
+    } catch {
+      toast.error("匯入失敗，請稍後再試");
     }
     setIsImporting(false);
   };
