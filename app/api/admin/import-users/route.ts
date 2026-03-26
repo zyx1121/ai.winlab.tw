@@ -33,8 +33,14 @@ export async function POST(request: Request) {
       { status: 500 }
     );
 
-  const body = await request.json();
-  const rows: { name: string; email: string }[] = body.users ?? [];
+  let body: unknown;
+  try {
+    body = await request.json();
+  } catch {
+    return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
+  }
+  const rows: { name: string; email: string }[] =
+    (body as Record<string, unknown>)?.users as { name: string; email: string }[] ?? [];
 
   const adminClient = createAdminClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
