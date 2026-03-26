@@ -12,6 +12,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { parseAsStringLiteral, useQueryState } from "nuqs";
 import { useState } from "react";
+import { toast } from "sonner";
 
 type Tab = "announcements" | "results" | "recruitment";
 
@@ -68,7 +69,7 @@ export function EventDetailClient({
       status: "draft", author_id: userId, type: "personal", team_id: null,
       event_id: event.id,
     }).select().single();
-    if (error) { setIsCreating(false); return; }
+    if (error) { toast.error("建立成果失敗，請稍後再試"); setIsCreating(false); return; }
     router.push(`/events/${slug}/results/${data.id}/edit`);
   };
 

@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/client";
 import { Loader2, Plus } from "lucide-react";
+import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
@@ -28,7 +29,7 @@ export function EventsCreateButton({ userId }: { userId: string }) {
       })
       .select()
       .single();
-    if (error) { setIsCreating(false); return; }
+    if (error) { toast.error("建立活動失敗，請稍後再試"); setIsCreating(false); return; }
     router.push(`/events/${data.slug}/edit`);
   };
 

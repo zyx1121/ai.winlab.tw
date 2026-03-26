@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { AppLink } from "@/components/app-link";
 
 export function Footer() {
   return (
@@ -6,12 +6,12 @@ export function Footer() {
       <p className="text-sm text-muted-foreground">
         &copy; {new Date().getFullYear()} Office of AI Affairs.
       </p>
-      <Link
+      <AppLink
         href="/privacy"
         className="text-sm text-muted-foreground hover:text-foreground transition-colors"
       >
         Privacy
-      </Link>
+      </AppLink>
     </footer>
   );
 }
