@@ -14,6 +14,9 @@ This file is the single source of truth for coding agents working in this reposi
 - Create production build: `bun build`
 - Start production server: `bun start`
 - Run lint: `bun lint`
+- Run tests: `bun test`
+- Run type checking: `bun typecheck`
+- Run tests + typecheck: `bun check`
 - Add shadcn/ui components: `bunx shadcn add <name>`
 
 ## Environment variables
@@ -56,7 +59,7 @@ Core entities defined in `lib/supabase/types.ts`:
 - `Announcement`: announcement content, Tiptap JSON, `status: draft | published`, optional `event_id`
 - `Result`: event or competition result, `type: personal | team`, `pinned`, optional `event_id`
 - `Recruitment`: stored in DB table `competitions`, includes `positions`, `application_method`, and `contact` JSON fields; `created_by` tracks the author
-- `EventVendor`: junction table (`event_vendors`) linking vendor users to events they can manage
+- `EventVendor`: junction table (`event_vendors`) linking vendor users to events they can manage (DB-only, no TypeScript type; checked via `isEventVendor()` in `lib/supabase/check-event-vendor.ts`)
 - `RecruitmentInterest`: tracks user interest in recruitment listings (`recruitment_interests`); one per user per competition
 - `Event`: `slug`, `status: draft | published`, `pinned`, `sort_order`
 - `Introduction`: single office-introduction record with Tiptap JSON content
@@ -79,7 +82,7 @@ Conventions:
 - SQL migrations live in `supabase/migrations/` and should be applied in order through the Supabase SQL editor.
 - All tables use RLS.
 - Initial setup also requires the public storage bucket `announcement-images`.
-- Storage policies are defined in `supabase/storage-policies.sql`.
+- Storage policies are included in the migrations under `supabase/migrations/`.
 
 ## Shared hooks and editor rules
 
@@ -113,13 +116,14 @@ Conventions:
 
 ### Account and public profile pages
 
-- `/account`: profile, teams, invitations
-- `/account/teams`, `/account/teams/[id]`
+- `/account`: profile, team membership, pending invitations
 - `/profile/[id]`: public author page; vendor users see a "My Events" section showing assigned events
 
 ### Admin-only pages
 
-- `/settings`: user management
+- `/settings`, `/settings/users`: user management
+- `/carousel`: carousel slide management
+- `/contacts`: contact info management
 
 ## UI conventions
 
@@ -191,7 +195,6 @@ Defined in `app/globals.css`:
 
 - `--font-noto-sans`: primary UI font, mapped to `--font-sans`
 - `--font-noto-sans-mono`: code font, mapped to `--font-mono`
-- `--font-instrument-serif`: decorative heading font, must be applied with inline style rather than a Tailwind class
 
 ### Components and images
 
@@ -201,10 +204,12 @@ Defined in `app/globals.css`:
 - Supabase remote patterns already allow `*.supabase.co`
 - Storage path conventions:
   - Announcement inline images: root
-  - Recruitment covers: `competitions/`
+  - Recruitment covers: `recruitment/`
   - Result header images: `results/`
   - Organization member photos: `organization/`
   - Event covers: `events/`
+  - Carousel slide images: `carousel/`
+  - External result images: `external-results/`
 
 ## Maintenance note
 

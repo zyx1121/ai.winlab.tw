@@ -21,10 +21,13 @@ Open [http://localhost:3000](http://localhost:3000) to view the site.
 ## Commands
 
 ```bash
-bun dev      # Start development server
-bun build    # Build for production
-bun start    # Start production server
-bun lint     # Run ESLint
+bun dev       # Start development server
+bun build     # Build for production
+bun start     # Start production server
+bun lint      # Run ESLint
+bun test      # Run tests
+bun typecheck # Run TypeScript type checking
+bun check     # Run tests + typecheck
 ```
 
 ## Environment Variables
@@ -61,29 +64,35 @@ NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY=
 | ---------------------------------------- | ------------------------ |
 | `/announcement/[id]/edit`                | Edit announcement        |
 | `/introduction/edit`                     | Edit office introduction |
-| `/events/[slug]/edit`                    | Edit event metadata      |
-| `/events/[slug]/announcements/[id]/edit` | Edit event announcement  |
-| `/events/[slug]/results/[id]/edit`       | Edit event result        |
-| `/events/[slug]/recruitment/[id]/edit`   | Edit event recruitment (admin/vendor) |
+| `/events/[slug]/edit`                    | Edit event metadata     |
+| `/events/[slug]/announcements/[id]/edit` | Edit event announcement |
+| `/events/[slug]/results/[id]/edit`       | Edit event result       |
 
 ### Account Pages (Login Required)
 
-| Route                 | Description                                   |
-| --------------------- | --------------------------------------------- |
-| `/account`            | Profile, team membership, pending invitations |
-| `/account/teams`      | Team list / create team                       |
-| `/account/teams/[id]` | Team detail + invite members                  |
+| Route      | Description                                   |
+| ---------- | --------------------------------------------- |
+| `/account` | Profile, team membership, pending invitations |
 
 ### Admin Only
 
 | Route                     | Description              |
 | ------------------------- | ------------------------ |
-| `/settings`               | System settings          |
-| `/settings/users`         | User management          |
-| `/organization/[id]/edit` | Edit organization member |
-| `/carousel/[id]/edit`     | Edit carousel slide      |
-| `/contacts/[id]/edit`     | Edit contact info        |
-| `/privacy/edit`           | Edit privacy policy      |
+| `/settings`               | System settings              |
+| `/settings/users`         | User management              |
+| `/organization/[id]/edit` | Edit organization member     |
+| `/carousel`               | Carousel slide management    |
+| `/carousel/[id]/edit`     | Edit carousel slide          |
+| `/contacts`               | Contact info management      |
+| `/contacts/[id]/edit`     | Edit contact info            |
+| `/privacy/edit`           | Edit privacy policy          |
+
+### API Routes
+
+| Route                      | Description                |
+| -------------------------- | -------------------------- |
+| `/api/admin/import-users`  | Bulk user import (admin)   |
+| `/profile/[id]/resume`     | Resume file download       |
 
 ## Data Model
 
@@ -101,12 +110,14 @@ All images are stored in the `announcement-images` bucket (public).
 1. Supabase Dashboard → **Storage** → **New bucket**
    - Name: `announcement-images`
    - Public bucket: **ON**
-2. Run `supabase/storage-policies.sql` in the **SQL Editor**
+2. Apply the migrations in `supabase/migrations/` in order via the **SQL Editor**
 
 Image path prefixes by content type:
 
 - Announcement inline images: root
-- Result cover images: `results/`
+- Result header images: `results/`
 - Recruitment images: `recruitment/`
 - Organization member photos: `organization/`
 - Event cover images: `events/`
+- Carousel slide images: `carousel/`
+- External result images: `external-results/`
