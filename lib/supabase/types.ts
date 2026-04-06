@@ -188,6 +188,7 @@ export type Recruitment = {
   required_documents: string | null;
   event_id: string | null;
   created_by: string | null;
+  pinned: boolean;
 };
 
 export type RecruitmentSummary = {
@@ -202,6 +203,7 @@ export type RecruitmentSummary = {
   end_date: string | null;
   event_id: string | null;
   created_by: string | null;
+  pinned: boolean;
 };
 
 export type RecruitmentInterest = {

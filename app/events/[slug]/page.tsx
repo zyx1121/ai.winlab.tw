@@ -51,8 +51,9 @@ export default async function EventDetailPage({
     resultsQuery,
     supabase
       .from("competitions")
-      .select("id, created_at, updated_at, title, link, image, company_description, start_date, end_date, event_id, created_by")
+      .select("id, created_at, updated_at, title, link, image, company_description, start_date, end_date, event_id, created_by, pinned")
       .eq("event_id", event.id)
+      .order("pinned", { ascending: false })
       .order("start_date", { ascending: false }),
   ]);
 

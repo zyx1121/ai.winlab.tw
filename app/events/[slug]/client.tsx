@@ -78,6 +78,12 @@ export function EventDetailClient({
     if (!error) router.refresh();
   };
 
+  const handleRecruitmentPinToggle = async (id: string, pinned: boolean) => {
+    const supabase = createClient();
+    const { error } = await supabase.from("competitions").update({ pinned }).eq("id", id);
+    if (!error) router.refresh();
+  };
+
   const [sheetOpen, setSheetOpen] = useState(false);
   const [editingRecruitment, setEditingRecruitment] = useState<Recruitment | null>(null);
 
@@ -240,6 +246,8 @@ export function EventDetailClient({
                   key={item.id}
                   item={item}
                   href={`/events/${slug}/recruitment/${item.id}`}
+                  isAdmin={isAdmin}
+                  onPinToggle={isAdmin ? handleRecruitmentPinToggle : undefined}
                   onEdit={(isAdmin || (isEventVendor && item.created_by === userId)) ? () => openEditSheet(item) : undefined}
                 />
               ))}

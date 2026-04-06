@@ -10,16 +10,18 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import type { RecruitmentSummary } from "@/lib/supabase/types";
 import { isExternalImage, resolveImageSrc } from "@/lib/utils";
-import { Pencil } from "lucide-react";
+import { Pencil, Pin } from "lucide-react";
 import Image from "next/image";
 
 type RecruitmentCardProps = {
   item: RecruitmentSummary;
   href: string;
+  isAdmin?: boolean;
   onEdit?: () => void;
+  onPinToggle?: (id: string, pinned: boolean) => void;
 };
 
-export function RecruitmentCard({ item, href, onEdit }: RecruitmentCardProps) {
+export function RecruitmentCard({ item, href, isAdmin, onEdit, onPinToggle }: RecruitmentCardProps) {
   const isExpired = item.end_date ? new Date(item.end_date) < new Date() : false;
 
   return (
@@ -33,6 +35,26 @@ export function RecruitmentCard({ item, href, onEdit }: RecruitmentCardProps) {
             className="object-cover"
             unoptimized={isExternalImage(item.image)}
           />
+          {isAdmin ? (
+            <button
+              type="button"
+              aria-label={item.pinned ? "取消訂選" : "訂選"}
+              onClick={(e) => { e.preventDefault(); e.stopPropagation(); onPinToggle?.(item.id, !item.pinned); }}
+              className={`absolute top-2 left-2 z-10 rounded-full p-1.5 interactive-opacity text-white ${item.pinned
+                ? "bg-black/50 opacity-100"
+                : "bg-black/50 opacity-40 hover:opacity-80"
+                }`}
+            >
+              <Pin className="w-4 h-4" fill={item.pinned ? "currentColor" : "none"} />
+            </button>
+          ) : item.pinned ? (
+            <div
+              className="absolute top-2 left-2 rounded-full bg-black/50 p-1.5 text-white pointer-events-none"
+              aria-hidden
+            >
+              <Pin className="w-4 h-4" fill="currentColor" />
+            </div>
+          ) : null}
         </div>
         <CardHeader className="shrink-0 pb-0">
           <CardTitle className="text-xl font-bold line-clamp-2">
