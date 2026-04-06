@@ -42,7 +42,7 @@ export function RecruitmentDetail({
   const isExpired =
     recruitment.end_date && new Date(recruitment.end_date) < new Date();
 
-  const positionCount = recruitment.positions?.length ?? 0;
+  const positionCount = recruitment.positions?.reduce((sum, p) => sum + (p.count ?? 0), 0) ?? 0;
   const applicationLinks = getApplicationMethodLinks(
     recruitment.application_method,
     recruitment.link,
