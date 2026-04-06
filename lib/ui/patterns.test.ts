@@ -6,7 +6,7 @@ import { describe, test } from "node:test"
 import { getAutoLinkProps, pageSectionVariants, pageShellVariants } from "./patterns"
 
 const globalsCss = readFileSync(resolve(process.cwd(), "app/globals.css"), "utf8")
-const uiRulesMd = readFileSync(resolve(process.cwd(), ".claude/rules/ui.md"), "utf8")
+const claudeMd = readFileSync(resolve(process.cwd(), "CLAUDE.md"), "utf8")
 const homeIntroduction = readFileSync(resolve(process.cwd(), "components/home-introduction.tsx"), "utf8")
 const recruitmentDialog = readFileSync(resolve(process.cwd(), "components/recruitment-dialog.tsx"), "utf8")
 const organizationMemberDialog = readFileSync(resolve(process.cwd(), "components/organization-member-dialog.tsx"), "utf8")
@@ -169,16 +169,16 @@ describe("getAutoLinkProps", () => {
 
 describe("skeleton architecture guidance", () => {
   test("documents component-owned skeletons instead of page-owned skeleton abstractions", () => {
-    assert.ok(uiRulesMd.includes("High-level UI components should own their matching skeleton components"))
-    assert.ok(uiRulesMd.includes("Route-level loading files should compose layout with component-owned skeletons"))
+    assert.ok(claudeMd.includes("High-level UI components should own their matching skeleton components"))
+    assert.ok(claudeMd.includes("Route-level loading files should compose layout with component-owned skeletons"))
   })
 
   test("documents the notion-like editor split between desktop contextual controls and mobile toolbar controls", () => {
-    assert.ok(uiRulesMd.includes("Desktop Tiptap editing should use contextual controls"))
-    assert.ok(uiRulesMd.includes("BubbleMenu"))
-    assert.ok(uiRulesMd.includes("FloatingMenu"))
-    assert.ok(uiRulesMd.includes("`/`-triggered insertion"))
-    assert.ok(uiRulesMd.includes("Mobile Tiptap editing should use a dedicated compact toolbar"))
+    assert.ok(claudeMd.includes("Desktop Tiptap editing should use contextual controls"))
+    assert.ok(claudeMd.includes("BubbleMenu"))
+    assert.ok(claudeMd.includes("FloatingMenu"))
+    assert.ok(claudeMd.includes("`/`-triggered insertion"))
+    assert.ok(claudeMd.includes("Mobile Tiptap editing should use a dedicated compact toolbar"))
     assert.ok(tiptapEditor.includes("<TiptapDesktopBubbleMenu"))
     assert.ok(tiptapEditor.includes("<TiptapDesktopFloatingMenu"))
     assert.ok(tiptapEditor.includes("<TiptapMobileToolbar"))
