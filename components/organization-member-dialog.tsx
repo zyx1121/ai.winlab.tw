@@ -1,12 +1,11 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect } from "react";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
 import { ImagePlus, Loader2, Trash2 } from "lucide-react";
-import { toast } from "sonner";
 
-import { createClient } from "@/lib/supabase/client";
+import { useDialogForm } from "@/hooks/use-dialog-form";
+import { useImageUpload } from "@/hooks/use-image-upload";
 import { uploadOrganizationImage } from "@/lib/upload-image";
 import { isExternalImage, resolveImageSrc } from "@/lib/utils";
 import type { OrganizationMember, OrganizationMemberCategory } from "@/lib/supabase/types";
@@ -96,83 +95,41 @@ type Props = {
 };
 
 export function OrganizationMemberDialog({ open, onOpenChange, member, defaultCategory }: Props) {
-  const router = useRouter();
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const [formData, setFormData] = useState<FormData>(() =>
-    member ? formDataFromMember(member) : getDefaults(defaultCategory)
-  );
-  const [saving, setSaving] = useState(false);
-  const [deleting, setDeleting] = useState(false);
-  const [uploading, setUploading] = useState(false);
+  const { formData, updateField, resetForm, isSaving, isDeleting, save, remove } = useDialogForm<FormData>({
+    table: "organization_members",
+    editingId: member?.id ?? null,
+    getDefaults: () => member ? formDataFromMember(member) : getDefaults(defaultCategory),
+    buildPayload: (form) => {
+      const payload = {
+        name: form.name.trim(),
+        member_role: form.member_role.trim() || null,
+        school: form.school.trim() || null,
+        research_areas: form.research_areas.trim() || null,
+        email: form.email.trim() || null,
+        website: form.website.trim() || null,
+        image: form.image,
+        sort_order: form.sort_order,
+        category: form.category,
+      };
+      if (!member) {
+        return { ...payload, summary: null, link: null };
+      }
+      return payload;
+    },
+    validate: (form) => form.name.trim() ? null : "請輸入名稱",
+    onClose: () => onOpenChange(false),
+  });
 
-  function update<K extends keyof FormData>(key: K, value: FormData[K]) {
-    setFormData((prev) => ({ ...prev, [key]: value }));
-  }
+  const { isUploading: uploading, fileInputRef, triggerFileInput, handleFileChange } = useImageUpload(uploadOrganizationImage);
 
-  async function handleImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setUploading(true);
-    const result = await uploadOrganizationImage(file);
-    setUploading(false);
-    if (fileInputRef.current) fileInputRef.current.value = "";
-    if ("error" in result) {
-      toast.error(result.error);
-    } else {
-      update("image", result.url);
-    }
-  }
+  const onImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const url = await handleFileChange(e);
+    if (url) updateField("image", url);
+  };
 
-  async function handleSave() {
-    if (!formData.name.trim()) {
-      toast.error("請輸入名稱");
-      return;
-    }
-    setSaving(true);
-    const supabase = createClient();
-    const payload = {
-      name: formData.name.trim(),
-      member_role: formData.member_role.trim() || null,
-      school: formData.school.trim() || null,
-      research_areas: formData.research_areas.trim() || null,
-      email: formData.email.trim() || null,
-      website: formData.website.trim() || null,
-      image: formData.image,
-      sort_order: formData.sort_order,
-      category: formData.category,
-    };
-
-    let error;
-    if (member) {
-      ({ error } = await supabase.from("organization_members").update(payload).eq("id", member.id));
-    } else {
-      ({ error } = await supabase.from("organization_members").insert({ ...payload, summary: null, link: null }));
-    }
-
-    setSaving(false);
-    if (error) {
-      toast.error(error.message);
-    } else {
-      toast.success(member ? "已更新" : "已建立");
-      onOpenChange(false);
-      router.refresh();
-    }
-  }
-
-  async function handleDelete() {
-    if (!member) return;
-    setDeleting(true);
-    const supabase = createClient();
-    const { error } = await supabase.from("organization_members").delete().eq("id", member.id);
-    setDeleting(false);
-    if (error) {
-      toast.error(error.message);
-    } else {
-      toast.success("已刪除");
-      onOpenChange(false);
-      router.refresh();
-    }
-  }
+  useEffect(() => {
+    resetForm(member ? formDataFromMember(member) : getDefaults(defaultCategory));
+  }, [member, defaultCategory, resetForm]);
 
   const isEditMode = member !== null;
 
@@ -206,7 +163,7 @@ export function OrganizationMemberDialog({ open, onOpenChange, member, defaultCa
                   variant="outline"
                   size="sm"
                   disabled={uploading}
-                  onClick={() => fileInputRef.current?.click()}
+                  onClick={triggerFileInput}
                 >
                   {uploading ? (
                     <><Loader2 className="size-4 animate-spin mr-1" />上傳中…</>
@@ -220,7 +177,7 @@ export function OrganizationMemberDialog({ open, onOpenChange, member, defaultCa
                     variant="ghost"
                     size="sm"
                     aria-label="移除照片"
-                    onClick={() => update("image", null)}
+                    onClick={() => updateField("image", null)}
                   >
                     移除照片
                   </Button>
@@ -231,7 +188,7 @@ export function OrganizationMemberDialog({ open, onOpenChange, member, defaultCa
                 type="file"
                 accept="image/*"
                 className="hidden"
-                onChange={handleImageUpload}
+                onChange={onImageUpload}
               />
             </div>
           </div>
@@ -242,7 +199,7 @@ export function OrganizationMemberDialog({ open, onOpenChange, member, defaultCa
               <Label>分類</Label>
               <Select
                 value={formData.category}
-                onValueChange={(v) => update("category", v as OrganizationMemberCategory)}
+                onValueChange={(v) => updateField("category", v as OrganizationMemberCategory)}
               >
                 <SelectTrigger className="w-full">
                   <SelectValue />
@@ -259,7 +216,7 @@ export function OrganizationMemberDialog({ open, onOpenChange, member, defaultCa
               <Input
                 type="number"
                 value={formData.sort_order}
-                onChange={(e) => update("sort_order", parseInt(e.target.value) || 0)}
+                onChange={(e) => updateField("sort_order", parseInt(e.target.value) || 0)}
               />
             </div>
           </div>
@@ -270,7 +227,7 @@ export function OrganizationMemberDialog({ open, onOpenChange, member, defaultCa
               <Label>姓名</Label>
               <Input
                 value={formData.name}
-                onChange={(e) => update("name", e.target.value)}
+                onChange={(e) => updateField("name", e.target.value)}
                 placeholder="成員姓名"
               />
             </div>
@@ -278,7 +235,7 @@ export function OrganizationMemberDialog({ open, onOpenChange, member, defaultCa
               <Label>職稱（選填）</Label>
               <Input
                 value={formData.member_role}
-                onChange={(e) => update("member_role", e.target.value)}
+                onChange={(e) => updateField("member_role", e.target.value)}
                 placeholder="例：主任、副主任"
               />
             </div>
@@ -290,7 +247,7 @@ export function OrganizationMemberDialog({ open, onOpenChange, member, defaultCa
               <Label>最高學歷（選填）</Label>
               <Input
                 value={formData.school}
-                onChange={(e) => update("school", e.target.value)}
+                onChange={(e) => updateField("school", e.target.value)}
                 placeholder="例：美國南美以美大學（資工博士）"
               />
             </div>
@@ -299,7 +256,7 @@ export function OrganizationMemberDialog({ open, onOpenChange, member, defaultCa
               <Input
                 type="email"
                 value={formData.email}
-                onChange={(e) => update("email", e.target.value)}
+                onChange={(e) => updateField("email", e.target.value)}
                 placeholder="professor@university.edu.tw"
               />
             </div>
@@ -311,7 +268,7 @@ export function OrganizationMemberDialog({ open, onOpenChange, member, defaultCa
             <Input
               type="url"
               value={formData.website}
-              onChange={(e) => update("website", e.target.value)}
+              onChange={(e) => updateField("website", e.target.value)}
               placeholder="https://..."
             />
           </div>
@@ -321,7 +278,7 @@ export function OrganizationMemberDialog({ open, onOpenChange, member, defaultCa
             <Label>研究領域（選填）</Label>
             <Textarea
               value={formData.research_areas}
-              onChange={(e) => update("research_areas", e.target.value)}
+              onChange={(e) => updateField("research_areas", e.target.value)}
               placeholder="研究領域（以頓號或換行分隔）"
               rows={3}
             />
@@ -332,8 +289,8 @@ export function OrganizationMemberDialog({ open, onOpenChange, member, defaultCa
           {isEditMode && (
             <AlertDialog>
               <AlertDialogTrigger asChild>
-                <Button variant="destructive" disabled={deleting}>
-                  {deleting ? <Loader2 className="size-4 animate-spin mr-1" /> : <Trash2 className="size-4 mr-1" />}
+                <Button variant="destructive" disabled={isDeleting}>
+                  {isDeleting ? <Loader2 className="size-4 animate-spin mr-1" /> : <Trash2 className="size-4 mr-1" />}
                   刪除
                 </Button>
               </AlertDialogTrigger>
@@ -344,13 +301,13 @@ export function OrganizationMemberDialog({ open, onOpenChange, member, defaultCa
                 </AlertDialogHeader>
                 <AlertDialogFooter>
                   <AlertDialogCancel>取消</AlertDialogCancel>
-                  <AlertDialogAction onClick={handleDelete}>確定刪除</AlertDialogAction>
+                  <AlertDialogAction onClick={remove}>確定刪除</AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>
             </AlertDialog>
           )}
-          <Button onClick={handleSave} disabled={saving} className="ml-auto">
-            {saving && <Loader2 className="size-4 animate-spin mr-1" />}
+          <Button onClick={save} disabled={isSaving} className="ml-auto">
+            {isSaving && <Loader2 className="size-4 animate-spin mr-1" />}
             {isEditMode ? "儲存" : "建立"}
           </Button>
         </DialogFooter>
