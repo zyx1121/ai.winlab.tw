@@ -88,15 +88,9 @@ export function VendorEventsSection() {
                   <div className="p-4 grid gap-2">
                     <p className="font-medium line-clamp-2">{event.name}</p>
                     <div>
-                      {event.status === "published" ? (
-                        <Badge variant="outline" className="bg-green-100 text-green-700 border-green-200">
-                          已發布
-                        </Badge>
-                      ) : (
-                        <Badge variant="outline" className="bg-yellow-100 text-yellow-700 border-yellow-200">
-                          草稿
-                        </Badge>
-                      )}
+                      <Badge variant={event.status === "published" ? "default" : "secondary"}>
+                        {event.status === "published" ? "已發布" : "草稿"}
+                      </Badge>
                     </div>
                   </div>
                 </div>

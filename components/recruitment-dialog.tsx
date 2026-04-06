@@ -471,7 +471,7 @@ export function RecruitmentDialog({
           </div>
 
           {/* 4. Recruitment period */}
-          <div className="grid grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <div className="space-y-2">
               <Label htmlFor="start_date">開始日期</Label>
               <Input
@@ -528,7 +528,7 @@ export function RecruitmentDialog({
                   </div>
                   <CollapsibleContent>
                     <div className="px-4 pb-4 pt-2 space-y-4 border-t">
-                      <div className="grid grid-cols-2 gap-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div className="space-y-1">
                           <Label className="text-xs">職缺名稱</Label>
                           <Input
@@ -554,7 +554,7 @@ export function RecruitmentDialog({
                           />
                         </div>
                       </div>
-                      <div className="grid grid-cols-3 gap-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                         <div className="space-y-1">
                           <Label className="text-xs">類型</Label>
                           <Select
@@ -672,7 +672,7 @@ export function RecruitmentDialog({
           <div className="space-y-3">
             <Label>應徵方式</Label>
             <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1">
                   <Label className="text-xs">Email</Label>
                   <Input
@@ -770,7 +770,7 @@ export function RecruitmentDialog({
           {/* 7. Contact */}
           <div className="space-y-3">
             <Label>聯絡資訊</Label>
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
               <div className="space-y-1">
                 <Label className="text-xs">姓名</Label>
                 <Input

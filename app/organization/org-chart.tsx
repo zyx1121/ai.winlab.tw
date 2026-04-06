@@ -261,7 +261,7 @@ export function OrgChart({ activeTab = "core" }: { activeTab?: ActiveTab }) {
         {/* Row 3: 法人 & 産業 (dashed alliance) */}
         <div className="flex items-center gap-2">
           <OrgNode title="法人" className="flex-1 border-dashed" highlighted={activeTab === "legal_entity"} />
-          <span className="text-xs text-gray-400 shrink-0 px-1">⋯ 聯盟 ⋯</span>
+          <span className="text-xs text-muted-foreground shrink-0 px-1">⋯ 聯盟 ⋯</span>
           <OrgNode title="產業" className="flex-1 border-dashed" highlighted={activeTab === "industry"} />
         </div>
         {/* Row 4: 合聘/培訓/應用 */}
