@@ -1,3 +1,4 @@
+import { JsonLd } from "@/components/json-ld";
 import { ResultDetail, type PublisherInfo } from "@/components/result-detail";
 import { createClient } from "@/lib/supabase/server";
 import type { Result } from "@/lib/supabase/types";
@@ -87,8 +88,23 @@ export default async function EventResultDetailPage({
     if (profile) publisherInfo = { name: profile.display_name || "未知使用者", href: `/profile/${result.author_id}` };
   }
 
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "CreativeWork",
+    name: result.title,
+    datePublished: result.date,
+    url: `https://ai.winlab.tw/events/${slug}/results/${id}`,
+    ...(publisherInfo ? { author: { "@type": "Person", name: publisherInfo.name } } : {}),
+    publisher: {
+      "@type": "Organization",
+      name: "國立陽明交通大學 人工智慧專責辦公室",
+      url: "https://ai.winlab.tw",
+    },
+  };
+
   return (
     <div className="max-w-6xl mx-auto px-4 py-12">
+      <JsonLd data={structuredData} />
       <div className="flex items-center justify-between mb-10">
         <Link
           href={`/events/${slug}?tab=results`}
