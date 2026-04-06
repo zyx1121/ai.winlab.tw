@@ -6,7 +6,7 @@ import { describe, test } from "node:test"
 import { getAutoLinkProps, pageSectionVariants, pageShellVariants } from "./patterns"
 
 const globalsCss = readFileSync(resolve(process.cwd(), "app/globals.css"), "utf8")
-const uiRulesMd = readFileSync(resolve(process.cwd(), "rules/ui.md"), "utf8")
+const uiRulesMd = readFileSync(resolve(process.cwd(), ".claude/rules/ui.md"), "utf8")
 const homeIntroduction = readFileSync(resolve(process.cwd(), "components/home-introduction.tsx"), "utf8")
 const recruitmentDialog = readFileSync(resolve(process.cwd(), "components/recruitment-dialog.tsx"), "utf8")
 const organizationMemberDialog = readFileSync(resolve(process.cwd(), "components/organization-member-dialog.tsx"), "utf8")

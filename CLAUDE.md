@@ -1,6 +1,4 @@
-# AGENTS.md
-
-This file is the single source of truth for coding agents working in this repository. Detailed rules live in `rules/`.
+# CLAUDE.md
 
 ## Project overview
 
@@ -21,19 +19,8 @@ This file is the single source of truth for coding agents working in this reposi
 - `NuqsAdapter` is wired in the root layout for URL search param state
 - Root layout loads pinned events for `<Header pinnedEvents={...} />`
 
-## Rules
-
-| File | Scope |
-|------|-------|
-| [`rules/auth.md`](rules/auth.md) | Auth、Supabase client 選擇、授權模型 |
-| [`rules/data.md`](rules/data.md) | 資料模型、DB conventions、storage |
-| [`rules/pages.md`](rules/pages.md) | 路由結構 |
-| [`rules/hooks.md`](rules/hooks.md) | 共用 hooks、編輯器 |
-| [`rules/ui.md`](rules/ui.md) | UI 規則、圓角、動態、間距、字型、圖片 |
-
 ## Maintenance
 
-- 更新 agent 指引時，編輯對應的 `rules/*.md`
 - Sibling MCP repo 在 `~/mcp.ai.winlab.tw`，變更 schema / RLS / admin workflow 後需同步檢查
 
 ## Delivery workflow
