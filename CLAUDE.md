@@ -71,14 +71,21 @@ Conventions:
 
 ## Hooks
 
+Hooks own state + logic，components 只負責 UI render。
+
 - `useAutoSave` — debounce save + navigation guard
 - `useContentEditor` — generic editor CRUD（state, save, publish, delete）with built-in useAutoSave
 - `useImageUpload` — single image upload with file ref + loading state
-- `useCrudList` — admin list page with fetch, create, delete
+- `useCrudList` — admin list with fetch, create, delete（支援 `initialItems` skip mount fetch）
 - `useDialogForm` — dialog-driven create/update/delete with form state
 - `useProfileEditor` — profile field save, links, external results CRUD
 - `useEventActions` — event detail: create content, toggle pins
+
+Conventions:
+- All hooks 用 `useRef(createClient())` 穩定 Supabase reference
+- Callback props（`uploadFn`, `onBeforeSave` 等）用 `useRef` 穩定（同 `useAutoSave` 的 `onSaveRef` 模式）
 - All CRUD operations must show `toast.error` on failure
+- Edit pages 接收 server-passed `initialData`（page.tsx fetch → client props），不做 client-side fetch
 
 ## Editor
 
@@ -98,6 +105,10 @@ Conventions:
 **Skeleton** — High-level UI components should own their matching skeleton components；Route-level loading files should compose layout with component-owned skeletons
 
 **Editor** — Desktop Tiptap editing should use contextual controls instead of a persistent full toolbar；`BubbleMenu`（inline）+ `FloatingMenu`（block，含 `/`-triggered insertion）；Mobile Tiptap editing should use a dedicated compact toolbar instead of desktop-style floating controls
+
+**Status** — 統一用 `Badge` component（`variant="default"` = 已發布，`variant="secondary"` = 草稿）
+
+**Empty state** — 統一用 `尚無{entity}` 格式，centered text with `text-muted-foreground`
 
 **Color** — 用 semantic tokens（`text-foreground`、`bg-background` 等），不硬編碼 `gray-*`
 
