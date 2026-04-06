@@ -5,12 +5,10 @@ import { TiptapEditor } from "@/components/tiptap-editor";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { createClient } from "@/lib/supabase/client";
 import type { Announcement } from "@/lib/supabase/types";
-import { useAutoSave } from "@/hooks/use-auto-save";
+import { useContentEditor } from "@/hooks/use-content-editor";
 import { ArrowLeft, Check, Loader2, Save, Send, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
 
 interface Props {
   id: string;
@@ -20,55 +18,18 @@ interface Props {
 
 export function EventAnnouncementEditClient({ id, slug, initialAnnouncement }: Props) {
   const router = useRouter();
-  const supabase = createClient();
 
-  const [announcement, setAnnouncement] = useState<Announcement>(initialAnnouncement);
-  const [savedAnnouncement, setSavedAnnouncement] = useState<Announcement>(initialAnnouncement);
-  const [isSaving, setIsSaving] = useState(false);
-  const [isPublishing, setIsPublishing] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
-
-  const hasChanges =
-    announcement.title !== savedAnnouncement.title ||
-    announcement.category !== savedAnnouncement.category ||
-    announcement.date !== savedAnnouncement.date ||
-    JSON.stringify(announcement.content) !== JSON.stringify(savedAnnouncement.content);
-
-  const handleSave = async () => {
-    setIsSaving(true);
-    const { error } = await supabase.from("announcements").update({
-      title: announcement.title,
-      category: announcement.category,
-      date: announcement.date,
-      content: announcement.content,
-    }).eq("id", id);
-    if (!error) setSavedAnnouncement({ ...announcement });
-    setIsSaving(false);
-  };
-
-  const { guardNavigation } = useAutoSave({ hasChanges, onSave: handleSave });
-
-  const handlePublish = async () => {
-    setIsPublishing(true);
-    const newStatus: "draft" | "published" = announcement.status === "published" ? "draft" : "published";
-    const { error } = await supabase.from("announcements").update({
-      title: announcement.title, category: announcement.category,
-      date: announcement.date, content: announcement.content, status: newStatus,
-    }).eq("id", id);
-    if (!error) {
-      const updated = { ...announcement, status: newStatus };
-      setAnnouncement(updated); setSavedAnnouncement(updated);
-    }
-    setIsPublishing(false);
-  };
-
-  const handleDelete = async () => {
-    if (!confirm("確定要刪除這則公告嗎？")) return;
-    setIsDeleting(true);
-    const { error } = await supabase.from("announcements").delete().eq("id", id);
-    if (error) { setIsDeleting(false); return; }
-    router.push(`/events/${slug}?tab=announcements`);
-  };
+  const {
+    data: announcement, setData: setAnnouncement, hasChanges,
+    isSaving, isPublishing, isDeleting,
+    save, publish, remove, guardNavigation,
+  } = useContentEditor({
+    table: "announcements",
+    id,
+    initialData: initialAnnouncement,
+    fields: ["title", "category", "date", "content"],
+    redirectTo: `/events/${slug}?tab=announcements`,
+  });
 
   return (
     <PageShell tone="editor">
@@ -79,15 +40,15 @@ export function EventAnnouncementEditClient({ id, slug, initialAnnouncement }: P
             返回活動
           </Button>
           <div className="flex gap-2">
-            <Button variant={hasChanges ? "outline" : "ghost"} onClick={handleSave} disabled={isSaving || !hasChanges}>
+            <Button variant={hasChanges ? "outline" : "ghost"} onClick={save} disabled={isSaving || !hasChanges}>
               {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : hasChanges ? <Save className="w-4 h-4" /> : <Check className="w-4 h-4 text-green-600" />}
               {hasChanges ? "儲存" : "已儲存"}
             </Button>
-            <Button variant={announcement.status === "published" ? "secondary" : "default"} onClick={handlePublish} disabled={isPublishing}>
+            <Button variant={announcement.status === "published" ? "secondary" : "default"} onClick={publish} disabled={isPublishing}>
               {isPublishing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
               {announcement.status === "published" ? "取消發布" : "發布"}
             </Button>
-            <Button variant="destructive" onClick={handleDelete} disabled={isDeleting}>
+            <Button variant="destructive" onClick={remove} disabled={isDeleting}>
               {isDeleting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
               刪除
             </Button>
@@ -98,18 +59,18 @@ export function EventAnnouncementEditClient({ id, slug, initialAnnouncement }: P
           <div className="flex flex-col gap-1">
             <Label htmlFor="date" className="text-sm mx-2">公告日期</Label>
             <Input id="date" type="date" value={announcement.date}
-              onChange={(e) => setAnnouncement({ ...announcement, date: e.target.value })} />
+              onChange={(e) => setAnnouncement((prev) => ({ ...prev, date: e.target.value }))} />
           </div>
           <div className="flex flex-col gap-1">
             <Label htmlFor="category" className="text-sm mx-2">類別</Label>
             <Input id="category" value={announcement.category}
-              onChange={(e) => setAnnouncement({ ...announcement, category: e.target.value })}
+              onChange={(e) => setAnnouncement((prev) => ({ ...prev, category: e.target.value }))}
               placeholder="請輸入類別" />
           </div>
           <div className="flex flex-col gap-1">
             <Label htmlFor="title" className="text-sm mx-2">標題</Label>
             <Input id="title" value={announcement.title}
-              onChange={(e) => setAnnouncement({ ...announcement, title: e.target.value })}
+              onChange={(e) => setAnnouncement((prev) => ({ ...prev, title: e.target.value }))}
               placeholder="請輸入公告標題" />
           </div>
         </div>
@@ -117,7 +78,7 @@ export function EventAnnouncementEditClient({ id, slug, initialAnnouncement }: P
 
       <TiptapEditor
         content={announcement.content}
-        onChange={(content) => setAnnouncement({ ...announcement, content })}
+        onChange={(content) => setAnnouncement((prev) => ({ ...prev, content }))}
       />
     </PageShell>
   );
