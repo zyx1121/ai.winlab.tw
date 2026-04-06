@@ -8,65 +8,32 @@ import { createClient } from "@/lib/supabase/client";
 import type { Contact } from "@/lib/supabase/types";
 import { useAutoSave } from "@/hooks/use-auto-save";
 import { ArrowLeft, Check, Loader2, Save, Trash2 } from "lucide-react";
-import { useParams, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { toast } from "sonner";
 
-export default function ContactEditPage() {
+interface Props {
+  id: string;
+  initialContact: Contact;
+}
+
+export function ContactEditClient({ id, initialContact }: Props) {
   const router = useRouter();
-  const params = useParams();
-  const id = params.id as string;
   const supabase = createClient();
 
-  const [contact, setContact] = useState<Contact | null>(null);
-  const [savedContact, setSavedContact] = useState<Contact | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [contact, setContact] = useState<Contact>(initialContact);
+  const [savedContact, setSavedContact] = useState<Contact>(initialContact);
   const [isSaving, setIsSaving] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
   const hasChanges =
-    contact && savedContact
-      ? contact.name !== savedContact.name ||
-        (contact.position ?? "") !== (savedContact.position ?? "") ||
-        (contact.phone ?? "") !== (savedContact.phone ?? "") ||
-        (contact.email ?? "") !== (savedContact.email ?? "") ||
-        contact.sort_order !== savedContact.sort_order
-      : false;
-
-  useEffect(() => {
-    let cancelled = false;
-
-    async function loadContact() {
-      const { data, error } = await supabase
-        .from("contacts")
-        .select("*")
-        .eq("id", id)
-        .single();
-
-      if (error) {
-        console.error("Error fetching contact:", error);
-        toast.error("讀取聯絡人失敗，已返回列表");
-        router.push("/contacts");
-        return;
-      }
-
-      if (cancelled) return;
-
-      setContact(data as Contact);
-      setSavedContact(data as Contact);
-      setIsLoading(false);
-    }
-
-    void loadContact();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [id, router, supabase]);
+    contact.name !== savedContact.name ||
+    (contact.position ?? "") !== (savedContact.position ?? "") ||
+    (contact.phone ?? "") !== (savedContact.phone ?? "") ||
+    (contact.email ?? "") !== (savedContact.email ?? "") ||
+    contact.sort_order !== savedContact.sort_order;
 
   const handleSave = async () => {
-    if (!contact) return;
-
     setIsSaving(true);
     const { error } = await supabase
       .from("contacts")
@@ -103,16 +70,6 @@ export default function ContactEditPage() {
     }
     router.push("/contacts");
   };
-
-  if (isLoading) {
-    return (
-      <PageShell tone="centeredState">
-        <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
-      </PageShell>
-    );
-  }
-
-  if (!contact) return null;
 
   return (
     <PageShell tone="admin">
