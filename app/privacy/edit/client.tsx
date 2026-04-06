@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { createClient } from "@/lib/supabase/client";
 import { formatDate } from "@/lib/date";
 import { ArrowLeft, Check, Loader2, RotateCcw, Save } from "lucide-react";
+import { toast } from "sonner";
 import Link from "next/link";
 import { useState } from "react";
 
@@ -49,20 +50,23 @@ export default function PrivacyEditPage({
       note: note.trim() || null,
       created_by: initialUserId,
     });
-    if (!error) {
-      setSavedContent({ ...content });
-      setNote("");
-      const { data } = await supabase
-        .from("privacy_policy")
-        .select("id, version, content, note, created_at, profiles!created_by(display_name)")
-        .order("version", { ascending: false });
-      if (data && data.length > 0) {
-        const typed = data as unknown as VersionRecord[];
-        setContent(typed[0].content);
-        setSavedContent(typed[0].content);
-        setLatestVersion(typed[0].version);
-        setVersions(typed);
-      }
+    if (error) {
+      toast.error("儲存失敗");
+      setIsSaving(false);
+      return;
+    }
+    setSavedContent({ ...content });
+    setNote("");
+    const { data } = await supabase
+      .from("privacy_policy")
+      .select("id, version, content, note, created_at, profiles!created_by(display_name)")
+      .order("version", { ascending: false });
+    if (data && data.length > 0) {
+      const typed = data as unknown as VersionRecord[];
+      setContent(typed[0].content);
+      setSavedContent(typed[0].content);
+      setLatestVersion(typed[0].version);
+      setVersions(typed);
     }
     setIsSaving(false);
   };

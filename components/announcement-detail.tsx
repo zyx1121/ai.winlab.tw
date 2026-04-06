@@ -2,6 +2,7 @@
  * Shared layout for announcement content across read and edit surfaces.
  */
 
+import { formatDate } from "@/lib/date";
 import { richTextDocumentClassName } from "@/lib/ui/rich-text";
 
 type Props = {
@@ -21,7 +22,7 @@ export function AnnouncementDetail({ title, date, category, contentHtml }: Props
         <div
           className="flex items-center gap-2 text-base text-muted-foreground flex-wrap"
         >
-          <span>{date}</span>
+          <span>{formatDate(date)}</span>
           <span className="opacity-30" aria-hidden>
             ·
           </span>

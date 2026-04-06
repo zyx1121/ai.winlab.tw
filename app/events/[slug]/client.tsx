@@ -7,6 +7,7 @@ import { PageShell } from "@/components/page-shell";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useEventActions } from "@/hooks/use-event-actions";
+import { formatDate } from "@/lib/date";
 import type { Announcement, Event, Recruitment } from "@/lib/supabase/types";
 import { ArrowLeft, Loader2, Pencil, Plus } from "lucide-react";
 import Link from "next/link";
@@ -135,7 +136,7 @@ export function EventDetailClient({
                           href={isAdmin ? `/events/${slug}/announcements/${item.id}/edit` : `/events/${slug}/announcements/${item.id}`}
                           className="flex items-center w-full h-full"
                         >
-                          <span className="pl-5 pr-4 py-3 w-32 text-base shrink-0">{item.date}</span>
+                          <span className="pl-5 pr-4 py-3 w-32 text-base shrink-0">{formatDate(item.date)}</span>
                           <span className="px-4 py-3 w-28 text-base shrink-0">{item.category}</span>
                           <span className="px-4 py-3 text-base flex-1">{item.title || "(無標題)"}</span>
                           {isAdmin && (

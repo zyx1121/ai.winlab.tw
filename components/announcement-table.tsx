@@ -11,6 +11,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { formatDate } from "@/lib/date";
 import type { Announcement } from "@/lib/supabase/types";
 
 export function AnnouncementTable({
@@ -48,7 +49,7 @@ export function AnnouncementTable({
                   href={getHref(item)}
                   className="flex min-h-12 w-full items-center px-4 py-3"
                 >
-                  {item.date}
+                  {formatDate(item.date)}
                 </AppLink>
               </TableCell>
               <TableCell className="p-0 text-base">
