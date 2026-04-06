@@ -5,117 +5,33 @@ import { TiptapEditor } from "@/components/tiptap-editor";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { createClient } from "@/lib/supabase/client";
+import { useContentEditor } from "@/hooks/use-content-editor";
 import type { Introduction } from "@/lib/supabase/types";
-import { useAutoSave } from "@/hooks/use-auto-save";
 import { ArrowLeft, Check, Loader2, Save } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import { toast } from "sonner";
 
-export default function IntroductionEditPage() {
+interface Props {
+  initialIntroduction: Introduction;
+}
+
+export function IntroductionEditClient({ initialIntroduction }: Props) {
   const router = useRouter();
-  const supabase = createClient();
 
-  const [introduction, setIntroduction] = useState<Introduction | null>(null);
-  const [savedIntroduction, setSavedIntroduction] = useState<Introduction | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isSaving, setIsSaving] = useState(false);
-
-  const hasChanges = introduction && savedIntroduction
-    ? introduction.title !== savedIntroduction.title ||
-    JSON.stringify(introduction.content) !== JSON.stringify(savedIntroduction.content)
-    : false;
-
-  useEffect(() => {
-    let cancelled = false;
-
-    async function loadIntroduction() {
-      const { data, error } = await supabase
-        .from("introduction")
-        .select("*")
-        .single();
-
-      if (error) {
-        console.error("Error fetching introduction:", error);
-        if (error.code === "PGRST116") {
-          const { data: newData, error: insertError } = await supabase
-            .from("introduction")
-            .insert({
-              title: "國立陽明交通大學 人工智慧專責辦公室",
-              content: {},
-            })
-            .select()
-            .single();
-
-          if (insertError) {
-            console.error("Error creating introduction:", insertError);
-            toast.error("建立簡介內容失敗，已返回頁面");
-            router.push("/introduction");
-            return;
-          }
-
-          if (cancelled) return;
-
-          setIntroduction(newData);
-          setSavedIntroduction(newData);
-          setIsLoading(false);
-          return;
-        }
-
-        toast.error("讀取簡介內容失敗，已返回頁面");
-        router.push("/introduction");
-        return;
-      }
-
-      if (cancelled) return;
-
-      setIntroduction(data);
-      setSavedIntroduction(data);
-      setIsLoading(false);
-    }
-
-    void loadIntroduction();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [router, supabase]);
-
-  const handleSave = async () => {
-    if (!introduction) return;
-
-    setIsSaving(true);
-    const { error } = await supabase
-      .from("introduction")
-      .update({
-        title: introduction.title,
-        content: introduction.content,
-      })
-      .eq("id", introduction.id);
-
-    if (error) {
-      console.error("Error saving introduction:", error);
-      toast.error("儲存簡介失敗，請稍後再試");
-    } else {
-      setSavedIntroduction({ ...introduction });
-    }
-    setIsSaving(false);
-  };
-
-  const { guardNavigation } = useAutoSave({ hasChanges, onSave: handleSave });
-
-  if (isLoading) {
-    return (
-      <PageShell tone="centeredState">
-        <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
-      </PageShell>
-    );
-  }
-
-  if (!introduction) {
-    return null;
-  }
+  const {
+    data: introduction,
+    setData: setIntroduction,
+    hasChanges,
+    isSaving,
+    save,
+    guardNavigation,
+  } = useContentEditor({
+    table: "introduction",
+    id: initialIntroduction.id,
+    initialData: initialIntroduction,
+    fields: ["title", "content"],
+    redirectTo: "/introduction",
+    publishable: false,
+  });
 
   return (
     <PageShell tone="editor">
@@ -128,7 +44,7 @@ export default function IntroductionEditPage() {
           <div className="flex gap-2">
             <Button
               variant={hasChanges ? "outline" : "ghost"}
-              onClick={handleSave}
+              onClick={save}
               disabled={isSaving || !hasChanges}
             >
             {isSaving ? (

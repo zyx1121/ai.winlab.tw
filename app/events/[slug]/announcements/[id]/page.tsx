@@ -1,4 +1,5 @@
 import { AnnouncementDetail } from "@/components/announcement-detail";
+import { JsonLd } from "@/components/json-ld";
 import { createClient } from "@/lib/supabase/server";
 import { renderRichTextHtml } from "@/lib/ui/rich-text";
 import { ArrowLeft } from "lucide-react";
@@ -58,8 +59,24 @@ export default async function EventAnnouncementDetailPage({
 
   const contentHtml = renderRichTextHtml(announcement.content) ?? "<p>（無內容）</p>";
 
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "NewsArticle",
+    headline: announcement.title,
+    datePublished: announcement.date,
+    dateModified: announcement.updated_at,
+    articleSection: announcement.category,
+    url: `https://ai.winlab.tw/events/${slug}/announcements/${id}`,
+    publisher: {
+      "@type": "Organization",
+      name: "國立陽明交通大學 人工智慧專責辦公室",
+      url: "https://ai.winlab.tw",
+    },
+  };
+
   return (
     <div className="max-w-6xl mx-auto px-4 py-12">
+      <JsonLd data={structuredData} />
       <Link
         href={`/events/${slug}?tab=announcements`}
         className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-10"

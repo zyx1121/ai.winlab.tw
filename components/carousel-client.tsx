@@ -69,6 +69,8 @@ export function CarouselClient({
         className="w-full relative group"
         onMouseEnter={plugin.current.stop}
         onMouseLeave={plugin.current.reset}
+        onFocus={plugin.current.stop}
+        onBlur={plugin.current.reset}
         opts={{ loop: true }}
       >
         <CarouselContent className="ml-0">
@@ -112,13 +114,13 @@ export function CarouselClient({
         </CarouselContent>
         <CarouselPrevious
           variant="ghost"
-          className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 h-10 w-10 md:h-12 md:w-12 rounded-full bg-black/30 hover:bg-black/50 text-white border-none opacity-0 group-hover:opacity-100 interactive-opacity"
+          className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 h-10 w-10 md:h-12 md:w-12 rounded-full bg-black/30 hover:bg-black/50 text-white border-none opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 interactive-opacity"
         >
           <ChevronLeft className="h-6 w-6 md:h-8 md:w-8" />
         </CarouselPrevious>
         <CarouselNext
           variant="ghost"
-          className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 h-10 w-10 md:h-12 md:w-12 rounded-full bg-black/30 hover:bg-black/50 text-white border-none opacity-0 group-hover:opacity-100 interactive-opacity"
+          className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 h-10 w-10 md:h-12 md:w-12 rounded-full bg-black/30 hover:bg-black/50 text-white border-none opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 interactive-opacity"
         >
           <ChevronRight className="h-6 w-6 md:h-8 md:w-8" />
         </CarouselNext>

@@ -5,19 +5,17 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { createClient } from "@/lib/supabase/client";
+import { useContentEditor } from "@/hooks/use-content-editor";
+import { useImageUpload } from "@/hooks/use-image-upload";
 import type {
   OrganizationMember,
   OrganizationMemberCategory,
 } from "@/lib/supabase/types";
 import { uploadOrganizationImage } from "@/lib/upload-image";
 import { isExternalImage, resolveImageSrc } from "@/lib/utils";
-import { toast } from "sonner";
-import { useAutoSave } from "@/hooks/use-auto-save";
-import { ArrowLeft, ImagePlus, Loader2, Save, Trash2 } from "lucide-react";
+import { ArrowLeft, Check, ImagePlus, Loader2, Save, Trash2 } from "lucide-react";
 import Image from "next/image";
-import { useParams, useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 
 const CATEGORIES: { value: OrganizationMemberCategory; label: string }[] = [
   { value: "core", label: "核心成員" },
@@ -25,144 +23,38 @@ const CATEGORIES: { value: OrganizationMemberCategory; label: string }[] = [
   { value: "industry", label: "產業" },
 ];
 
-export default function OrganizationMemberEditPage() {
+export function OrganizationMemberEditClient({
+  id,
+  initialMember,
+}: {
+  id: string;
+  initialMember: OrganizationMember;
+}) {
   const router = useRouter();
-  const params = useParams();
-  const id = params.id as string;
-  const supabase = createClient();
 
-  const [member, setMember] = useState<OrganizationMember | null>(null);
-  const [savedMember, setSavedMember] = useState<OrganizationMember | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isSaving, setIsSaving] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
-  const [isUploadingImage, setIsUploadingImage] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const {
+    data: member, setData: setMember, hasChanges,
+    isSaving, isDeleting,
+    save, remove, guardNavigation,
+  } = useContentEditor({
+    table: "organization_members",
+    id,
+    initialData: initialMember,
+    fields: ["name", "summary", "image", "link", "category", "sort_order", "school", "research_areas", "email", "website", "member_role"],
+    redirectTo: "/organization",
+    publishable: false,
+  });
 
-  const hasChanges =
-    member && savedMember
-      ? member.name !== savedMember.name ||
-        (member.summary ?? "") !== (savedMember.summary ?? "") ||
-        (member.image ?? "") !== (savedMember.image ?? "") ||
-        (member.link ?? "") !== (savedMember.link ?? "") ||
-        member.category !== savedMember.category ||
-        member.sort_order !== savedMember.sort_order ||
-        (member.school ?? "") !== (savedMember.school ?? "") ||
-        (member.research_areas ?? "") !== (savedMember.research_areas ?? "") ||
-        (member.email ?? "") !== (savedMember.email ?? "") ||
-        (member.website ?? "") !== (savedMember.website ?? "") ||
-        (member.member_role ?? "") !== (savedMember.member_role ?? "")
-      : false;
+  const { isUploading: isUploadingImage, fileInputRef, triggerFileInput, handleFileChange } = useImageUpload(uploadOrganizationImage);
 
-  useEffect(() => {
-    let cancelled = false;
-
-    async function loadMember() {
-      const { data, error } = await supabase
-        .from("organization_members")
-        .select("*")
-        .eq("id", id)
-        .single();
-
-      if (error) {
-        console.error("Error fetching organization member:", error);
-        toast.error("讀取成員資料失敗，已返回列表");
-        router.push("/organization");
-        return;
-      }
-
-      if (cancelled) return;
-
-      setMember(data as OrganizationMember);
-      setSavedMember(data as OrganizationMember);
-      setIsLoading(false);
-    }
-
-    void loadMember();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [id, router, supabase]);
-
-  const handleSave = async () => {
-    if (!member) return;
-
-    setIsSaving(true);
-    const { error } = await supabase
-      .from("organization_members")
-      .update({
-        name: member.name,
-        summary: member.summary || null,
-        image: member.image || null,
-        link: member.link || null,
-        category: member.category,
-        sort_order: member.sort_order,
-        school: member.school || null,
-        research_areas: member.research_areas || null,
-        email: member.email || null,
-        website: member.website || null,
-        member_role: member.member_role || null,
-      })
-      .eq("id", id);
-
-    if (error) {
-      console.error("Error saving organization member:", error);
-      toast.error("儲存失敗，請稍後再試");
-    } else {
-      setSavedMember({ ...member });
-    }
-    setIsSaving(false);
+  const onImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const url = await handleFileChange(e);
+    if (url) setMember((prev) => ({ ...prev, image: url }));
   };
-
-  const { guardNavigation } = useAutoSave({ hasChanges, onSave: handleSave });
-
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file || !member) return;
-
-    setIsUploadingImage(true);
-    const result = await uploadOrganizationImage(file);
-    e.target.value = "";
-
-    if ("error" in result) {
-      toast.error(result.error);
-    } else {
-      setMember({ ...member, image: result.url });
-    }
-    setIsUploadingImage(false);
-  };
-
-  const handleDelete = async () => {
-    if (!confirm("確定要刪除此成員嗎？")) return;
-
-    setIsDeleting(true);
-    const { error } = await supabase
-      .from("organization_members")
-      .delete()
-      .eq("id", id);
-
-    if (error) {
-      console.error("Error deleting organization member:", error);
-      toast.error("刪除成員失敗，請稍後再試");
-      setIsDeleting(false);
-      return;
-    }
-
-    router.push("/organization");
-  };
-
-  if (isLoading || !member) {
-    return (
-      <PageShell tone="centeredState" className="py-0">
-        <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
-      </PageShell>
-    );
-  }
 
   return (
     <PageShell tone="admin">
-      <div className="flex items-center justify-between gap-4">
+      <div className="sticky top-16 z-20 bg-background/80 backdrop-blur-sm py-4 -mx-4 px-4 flex items-center justify-between gap-4">
         <Button
           variant="ghost"
           size="sm"
@@ -171,6 +63,32 @@ export default function OrganizationMemberEditPage() {
           <ArrowLeft className="w-4 h-4" />
           返回
         </Button>
+
+        <div className="flex gap-2">
+          <Button
+            variant={hasChanges ? "outline" : "ghost"}
+            onClick={save}
+            disabled={isSaving || !hasChanges}
+          >
+            {isSaving ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : hasChanges ? (
+              <Save className="w-4 h-4" />
+            ) : (
+              <Check className="w-4 h-4 text-green-600" />
+            )}
+            {hasChanges ? "儲存" : "已儲存"}
+          </Button>
+
+          <Button variant="destructive" onClick={remove} disabled={isDeleting}>
+            {isDeleting ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <Trash2 className="w-4 h-4" />
+            )}
+            刪除
+          </Button>
+        </div>
       </div>
 
       <div className="flex flex-col gap-6">
@@ -180,10 +98,10 @@ export default function OrganizationMemberEditPage() {
             className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-xs md:text-sm"
             value={member.category}
             onChange={(e) =>
-              setMember({
-                ...member,
+              setMember((prev) => ({
+                ...prev,
                 category: e.target.value as OrganizationMemberCategory,
-              })
+              }))
             }
           >
             {CATEGORIES.map(({ value, label }) => (
@@ -198,7 +116,7 @@ export default function OrganizationMemberEditPage() {
           <Label>名稱</Label>
           <Input
             value={member.name}
-            onChange={(e) => setMember({ ...member, name: e.target.value })}
+            onChange={(e) => setMember((prev) => ({ ...prev, name: e.target.value }))}
             placeholder="成員名稱"
           />
         </div>
@@ -209,7 +127,7 @@ export default function OrganizationMemberEditPage() {
             className="min-h-[120px] resize-y"
             value={member.summary ?? ""}
             onChange={(e) =>
-              setMember({ ...member, summary: e.target.value || null })
+              setMember((prev) => ({ ...prev, summary: e.target.value || null }))
             }
             placeholder="簡短介紹"
           />
@@ -232,12 +150,12 @@ export default function OrganizationMemberEditPage() {
               type="file"
               accept="image/*"
               className="hidden"
-              onChange={handleImageUpload}
+              onChange={onImageChange}
             />
             <Button
               variant="secondary"
               size="sm"
-              onClick={() => fileInputRef.current?.click()}
+              onClick={triggerFileInput}
               disabled={isUploadingImage}
             >
               {isUploadingImage ? (
@@ -256,7 +174,7 @@ export default function OrganizationMemberEditPage() {
             type="url"
             value={member.link ?? ""}
             onChange={(e) =>
-              setMember({ ...member, link: e.target.value || null })
+              setMember((prev) => ({ ...prev, link: e.target.value || null }))
             }
             placeholder="https://..."
           />
@@ -268,10 +186,10 @@ export default function OrganizationMemberEditPage() {
             type="number"
             value={member.sort_order}
             onChange={(e) =>
-              setMember({
-                ...member,
+              setMember((prev) => ({
+                ...prev,
                 sort_order: parseInt(e.target.value, 10) || 0,
-              })
+              }))
             }
           />
         </div>
@@ -280,7 +198,7 @@ export default function OrganizationMemberEditPage() {
           <Label>職稱（選填）</Label>
           <Input
             value={member.member_role ?? ""}
-            onChange={(e) => setMember({ ...member, member_role: e.target.value || null })}
+            onChange={(e) => setMember((prev) => ({ ...prev, member_role: e.target.value || null }))}
             placeholder="例：主任、副主任、合聘專家"
           />
         </div>
@@ -289,7 +207,7 @@ export default function OrganizationMemberEditPage() {
           <Label>最高學歷（選填）</Label>
           <Input
             value={member.school ?? ""}
-            onChange={(e) => setMember({ ...member, school: e.target.value || null })}
+            onChange={(e) => setMember((prev) => ({ ...prev, school: e.target.value || null }))}
             placeholder="例：國立台灣大學（電機博士）"
           />
         </div>
@@ -299,7 +217,7 @@ export default function OrganizationMemberEditPage() {
           <Textarea
             className="min-h-[80px] resize-y"
             value={member.research_areas ?? ""}
-            onChange={(e) => setMember({ ...member, research_areas: e.target.value || null })}
+            onChange={(e) => setMember((prev) => ({ ...prev, research_areas: e.target.value || null }))}
             placeholder="研究領域（以頓號或換行分隔）"
           />
         </div>
@@ -309,7 +227,7 @@ export default function OrganizationMemberEditPage() {
           <Input
             type="email"
             value={member.email ?? ""}
-            onChange={(e) => setMember({ ...member, email: e.target.value || null })}
+            onChange={(e) => setMember((prev) => ({ ...prev, email: e.target.value || null }))}
             placeholder="professor@university.edu.tw"
           />
         </div>
@@ -319,33 +237,11 @@ export default function OrganizationMemberEditPage() {
           <Input
             type="url"
             value={member.website ?? ""}
-            onChange={(e) => setMember({ ...member, website: e.target.value || null })}
+            onChange={(e) => setMember((prev) => ({ ...prev, website: e.target.value || null }))}
             placeholder="https://..."
           />
         </div>
 
-        <div className="flex flex-wrap gap-4">
-          <Button onClick={handleSave} disabled={!hasChanges || isSaving}>
-            {isSaving ? (
-              <Loader2 className="w-4 h-4 animate-spin" />
-            ) : (
-              <Save className="w-4 h-4" />
-            )}
-            儲存
-          </Button>
-          <Button
-            variant="destructive"
-            onClick={handleDelete}
-            disabled={isDeleting}
-          >
-            {isDeleting ? (
-              <Loader2 className="w-4 h-4 animate-spin" />
-            ) : (
-              <Trash2 className="w-4 h-4" />
-            )}
-            刪除
-          </Button>
-        </div>
       </div>
     </PageShell>
   );

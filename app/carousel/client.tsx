@@ -3,21 +3,14 @@
 import { AppLink } from "@/components/app-link";
 import { PageShell } from "@/components/page-shell";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { createClient } from "@/lib/supabase/client";
+import { Card } from "@/components/ui/card";
+import { useCrudList } from "@/hooks/use-crud-list";
 import type { CarouselSlide } from "@/lib/supabase/types";
 import { isExternalImage, resolveImageSrc } from "@/lib/utils";
 import { ArrowLeft, Loader2, Pencil, Plus, Trash2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
 
 export function CarouselPageClient({
   initialSlides,
@@ -25,48 +18,12 @@ export function CarouselPageClient({
   initialSlides: CarouselSlide[];
 }) {
   const router = useRouter();
-  const supabase = createClient();
-  const [slides, setSlides] = useState<CarouselSlide[]>(initialSlides);
-  const [isCreating, setIsCreating] = useState(false);
-  const [deletingId, setDeletingId] = useState<string | null>(null);
-
-  const handleCreate = async () => {
-    setIsCreating(true);
-    const { data, error } = await supabase
-      .from("carousel_slides")
-      .insert({
-        title: "新橫幅",
-        description: null,
-        link: null,
-        image: null,
-        sort_order: slides.length,
-      })
-      .select()
-      .single();
-    if (error) {
-      console.error("Error creating slide:", error);
-      setIsCreating(false);
-      return;
-    }
-    router.push(`/carousel/${data.id}/edit`);
-  };
-
-  const handleDelete = async (id: string) => {
-    if (!confirm("確定要刪除此橫幅嗎？")) return;
-    setDeletingId(id);
-    const { error } = await supabase.from("carousel_slides").delete().eq("id", id);
-    if (error) {
-      console.error("Error deleting slide:", error);
-    } else {
-      const { data } = await supabase
-        .from("carousel_slides")
-        .select("*")
-        .order("sort_order", { ascending: true })
-        .order("created_at", { ascending: true });
-      setSlides((data as CarouselSlide[]) || []);
-    }
-    setDeletingId(null);
-  };
+  const { items: slides, isCreating, deletingId, create, remove } = useCrudList<CarouselSlide>({
+    table: "carousel_slides",
+    orderBy: "sort_order",
+    initialItems: initialSlides,
+    onCreated: (item) => router.push(`/carousel/${item.id}/edit`),
+  });
 
   return (
     <PageShell>
@@ -85,25 +42,14 @@ export function CarouselPageClient({
           <h1 className="text-3xl font-bold">首頁橫幅</h1>
           <p className="text-muted-foreground mt-1">管理首頁輪播圖片，可設定標題、描述與連結</p>
         </div>
-        <Button onClick={handleCreate} disabled={isCreating}>
+        <Button onClick={() => create({ title: "", sort_order: slides.length })} disabled={isCreating}>
           {isCreating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
           新增橫幅
         </Button>
       </div>
 
       {slides.length === 0 ? (
-        <Card>
-          <CardHeader>
-            <CardTitle>尚無橫幅</CardTitle>
-            <CardDescription>新增橫幅後將顯示於首頁輪播</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Button onClick={handleCreate} disabled={isCreating}>
-              {isCreating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
-              新增第一則橫幅
-            </Button>
-          </CardContent>
-        </Card>
+        <div className="text-center py-12 text-muted-foreground">尚無橫幅</div>
       ) : (
         <div className="flex flex-col gap-4">
           {slides.map((slide, index) => (
@@ -138,7 +84,7 @@ export function CarouselPageClient({
                   <Button
                     variant="destructive"
                     size="sm"
-                    onClick={() => handleDelete(slide.id)}
+                    onClick={() => remove(slide.id)}
                     disabled={deletingId === slide.id}
                   >
                     {deletingId === slide.id ? (

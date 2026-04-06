@@ -69,11 +69,21 @@ Conventions:
 
 **Admin** `/settings`、`/settings/users`
 
-## Hooks & editor
+## Hooks
 
-- `useAutoSave`（`hooks/use-auto-save.ts`）— 所有編輯頁使用，debounce 3s，`guardNavigation`
-- `nuqs` — URL params（`NuqsAdapter` in root layout）
+- `useAutoSave` — debounce save + navigation guard
+- `useContentEditor` — generic editor CRUD（state, save, publish, delete）with built-in useAutoSave
+- `useImageUpload` — single image upload with file ref + loading state
+- `useCrudList` — admin list page with fetch, create, delete
+- `useDialogForm` — dialog-driven create/update/delete with form state
+- `useProfileEditor` — profile field save, links, external results CRUD
+- `useEventActions` — event detail: create content, toggle pins
+- All CRUD operations must show `toast.error` on failure
+
+## Editor
+
 - `TiptapEditor`（`components/tiptap-editor.tsx`）— 圖片上傳用 `uploadAnnouncementImage`
+- `nuqs` — URL params（`NuqsAdapter` in root layout）
 
 ## UI rules
 

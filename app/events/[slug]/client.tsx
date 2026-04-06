@@ -4,12 +4,13 @@ import { RecruitmentCard } from "@/components/recruitment-card";
 import { RecruitmentDialog } from "@/components/recruitment-dialog";
 import { ResultCard, type ResultWithMeta } from "@/components/result-card";
 import { PageShell } from "@/components/page-shell";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { createClient } from "@/lib/supabase/client";
+import { useEventActions } from "@/hooks/use-event-actions";
+import { formatDate } from "@/lib/date";
 import type { Announcement, Event, Recruitment } from "@/lib/supabase/types";
 import { ArrowLeft, Loader2, Pencil, Plus } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { parseAsStringLiteral, useQueryState } from "nuqs";
 import { useState } from "react";
 
@@ -42,47 +43,8 @@ export function EventDetailClient({
   results: ResultWithMeta[];
   recruitments: Recruitment[];
 }) {
-  const router = useRouter();
   const [tab, setTab] = useQueryState("tab", tabParser);
-  const [isCreating, setIsCreating] = useState(false);
-
-  const handleCreateAnnouncement = async () => {
-    if (!userId) return;
-    setIsCreating(true);
-    const supabase = createClient();
-    const { data, error } = await supabase.from("announcements").insert({
-      title: "新公告", category: "一般", content: {}, status: "draft",
-      author_id: userId, event_id: event.id,
-    }).select().single();
-    if (error) { setIsCreating(false); return; }
-    router.push(`/events/${slug}/announcements/${data.id}/edit`);
-  };
-
-  const handleCreateResult = async () => {
-    if (!userId) return;
-    setIsCreating(true);
-    const supabase = createClient();
-    const { data, error } = await supabase.from("results").insert({
-      title: "新成果", date: new Date().toISOString().slice(0, 10),
-      header_image: null, summary: "", content: {},
-      status: "draft", author_id: userId, type: "personal", team_id: null,
-      event_id: event.id,
-    }).select().single();
-    if (error) { setIsCreating(false); return; }
-    router.push(`/events/${slug}/results/${data.id}/edit`);
-  };
-
-  const handlePinToggle = async (id: string, pinned: boolean) => {
-    const supabase = createClient();
-    const { error } = await supabase.from("results").update({ pinned }).eq("id", id);
-    if (!error) router.refresh();
-  };
-
-  const handleRecruitmentPinToggle = async (id: string, pinned: boolean) => {
-    const supabase = createClient();
-    const { error } = await supabase.from("competitions").update({ pinned }).eq("id", id);
-    if (!error) router.refresh();
-  };
+  const { isCreating, createAnnouncement, createResult, togglePin } = useEventActions(event.id, slug, userId);
 
   const [sheetOpen, setSheetOpen] = useState(false);
   const [editingRecruitment, setEditingRecruitment] = useState<Recruitment | null>(null);
@@ -143,14 +105,14 @@ export function EventDetailClient({
         <div className="flex flex-col gap-6">
           {isAdmin && (
             <div className="flex justify-end">
-              <Button variant="secondary" onClick={handleCreateAnnouncement} disabled={isCreating}>
+              <Button variant="secondary" onClick={createAnnouncement} disabled={isCreating}>
                 {isCreating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
                 新增公告
               </Button>
             </div>
           )}
           {announcements.length === 0 ? (
-            <div className="text-center py-12 text-muted-foreground">目前沒有公告</div>
+            <div className="text-center py-12 text-muted-foreground">尚無公告</div>
           ) : (
             <div className="rounded-xl border border-border overflow-hidden">
               <table className="w-full">
@@ -170,12 +132,14 @@ export function EventDetailClient({
                           href={isAdmin ? `/events/${slug}/announcements/${item.id}/edit` : `/events/${slug}/announcements/${item.id}`}
                           className="flex items-center w-full h-full"
                         >
-                          <span className="pl-5 pr-4 py-3 w-32 text-base shrink-0">{item.date}</span>
+                          <span className="pl-5 pr-4 py-3 w-32 text-base shrink-0">{formatDate(item.date)}</span>
                           <span className="px-4 py-3 w-28 text-base shrink-0">{item.category}</span>
                           <span className="px-4 py-3 text-base flex-1">{item.title || "(無標題)"}</span>
                           {isAdmin && (
-                            <span className={`px-4 py-3 w-20 text-base shrink-0 ${item.status === "published" ? "text-green-600" : "text-yellow-600"}`}>
-                              {item.status === "published" ? "已發布" : "草稿"}
+                            <span className="px-4 py-3 w-20 text-base shrink-0">
+                              <Badge variant={item.status === "published" ? "default" : "secondary"}>
+                                {item.status === "published" ? "已發布" : "草稿"}
+                              </Badge>
                             </span>
                           )}
                         </Link>
@@ -193,14 +157,14 @@ export function EventDetailClient({
         <div className="flex flex-col gap-6">
           {userId && (
             <div className="flex justify-end">
-              <Button variant="secondary" onClick={handleCreateResult} disabled={isCreating}>
+              <Button variant="secondary" onClick={createResult} disabled={isCreating}>
                 {isCreating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
                 新增個人成果
               </Button>
             </div>
           )}
           {results.length === 0 ? (
-            <div className="text-center py-12 text-muted-foreground">目前沒有成果</div>
+            <div className="text-center py-12 text-muted-foreground">尚無成果</div>
           ) : (
             <div className="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-6">
               {results.map((item) => {
@@ -214,7 +178,7 @@ export function EventDetailClient({
                     publisherHref={item.type === "personal" && item.author_id ? `/profile/${item.author_id}` : null}
                     showStatus={showStatus}
                     isAdmin={isAdmin}
-                    onPinToggle={isAdmin ? handlePinToggle : undefined}
+                    onPinToggle={isAdmin ? (id, pinned) => togglePin("results", id, pinned) : undefined}
                   />
                 );
               })}
@@ -234,7 +198,7 @@ export function EventDetailClient({
             </div>
           )}
           {recruitments.length === 0 ? (
-            <div className="text-center py-12 text-muted-foreground">目前沒有徵才資訊</div>
+            <div className="text-center py-12 text-muted-foreground">尚無徵才資訊</div>
           ) : (
             <div className="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-6">
               {recruitments.map((item) => (
@@ -243,7 +207,7 @@ export function EventDetailClient({
                   item={item}
                   href={`/events/${slug}/recruitment/${item.id}`}
                   isAdmin={isAdmin}
-                  onPinToggle={isAdmin ? handleRecruitmentPinToggle : undefined}
+                  onPinToggle={isAdmin ? (id, pinned) => togglePin("competitions", id, pinned) : undefined}
                   onEdit={(isAdmin || (isEventVendor && item.created_by === userId)) ? () => openEditSheet(item) : undefined}
                 />
               ))}

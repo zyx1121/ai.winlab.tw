@@ -5,12 +5,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { useContentEditor } from "@/hooks/use-content-editor";
+import { useImageUpload } from "@/hooks/use-image-upload";
 import { createClient } from "@/lib/supabase/client";
 import type { Event } from "@/lib/supabase/types";
 import { uploadEventImage } from "@/lib/upload-image";
 import { isExternalImage, resolveImageSrc } from "@/lib/utils";
-import { useAutoSave } from "@/hooks/use-auto-save";
-import { toast } from "sonner";
 import {
   ArrowLeft,
   Check,
@@ -33,102 +33,49 @@ export function EventEditClient({
   initialEvent: Event;
 }) {
   const router = useRouter();
-  const supabase = createClient();
-
-  const [event, setEvent] = useState<Event>(initialEvent);
-  const [savedEvent, setSavedEvent] = useState<Event>(initialEvent);
-  const [isSaving, setIsSaving] = useState(false);
-  const [isPublishing, setIsPublishing] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
-  const [isUploadingImage, setIsUploadingImage] = useState(false);
   const [slugError, setSlugError] = useState<string | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const supabaseRef = useRef(createClient());
+  const savedSlug = useRef(initialEvent.slug);
 
-  const hasChanges = event && savedEvent
-    ? event.name !== savedEvent.name ||
-      event.slug !== savedEvent.slug ||
-      (event.description ?? "") !== (savedEvent.description ?? "") ||
-      (event.cover_image ?? "") !== (savedEvent.cover_image ?? "") ||
-      event.pinned !== savedEvent.pinned ||
-      event.sort_order !== savedEvent.sort_order
-    : false;
-
-  const handleSave = async () => {
-    if (!event) return;
-    setSlugError(null);
-
-    if (event.slug !== savedEvent?.slug) {
-      const { data: existing } = await supabase
-        .from("events")
-        .select("id")
-        .eq("slug", event.slug)
-        .neq("id", event.id)
-        .single();
-      if (existing) {
-        setSlugError("此 slug 已被使用，請選擇其他名稱");
-        return;
+  const {
+    data: event, setData: setEvent, hasChanges,
+    isSaving, isPublishing, isDeleting,
+    save, publish, remove, guardNavigation,
+  } = useContentEditor({
+    table: "events",
+    id: initialEvent.id,
+    initialData: initialEvent,
+    fields: ["name", "slug", "description", "cover_image", "pinned", "sort_order"],
+    redirectTo: "/events",
+    onBeforeSave: async () => {
+      setSlugError(null);
+      if (event.slug !== savedSlug.current) {
+        const { data: existing } = await supabaseRef.current
+          .from("events")
+          .select("id")
+          .eq("slug", event.slug)
+          .neq("id", initialEvent.id)
+          .single();
+        if (existing) {
+          setSlugError("此 slug 已被使用，請選擇其他名稱");
+          return false;
+        }
       }
-    }
-
-    setIsSaving(true);
-    const { error } = await supabase.from("events").update({
-      name: event.name,
-      slug: event.slug,
-      description: event.description,
-      cover_image: event.cover_image,
-      pinned: event.pinned,
-      sort_order: event.sort_order,
-    }).eq("id", event.id);
-
-    if (!error) {
-      setSavedEvent({ ...event });
+      return true;
+    },
+    onAfterSave: () => {
       if (event.slug !== slug) {
         router.replace(`/events/${event.slug}/edit`);
       }
-    }
-    setIsSaving(false);
-  };
+      savedSlug.current = event.slug;
+    },
+  });
 
-  const { guardNavigation } = useAutoSave({ hasChanges, onSave: handleSave });
+  const { isUploading: isUploadingImage, fileInputRef, triggerFileInput, handleFileChange } = useImageUpload(uploadEventImage);
 
-  const handlePublish = async () => {
-    if (!event) return;
-    setIsPublishing(true);
-    const newStatus: "draft" | "published" = event.status === "published" ? "draft" : "published";
-    const { error } = await supabase.from("events").update({
-      name: event.name,
-      slug: event.slug,
-      description: event.description,
-      cover_image: event.cover_image,
-      pinned: event.pinned,
-      sort_order: event.sort_order,
-      status: newStatus,
-    }).eq("id", event.id);
-    if (!error) {
-      const updated = { ...event, status: newStatus };
-      setEvent(updated);
-      setSavedEvent(updated);
-    }
-    setIsPublishing(false);
-  };
-
-  const handleDelete = async () => {
-    if (!event || !confirm("確定要刪除此活動嗎？活動下的公告與徵才將一併刪除。")) return;
-    setIsDeleting(true);
-    const { error } = await supabase.from("events").delete().eq("id", event.id);
-    if (error) { setIsDeleting(false); return; }
-    router.push("/events");
-  };
-
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file || !event) return;
-    setIsUploadingImage(true);
-    const result = await uploadEventImage(file);
-    e.target.value = "";
-    if ("error" in result) { toast.error(result.error); }
-    else { setEvent({ ...event, cover_image: result.url }); }
-    setIsUploadingImage(false);
+  const onImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const url = await handleFileChange(e);
+    if (url) setEvent((prev) => ({ ...prev, cover_image: url }));
   };
 
   return (
@@ -140,15 +87,15 @@ export function EventEditClient({
             返回列表
           </Button>
           <div className="flex gap-2">
-            <Button variant={hasChanges ? "outline" : "ghost"} onClick={handleSave} disabled={isSaving || !hasChanges}>
+            <Button variant={hasChanges ? "outline" : "ghost"} onClick={save} disabled={isSaving || !hasChanges}>
               {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : hasChanges ? <Save className="w-4 h-4" /> : <Check className="w-4 h-4 text-green-600" />}
               {hasChanges ? "儲存" : "已儲存"}
             </Button>
-            <Button variant={event.status === "published" ? "secondary" : "default"} onClick={handlePublish} disabled={isPublishing}>
+            <Button variant={event.status === "published" ? "secondary" : "default"} onClick={publish} disabled={isPublishing}>
               {isPublishing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
               {event.status === "published" ? "取消發布" : "發布"}
             </Button>
-            <Button variant="destructive" onClick={handleDelete} disabled={isDeleting}>
+            <Button variant="destructive" onClick={remove} disabled={isDeleting}>
               {isDeleting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
               刪除
             </Button>
@@ -170,8 +117,8 @@ export function EventEditClient({
               />
             </div>
             <div className="flex flex-col gap-2">
-              <input ref={fileInputRef} type="file" accept="image/jpeg,image/png,image/gif,image/webp" className="hidden" onChange={handleImageUpload} />
-              <Button type="button" variant="outline" size="sm" disabled={isUploadingImage} onClick={() => fileInputRef.current?.click()}>
+              <input ref={fileInputRef} type="file" accept="image/jpeg,image/png,image/gif,image/webp" className="hidden" onChange={onImageChange} />
+              <Button type="button" variant="outline" size="sm" disabled={isUploadingImage} onClick={triggerFileInput}>
                 {isUploadingImage ? <Loader2 className="w-4 h-4 animate-spin" /> : <ImagePlus className="w-4 h-4" />}
                 {isUploadingImage ? "上傳中…" : "上傳圖片"}
               </Button>
@@ -186,7 +133,7 @@ export function EventEditClient({
             <Input
               id="name"
               value={event.name}
-              onChange={(e) => setEvent({ ...event, name: e.target.value })}
+              onChange={(e) => setEvent((prev) => ({ ...prev, name: e.target.value }))}
               placeholder="例：AI新秀"
             />
           </div>
@@ -197,7 +144,7 @@ export function EventEditClient({
               value={event.slug}
               onChange={(e) => {
                 setSlugError(null);
-                setEvent({ ...event, slug: e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, "-") });
+                setEvent((prev) => ({ ...prev, slug: e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, "-") }));
               }}
               placeholder="例：ai-rising-star"
             />
@@ -212,7 +159,7 @@ export function EventEditClient({
             id="description"
             className="min-h-[80px] resize-y"
             value={event.description ?? ""}
-            onChange={(e) => setEvent({ ...event, description: e.target.value || null })}
+            onChange={(e) => setEvent((prev) => ({ ...prev, description: e.target.value || null }))}
             placeholder="活動簡短介紹（選填）"
           />
         </div>
@@ -222,7 +169,7 @@ export function EventEditClient({
             <Label className="text-sm mx-2">顯示於導覽列</Label>
             <button
               type="button"
-              onClick={() => setEvent({ ...event, pinned: !event.pinned })}
+              onClick={() => setEvent((prev) => ({ ...prev, pinned: !prev.pinned }))}
               className={`flex items-center gap-2 h-9 px-3 rounded-md border text-sm transition-colors ${event.pinned
                 ? "bg-foreground text-background border-foreground"
                 : "border-border text-muted-foreground hover:border-foreground hover:text-foreground"
@@ -240,7 +187,7 @@ export function EventEditClient({
               value={event.sort_order}
               onChange={(e) => {
                 const v = parseInt(e.target.value);
-                setEvent({ ...event, sort_order: isNaN(v) ? 0 : v });
+                setEvent((prev) => ({ ...prev, sort_order: isNaN(v) ? 0 : v }));
               }}
               className="w-32"
             />

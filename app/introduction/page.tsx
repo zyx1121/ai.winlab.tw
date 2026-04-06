@@ -1,5 +1,6 @@
 import { IntroductionDetail } from "@/components/introduction-detail";
 import { IntroductionEditButton } from "@/components/introduction-edit-button";
+import { JsonLd } from "@/components/json-ld";
 import { PageShell } from "@/components/page-shell";
 import { getViewer } from "@/lib/supabase/get-viewer";
 import { renderRichTextHtml } from "@/lib/ui/rich-text";
@@ -24,8 +25,17 @@ export default async function IntroductionPage() {
 
   const contentHtml = renderRichTextHtml(introduction?.content) ?? "";
 
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    name: "關於我們｜人工智慧專責辦公室",
+    description: "認識國立陽明交通大學人工智慧專責辦公室的定位、任務、課程方向與計畫介紹。",
+    url: "https://ai.winlab.tw/introduction",
+  };
+
   return (
     <PageShell>
+      <JsonLd data={structuredData} />
       <IntroductionDetail
         title={introduction?.title || "國立陽明交通大學 人工智慧專責辦公室"}
         contentHtml={contentHtml}

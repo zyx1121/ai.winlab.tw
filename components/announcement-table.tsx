@@ -1,6 +1,7 @@
 "use client";
 
 import { AppLink } from "@/components/app-link";
+import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Table,
@@ -10,6 +11,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { formatDate } from "@/lib/date";
 import type { Announcement } from "@/lib/supabase/types";
 
 export function AnnouncementTable({
@@ -47,7 +49,7 @@ export function AnnouncementTable({
                   href={getHref(item)}
                   className="flex min-h-12 w-full items-center px-4 py-3"
                 >
-                  {item.date}
+                  {formatDate(item.date)}
                 </AppLink>
               </TableCell>
               <TableCell className="p-0 text-base">
@@ -70,9 +72,11 @@ export function AnnouncementTable({
                 <TableCell className="p-0 text-base">
                   <AppLink
                     href={getHref(item)}
-                    className={`flex min-h-12 w-full items-center px-4 py-3 ${item.status === "published" ? "text-green-600" : "text-yellow-600"}`}
+                    className="flex min-h-12 w-full items-center px-4 py-3"
                   >
-                    {item.status === "published" ? "已發布" : "草稿"}
+                    <Badge variant={item.status === "published" ? "default" : "secondary"}>
+                      {item.status === "published" ? "已發布" : "草稿"}
+                    </Badge>
                   </AppLink>
                 </TableCell>
               )}

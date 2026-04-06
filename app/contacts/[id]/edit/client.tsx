@@ -4,119 +4,35 @@ import { PageShell } from "@/components/page-shell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { createClient } from "@/lib/supabase/client";
+import { useContentEditor } from "@/hooks/use-content-editor";
 import type { Contact } from "@/lib/supabase/types";
-import { useAutoSave } from "@/hooks/use-auto-save";
 import { ArrowLeft, Check, Loader2, Save, Trash2 } from "lucide-react";
-import { useParams, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
-export default function ContactEditPage() {
+interface Props {
+  id: string;
+  initialContact: Contact;
+}
+
+export function ContactEditClient({ id, initialContact }: Props) {
   const router = useRouter();
-  const params = useParams();
-  const id = params.id as string;
-  const supabase = createClient();
 
-  const [contact, setContact] = useState<Contact | null>(null);
-  const [savedContact, setSavedContact] = useState<Contact | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isSaving, setIsSaving] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
-
-  const hasChanges =
-    contact && savedContact
-      ? contact.name !== savedContact.name ||
-        (contact.position ?? "") !== (savedContact.position ?? "") ||
-        (contact.phone ?? "") !== (savedContact.phone ?? "") ||
-        (contact.email ?? "") !== (savedContact.email ?? "") ||
-        contact.sort_order !== savedContact.sort_order
-      : false;
-
-  useEffect(() => {
-    let cancelled = false;
-
-    async function loadContact() {
-      const { data, error } = await supabase
-        .from("contacts")
-        .select("*")
-        .eq("id", id)
-        .single();
-
-      if (error) {
-        console.error("Error fetching contact:", error);
-        toast.error("讀取聯絡人失敗，已返回列表");
-        router.push("/contacts");
-        return;
-      }
-
-      if (cancelled) return;
-
-      setContact(data as Contact);
-      setSavedContact(data as Contact);
-      setIsLoading(false);
-    }
-
-    void loadContact();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [id, router, supabase]);
-
-  const handleSave = async () => {
-    if (!contact) return;
-
-    setIsSaving(true);
-    const { error } = await supabase
-      .from("contacts")
-      .update({
-        name: contact.name,
-        position: contact.position || null,
-        phone: contact.phone || null,
-        email: contact.email || null,
-        sort_order: contact.sort_order,
-      })
-      .eq("id", id);
-
-    if (error) {
-      console.error("Error saving contact:", error);
-      toast.error("儲存聯絡人失敗，請稍後再試");
-    } else {
-      setSavedContact({ ...contact });
-    }
-    setIsSaving(false);
-  };
-
-  const { guardNavigation } = useAutoSave({ hasChanges, onSave: handleSave });
-
-  const handleDelete = async () => {
-    if (!confirm("確定要刪除此聯絡人嗎？")) return;
-
-    setIsDeleting(true);
-    const { error } = await supabase.from("contacts").delete().eq("id", id);
-    if (error) {
-      console.error("Error deleting contact:", error);
-      toast.error("刪除聯絡人失敗，請稍後再試");
-      setIsDeleting(false);
-      return;
-    }
-    router.push("/contacts");
-  };
-
-  if (isLoading) {
-    return (
-      <PageShell tone="centeredState">
-        <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
-      </PageShell>
-    );
-  }
-
-  if (!contact) return null;
+  const {
+    data: contact, setData: setContact, hasChanges,
+    isSaving, isDeleting,
+    save, remove, guardNavigation,
+  } = useContentEditor({
+    table: "contacts",
+    id,
+    initialData: initialContact,
+    fields: ["name", "position", "phone", "email", "sort_order"],
+    redirectTo: "/contacts",
+    publishable: false,
+  });
 
   return (
     <PageShell tone="admin">
-      <div className="flex items-center justify-between gap-4">
+      <div className="sticky top-16 z-20 bg-background/80 backdrop-blur-sm py-4 -mx-4 px-4 flex items-center justify-between gap-4">
         <Button variant="ghost" size="sm" onClick={() => guardNavigation(() => router.push("/contacts"))}>
           <ArrowLeft className="w-4 h-4" />
           返回
@@ -125,7 +41,7 @@ export default function ContactEditPage() {
         <div className="flex gap-2">
           <Button
             variant={hasChanges ? "outline" : "ghost"}
-            onClick={handleSave}
+            onClick={save}
             disabled={isSaving || !hasChanges}
           >
             {isSaving ? (
@@ -138,7 +54,7 @@ export default function ContactEditPage() {
             {hasChanges ? "儲存" : "已儲存"}
           </Button>
 
-          <Button variant="destructive" onClick={handleDelete} disabled={isDeleting}>
+          <Button variant="destructive" onClick={remove} disabled={isDeleting}>
             {isDeleting ? (
               <Loader2 className="w-4 h-4 animate-spin" />
             ) : (
@@ -155,7 +71,7 @@ export default function ContactEditPage() {
           <Input
             id="name"
             value={contact.name}
-            onChange={(e) => setContact({ ...contact, name: e.target.value })}
+            onChange={(e) => setContact((prev) => ({ ...prev, name: e.target.value }))}
             placeholder="聯絡人姓名"
           />
         </div>
@@ -165,7 +81,7 @@ export default function ContactEditPage() {
           <Input
             id="position"
             value={contact.position ?? ""}
-            onChange={(e) => setContact({ ...contact, position: e.target.value || null })}
+            onChange={(e) => setContact((prev) => ({ ...prev, position: e.target.value || null }))}
             placeholder="例如：行政助理 / 專案經理"
           />
         </div>
@@ -175,7 +91,7 @@ export default function ContactEditPage() {
           <Input
             id="phone"
             value={contact.phone ?? ""}
-            onChange={(e) => setContact({ ...contact, phone: e.target.value || null })}
+            onChange={(e) => setContact((prev) => ({ ...prev, phone: e.target.value || null }))}
             placeholder="例如：03-5131867#54832"
           />
         </div>
@@ -186,7 +102,7 @@ export default function ContactEditPage() {
             id="email"
             type="email"
             value={contact.email ?? ""}
-            onChange={(e) => setContact({ ...contact, email: e.target.value || null })}
+            onChange={(e) => setContact((prev) => ({ ...prev, email: e.target.value || null }))}
             placeholder="name@nycu.edu.tw"
           />
         </div>
@@ -198,7 +114,7 @@ export default function ContactEditPage() {
             type="number"
             value={contact.sort_order}
             onChange={(e) =>
-              setContact({ ...contact, sort_order: parseInt(e.target.value, 10) || 0 })
+              setContact((prev) => ({ ...prev, sort_order: parseInt(e.target.value, 10) || 0 }))
             }
           />
         </div>

@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/client";
 import type { Tag } from "@/lib/supabase/types";
 import { Check, Loader2, Pencil, Plus, Tag as TagIcon, Trash2, X } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { toast } from "sonner";
 
 type Props = {
   selectedTagIds: Set<string>;
@@ -77,7 +78,8 @@ export function ResultTagSidebar({ selectedTagIds, onToggle, onClear, isAdmin }:
   const handleAddParent = async () => {
     if (!inputValue.trim()) return;
     setSaving(true);
-    await supabase.from("tags").insert({ name: inputValue.trim(), parent_id: null, sort_order: tags.length });
+    const { error } = await supabase.from("tags").insert({ name: inputValue.trim(), parent_id: null, sort_order: tags.length });
+    if (error) { toast.error("操作失敗"); setSaving(false); return; }
     setInputValue("");
     setAddingParent(false);
     await fetchTags();
@@ -89,7 +91,8 @@ export function ResultTagSidebar({ selectedTagIds, onToggle, onClear, isAdmin }:
     setSaving(true);
     const parent = tags.find((p) => p.id === parentId);
     const childCount = parent?.children.length ?? 0;
-    await supabase.from("tags").insert({ name: inputValue.trim(), parent_id: parentId, sort_order: childCount });
+    const { error } = await supabase.from("tags").insert({ name: inputValue.trim(), parent_id: parentId, sort_order: childCount });
+    if (error) { toast.error("操作失敗"); setSaving(false); return; }
     setInputValue("");
     setAddingChildOf(null);
     await fetchTags();
@@ -99,7 +102,8 @@ export function ResultTagSidebar({ selectedTagIds, onToggle, onClear, isAdmin }:
   const handleRename = async (tagId: string) => {
     if (!inputValue.trim()) return;
     setSaving(true);
-    await supabase.from("tags").update({ name: inputValue.trim() }).eq("id", tagId);
+    const { error } = await supabase.from("tags").update({ name: inputValue.trim() }).eq("id", tagId);
+    if (error) { toast.error("操作失敗"); setSaving(false); return; }
     setInputValue("");
     setEditingId(null);
     await fetchTags();
@@ -108,7 +112,8 @@ export function ResultTagSidebar({ selectedTagIds, onToggle, onClear, isAdmin }:
 
   const handleDelete = async (tagId: string) => {
     if (!confirm("確定要刪除此標籤？（包含所有子標籤）")) return;
-    await supabase.from("tags").delete().eq("id", tagId);
+    const { error } = await supabase.from("tags").delete().eq("id", tagId);
+    if (error) { toast.error("操作失敗"); return; }
     if (selectedTagIds.has(tagId)) onToggle(tagId);
     await fetchTags();
   };

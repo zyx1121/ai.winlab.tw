@@ -3,13 +3,12 @@
 import { AppLink } from "@/components/app-link";
 import { PageShell } from "@/components/page-shell";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { createClient } from "@/lib/supabase/client";
+import { Card } from "@/components/ui/card";
+import { useCrudList } from "@/hooks/use-crud-list";
 import type { Contact } from "@/lib/supabase/types";
 import { ArrowLeft, Loader2, Pencil, Plus, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
 
 export function ContactsAdminPageClient({
   initialContacts,
@@ -17,49 +16,12 @@ export function ContactsAdminPageClient({
   initialContacts: Contact[];
 }) {
   const router = useRouter();
-  const supabase = createClient();
-
-  const [contacts, setContacts] = useState<Contact[]>(initialContacts);
-  const [isCreating, setIsCreating] = useState(false);
-  const [deletingId, setDeletingId] = useState<string | null>(null);
-
-  const handleCreate = async () => {
-    setIsCreating(true);
-    const { data, error } = await supabase
-      .from("contacts")
-      .insert({
-        name: "新聯絡人",
-        position: "職位（可填可不填）",
-        phone: null,
-        email: null,
-        sort_order: contacts.length,
-      })
-      .select()
-      .single();
-    if (error) {
-      console.error("Error creating contact:", error);
-      setIsCreating(false);
-      return;
-    }
-    router.push(`/contacts/${data.id}/edit`);
-  };
-
-  const handleDelete = async (id: string) => {
-    if (!confirm("確定要刪除此聯絡人嗎？")) return;
-    setDeletingId(id);
-    const { error } = await supabase.from("contacts").delete().eq("id", id);
-    if (error) {
-      console.error("Error deleting contact:", error);
-    } else {
-      const { data } = await supabase
-        .from("contacts")
-        .select("*")
-        .order("sort_order", { ascending: true })
-        .order("created_at", { ascending: true });
-      setContacts((data as Contact[]) || []);
-    }
-    setDeletingId(null);
-  };
+  const { items: contacts, isCreating, deletingId, create, remove } = useCrudList<Contact>({
+    table: "contacts",
+    orderBy: "sort_order",
+    initialItems: initialContacts,
+    onCreated: (item) => router.push(`/contacts/${item.id}/edit`),
+  });
 
   return (
     <PageShell>
@@ -78,25 +40,14 @@ export function ContactsAdminPageClient({
           <h1 className="text-3xl font-bold">聯絡資訊</h1>
           <p className="text-muted-foreground mt-1">管理首頁「聯絡我們」區塊的聯絡人、職位、電話與信箱</p>
         </div>
-        <Button onClick={handleCreate} disabled={isCreating}>
+        <Button onClick={() => create({ name: "新聯絡人", sort_order: contacts.length })} disabled={isCreating}>
           {isCreating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
           新增聯絡人
         </Button>
       </div>
 
       {contacts.length === 0 ? (
-        <Card>
-          <CardHeader>
-            <CardTitle>尚無聯絡人</CardTitle>
-            <CardDescription>新增後會顯示在首頁「聯絡我們」區塊</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Button onClick={handleCreate} disabled={isCreating}>
-              {isCreating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
-              新增第一位聯絡人
-            </Button>
-          </CardContent>
-        </Card>
+        <div className="text-center py-12 text-muted-foreground">尚無聯絡人</div>
       ) : (
         <div className="flex flex-col gap-4">
           {contacts.map((c, index) => (
@@ -121,7 +72,7 @@ export function ContactsAdminPageClient({
                   <Button
                     variant="destructive"
                     size="sm"
-                    onClick={() => handleDelete(c.id)}
+                    onClick={() => remove(c.id)}
                     disabled={deletingId === c.id}
                   >
                     {deletingId === c.id ? (

@@ -4,138 +4,42 @@ import { PageShell } from "@/components/page-shell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { createClient } from "@/lib/supabase/client";
+import { useContentEditor } from "@/hooks/use-content-editor";
+import { useImageUpload } from "@/hooks/use-image-upload";
 import type { CarouselSlide } from "@/lib/supabase/types";
 import { uploadCarouselImage } from "@/lib/upload-image";
 import { isExternalImage, resolveImageSrc } from "@/lib/utils";
-import { toast } from "sonner";
-import { useAutoSave } from "@/hooks/use-auto-save";
 import { ArrowLeft, Check, ImagePlus, Loader2, Save, Trash2 } from "lucide-react";
 import Image from "next/image";
-import { useParams, useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 
-export default function CarouselEditPage() {
+interface Props {
+  id: string;
+  initialSlide: CarouselSlide;
+}
+
+export function CarouselEditClient({ id, initialSlide }: Props) {
   const router = useRouter();
-  const params = useParams();
-  const id = params.id as string;
-  const supabase = createClient();
 
-  const [slide, setSlide] = useState<CarouselSlide | null>(null);
-  const [savedSlide, setSavedSlide] = useState<CarouselSlide | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isSaving, setIsSaving] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
-  const [isUploadingImage, setIsUploadingImage] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const {
+    data: slide, setData: setSlide, hasChanges,
+    isSaving, isDeleting,
+    save, remove, guardNavigation,
+  } = useContentEditor({
+    table: "carousel_slides",
+    id,
+    initialData: initialSlide,
+    fields: ["title", "description", "link", "image", "sort_order"],
+    redirectTo: "/carousel",
+    publishable: false,
+  });
 
-  const hasChanges =
-    slide && savedSlide
-      ? slide.title !== savedSlide.title ||
-        (slide.description ?? "") !== (savedSlide.description ?? "") ||
-        (slide.link ?? "") !== (savedSlide.link ?? "") ||
-        (slide.image ?? "") !== (savedSlide.image ?? "") ||
-        slide.sort_order !== savedSlide.sort_order
-      : false;
+  const { isUploading: isUploadingImage, fileInputRef, triggerFileInput, handleFileChange } = useImageUpload(uploadCarouselImage);
 
-  useEffect(() => {
-    let cancelled = false;
-
-    async function loadSlide() {
-      const { data, error } = await supabase
-        .from("carousel_slides")
-        .select("*")
-        .eq("id", id)
-        .single();
-
-      if (error) {
-        console.error("Error fetching carousel slide:", error);
-        toast.error("讀取橫幅失敗，已返回列表");
-        router.push("/carousel");
-        return;
-      }
-
-      if (cancelled) return;
-
-      setSlide(data as CarouselSlide);
-      setSavedSlide(data as CarouselSlide);
-      setIsLoading(false);
-    }
-
-    void loadSlide();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [id, router, supabase]);
-
-  const handleSave = async () => {
-    if (!slide) return;
-
-    setIsSaving(true);
-    const { error } = await supabase
-      .from("carousel_slides")
-      .update({
-        title: slide.title,
-        description: slide.description || null,
-        link: slide.link || null,
-        image: slide.image || null,
-        sort_order: slide.sort_order,
-      })
-      .eq("id", id);
-
-    if (error) {
-      console.error("Error saving carousel slide:", error);
-      toast.error("儲存橫幅失敗，請稍後再試");
-    } else {
-      setSavedSlide({ ...slide });
-    }
-    setIsSaving(false);
+  const onImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const url = await handleFileChange(e);
+    if (url) setSlide((prev) => ({ ...prev, image: url }));
   };
-
-  const { guardNavigation } = useAutoSave({ hasChanges, onSave: handleSave });
-
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file || !slide) return;
-
-    setIsUploadingImage(true);
-    const result = await uploadCarouselImage(file);
-    e.target.value = "";
-
-    if ("error" in result) {
-      toast.error(result.error);
-    } else {
-      setSlide({ ...slide, image: result.url });
-    }
-    setIsUploadingImage(false);
-  };
-
-  const handleDelete = async () => {
-    if (!confirm("確定要刪除此橫幅嗎？")) return;
-
-    setIsDeleting(true);
-    const { error } = await supabase.from("carousel_slides").delete().eq("id", id);
-
-    if (error) {
-      console.error("Error deleting slide:", error);
-      toast.error("刪除橫幅失敗，請稍後再試");
-      setIsDeleting(false);
-      return;
-    }
-
-    router.push("/carousel");
-  };
-
-  if (isLoading) {
-    return (
-      <PageShell tone="centeredState">
-        <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
-      </PageShell>
-    );
-  }
-
-  if (!slide) return null;
 
   return (
     <PageShell tone="editor">
@@ -148,7 +52,7 @@ export default function CarouselEditPage() {
           <div className="flex gap-2">
             <Button
               variant={hasChanges ? "outline" : "ghost"}
-              onClick={handleSave}
+              onClick={save}
               disabled={isSaving || !hasChanges}
             >
               {isSaving ? (
@@ -160,7 +64,7 @@ export default function CarouselEditPage() {
               )}
               {hasChanges ? "儲存" : "已儲存"}
             </Button>
-            <Button variant="destructive" onClick={handleDelete} disabled={isDeleting}>
+            <Button variant="destructive" onClick={remove} disabled={isDeleting}>
               {isDeleting ? (
                 <Loader2 className="w-4 h-4 animate-spin" />
               ) : (
@@ -178,7 +82,7 @@ export default function CarouselEditPage() {
           <Input
             id="title"
             value={slide.title}
-            onChange={(e) => setSlide({ ...slide, title: e.target.value })}
+            onChange={(e) => setSlide((prev) => ({ ...prev, title: e.target.value }))}
             placeholder="橫幅主標題"
           />
         </div>
@@ -188,7 +92,7 @@ export default function CarouselEditPage() {
           <Input
             id="description"
             value={slide.description ?? ""}
-            onChange={(e) => setSlide({ ...slide, description: e.target.value || null })}
+            onChange={(e) => setSlide((prev) => ({ ...prev, description: e.target.value || null }))}
             placeholder="副標或說明文字"
           />
         </div>
@@ -199,7 +103,7 @@ export default function CarouselEditPage() {
             id="link"
             type="url"
             value={slide.link ?? ""}
-            onChange={(e) => setSlide({ ...slide, link: e.target.value || null })}
+            onChange={(e) => setSlide((prev) => ({ ...prev, link: e.target.value || null }))}
             placeholder="https://..."
           />
         </div>
@@ -210,7 +114,7 @@ export default function CarouselEditPage() {
             id="sort_order"
             type="number"
             value={slide.sort_order}
-            onChange={(e) => setSlide({ ...slide, sort_order: parseInt(e.target.value, 10) || 0 })}
+            onChange={(e) => setSlide((prev) => ({ ...prev, sort_order: parseInt(e.target.value, 10) || 0 }))}
           />
         </div>
 
@@ -232,12 +136,12 @@ export default function CarouselEditPage() {
                 type="file"
                 accept="image/jpeg,image/png,image/webp,image/gif"
                 className="hidden"
-                onChange={handleImageUpload}
+                onChange={onImageChange}
               />
               <Button
                 type="button"
                 variant="secondary"
-                onClick={() => fileInputRef.current?.click()}
+                onClick={triggerFileInput}
                 disabled={isUploadingImage}
               >
                 {isUploadingImage ? (
