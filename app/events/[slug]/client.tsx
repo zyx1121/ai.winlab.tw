@@ -4,6 +4,7 @@ import { RecruitmentCard } from "@/components/recruitment-card";
 import { RecruitmentDialog } from "@/components/recruitment-dialog";
 import { ResultCard, type ResultWithMeta } from "@/components/result-card";
 import { PageShell } from "@/components/page-shell";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useEventActions } from "@/hooks/use-event-actions";
 import type { Announcement, Event, Recruitment } from "@/lib/supabase/types";
@@ -138,8 +139,10 @@ export function EventDetailClient({
                           <span className="px-4 py-3 w-28 text-base shrink-0">{item.category}</span>
                           <span className="px-4 py-3 text-base flex-1">{item.title || "(無標題)"}</span>
                           {isAdmin && (
-                            <span className={`px-4 py-3 w-20 text-base shrink-0 ${item.status === "published" ? "text-green-600" : "text-yellow-600"}`}>
-                              {item.status === "published" ? "已發布" : "草稿"}
+                            <span className="px-4 py-3 w-20 text-base shrink-0">
+                              <Badge variant={item.status === "published" ? "default" : "secondary"}>
+                                {item.status === "published" ? "已發布" : "草稿"}
+                              </Badge>
                             </span>
                           )}
                         </Link>
