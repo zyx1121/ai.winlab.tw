@@ -336,7 +336,6 @@ export function ProfilePageClient({
 
           <div className="w-full grid lg:grid-cols-3 gap-4">
 
-            {/* LEFT: profile */}
             <div className="col-span-1">
               <Block className="relative w-full">
                 {isOwner && (
@@ -400,7 +399,6 @@ export function ProfilePageClient({
                   )}
                 </div>
 
-                {/* Resume */}
                 {isEditMode ? (
                   <div className="grid gap-1.5">
                     <span className="text-xs font-medium text-muted-foreground">
@@ -463,7 +461,6 @@ export function ProfilePageClient({
                   </div>
                 ) : null}
 
-                {/* Links */}
                 {isEditMode ? (
                   <div className="grid gap-2">
                     <div className="flex items-center justify-between">
@@ -522,7 +519,6 @@ export function ProfilePageClient({
               </Block>
             </div>
 
-            {/* RIGHT: results */}
             <div className="col-span-1 lg:col-span-2 grid gap-4 content-start">
 
               {isOwner && isVendor && <VendorEventsSection />}
@@ -583,7 +579,6 @@ export function ProfilePageClient({
                 ))
               )}
 
-              {/* External results */}
               {externalResults.map((ext) => {
                 const card = (
                   <Block className="overflow-hidden flex flex-col lg:grid lg:grid-cols-2 gap-4">

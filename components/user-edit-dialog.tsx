@@ -169,7 +169,6 @@ function UserEditForm({
       </DialogHeader>
 
       <div className="space-y-4">
-        {/* Display name (read-only) */}
         <div className="space-y-1.5">
           <Label className="text-sm font-medium text-muted-foreground">姓名</Label>
           <p className="text-sm">
@@ -179,13 +178,11 @@ function UserEditForm({
           </p>
         </div>
 
-        {/* Email (read-only) */}
         <div className="space-y-1.5">
           <Label className="text-sm font-medium text-muted-foreground">電子信箱</Label>
           <p className="text-sm text-muted-foreground">{user.email}</p>
         </div>
 
-        {/* Role selector */}
         <div className="space-y-1.5">
           <Label htmlFor="role-select" className="text-sm font-medium">
             角色
@@ -202,7 +199,6 @@ function UserEditForm({
           </Select>
         </div>
 
-        {/* Event assignment for vendor role */}
         {role === "vendor" && (
           <div className="space-y-2">
             <Label className="text-sm font-medium">指定活動</Label>

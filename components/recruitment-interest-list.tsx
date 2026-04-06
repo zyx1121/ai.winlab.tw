@@ -49,7 +49,6 @@ export function RecruitmentInterestList({
                 key={applicant.id}
                 className="flex items-start gap-3 px-4 py-4"
               >
-                {/* Avatar */}
                 <AppLink
                   href={`/profile/${applicant.id}`}
                   className="shrink-0"
@@ -70,7 +69,6 @@ export function RecruitmentInterestList({
                   )}
                 </AppLink>
 
-                {/* Info */}
                 <div className="min-w-0 flex-1 space-y-0.5">
                   <AppLink
                     href={`/profile/${applicant.id}`}

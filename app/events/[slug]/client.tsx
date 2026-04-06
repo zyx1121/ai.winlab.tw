@@ -92,7 +92,6 @@ export function EventDetailClient({
 
   return (
     <PageShell>
-      {/* Back link */}
       <Link
         href="/events"
         className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
@@ -101,7 +100,6 @@ export function EventDetailClient({
         活動專區
       </Link>
 
-      {/* Event header */}
       <div className="flex flex-col gap-4">
 
         <div className="flex items-start justify-between gap-4">
@@ -128,7 +126,6 @@ export function EventDetailClient({
         </div>
       </div>
 
-      {/* Tabs */}
       <div className="flex gap-2 border-b border-border pb-2">
         {TABS.map(({ value, label }) => (
           <Button
@@ -142,7 +139,6 @@ export function EventDetailClient({
         ))}
       </div>
 
-      {/* Tab content */}
       {tab === "announcements" && (
         <div className="flex flex-col gap-6">
           {isAdmin && (

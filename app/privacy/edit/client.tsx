@@ -69,7 +69,6 @@ export default function PrivacyEditPage({
 
   return (
     <PageShell tone="editor">
-      {/* Sticky toolbar */}
       <div className="sticky top-16 z-20 bg-background/80 backdrop-blur-sm py-4 -mx-4 px-4 flex items-center justify-between gap-4">
         <Button asChild variant="ghost" size="sm">
           <Link href="/privacy">
@@ -101,7 +100,6 @@ export default function PrivacyEditPage({
         </div>
       </div>
 
-      {/* Editor */}
       <div className="mt-6">
         <TiptapEditor
           content={content}
@@ -109,7 +107,6 @@ export default function PrivacyEditPage({
         />
       </div>
 
-      {/* Version history */}
       {versions.length > 0 && (
         <div className="mt-12">
           <h2 className="text-base font-semibold mb-4">版本紀錄</h2>

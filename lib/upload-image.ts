@@ -6,11 +6,11 @@ const IMAGE_MIME_TYPES = ["image/jpeg", "image/png", "image/gif", "image/webp"];
 
 const MAX_SIZE_BYTES = 5 * 1024 * 1024; // 5MB
 
-export function isImageFile(file: File): boolean {
+function isImageFile(file: File): boolean {
   return IMAGE_MIME_TYPES.includes(file.type);
 }
 
-export function isWithinSizeLimit(file: File): boolean {
+function isWithinSizeLimit(file: File): boolean {
   return file.size <= MAX_SIZE_BYTES;
 }
 

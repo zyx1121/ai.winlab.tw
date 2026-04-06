@@ -23,20 +23,20 @@ type VendorEvent = {
 
 export function VendorEventsSection() {
   const { user } = useAuth();
-  // null = not yet fetched, array = fetched (possibly empty)
   const [events, setEvents] = useState<VendorEvent[] | null>(null);
 
   useEffect(() => {
     if (!user) return;
-    const supabase = createClient();
-    supabase
-      .from("event_vendors")
-      .select("event_id, events(id, name, slug, cover_image, status)")
-      .eq("user_id", user.id)
-      .then(({ data, error }) => {
-        if (error) console.error("Failed to fetch vendor events:", error);
-        setEvents((data as unknown as VendorEvent[]) ?? []);
-      });
+    async function fetchVendorEvents() {
+      const supabase = createClient();
+      const { data, error } = await supabase
+        .from("event_vendors")
+        .select("event_id, events(id, name, slug, cover_image, status)")
+        .eq("user_id", user!.id);
+      if (error) console.error("Failed to fetch vendor events:", error);
+      setEvents((data as unknown as VendorEvent[]) ?? []);
+    }
+    fetchVendorEvents();
   }, [user]);
 
   const loading = user !== null && events === null;

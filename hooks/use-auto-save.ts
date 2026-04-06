@@ -28,12 +28,10 @@ export function useAutoSave({
     hasChangesRef.current = hasChanges;
   }, [hasChanges]);
 
-  // Keep onSave ref fresh without re-triggering effects
   useEffect(() => {
     onSaveRef.current = onSave;
   }, [onSave]);
 
-  // Cancel any pending auto-save
   const cancel = useCallback(() => {
     if (timerRef.current) {
       clearTimeout(timerRef.current);
@@ -41,7 +39,6 @@ export function useAutoSave({
     }
   }, []);
 
-  // Debounced auto-save: when hasChanges becomes/stays true, start timer
   useEffect(() => {
     if (!enabled || !hasChanges) {
       cancel();
@@ -61,7 +58,6 @@ export function useAutoSave({
     return cancel;
   }, [hasChanges, enabled, delay, cancel]);
 
-  // beforeunload warning when there are unsaved changes
   useEffect(() => {
     if (!hasChanges) return;
 
@@ -73,7 +69,6 @@ export function useAutoSave({
     return () => window.removeEventListener("beforeunload", handleBeforeUnload);
   }, [hasChanges]);
 
-  // Guard for in-app navigation (e.g. back buttons using router.push)
   const guardNavigation = useCallback((navigate: () => void) => {
     if (hasChangesRef.current) {
       if (!window.confirm("你有尚未儲存的變更，確定要離開嗎？")) return;

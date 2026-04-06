@@ -38,7 +38,6 @@ export default async function Home() {
       <JsonLd data={structuredData} />
       <HomeCarousel isAdmin={isAdmin} />
       <HomeIntroduction />
-      {/* <HomeOrganization /> */}
       <HomeAnnouncement />
       <HomeEvents />
       <HomeContacts isAdmin={isAdmin} />

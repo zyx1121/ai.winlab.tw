@@ -81,8 +81,6 @@ NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY=
 | Route                 | Description                                   |
 | --------------------- | --------------------------------------------- |
 | `/account`            | Profile, team membership, pending invitations |
-| `/account/teams`      | Team list / create team                       |
-| `/account/teams/[id]` | Team detail + invite members                  |
 
 ### Admin Only
 
@@ -111,7 +109,7 @@ All images are stored in the `announcement-images` bucket (public).
 1. Supabase Dashboard → **Storage** → **New bucket**
    - Name: `announcement-images`
    - Public bucket: **ON**
-2. Run `supabase/storage-policies.sql` in the **SQL Editor**
+2. Configure storage policies via the Supabase Dashboard
 
 Image path prefixes by content type:
 

@@ -393,9 +393,7 @@ export function RecruitmentDialog({
           </DialogDescription>
         </DialogHeader>
 
-        {/* Scrollable form body */}
         <div className="flex-1 overflow-y-auto px-8 py-6 space-y-8">
-          {/* 1. Cover image */}
           <div className="space-y-3">
             <Label>封面圖片</Label>
             <div className="flex items-center gap-6">
@@ -452,7 +450,6 @@ export function RecruitmentDialog({
             </div>
           </div>
 
-          {/* 2. Title */}
           <div className="space-y-2">
             <Label htmlFor="title">標題</Label>
             <Input
@@ -463,7 +460,6 @@ export function RecruitmentDialog({
             />
           </div>
 
-          {/* 3. Company description */}
           <div className="space-y-3">
             <Label htmlFor="company_description">公司簡介</Label>
             <Textarea
@@ -481,7 +477,6 @@ export function RecruitmentDialog({
             </p>
           </div>
 
-          {/* 4. Recruitment period */}
           <div className="grid grid-cols-2 gap-6">
             <div className="space-y-2">
               <Label htmlFor="start_date">開始日期</Label>
@@ -505,7 +500,6 @@ export function RecruitmentDialog({
             </div>
           </div>
 
-          {/* 5. Positions */}
           <div className="space-y-4">
             <Label>職缺</Label>
             {formData.positions.map((pos, index) => (
@@ -679,7 +673,6 @@ export function RecruitmentDialog({
             </Button>
           </div>
 
-          {/* 6. Application method */}
           <div className="space-y-3">
             <Label>應徵方式</Label>
             <div className="space-y-4">
@@ -778,7 +771,6 @@ export function RecruitmentDialog({
             </div>
           </div>
 
-          {/* 7. Contact */}
           <div className="space-y-3">
             <Label>聯絡資訊</Label>
             <div className="grid grid-cols-3 gap-4">
@@ -811,7 +803,6 @@ export function RecruitmentDialog({
             </div>
           </div>
 
-          {/* 8. Required documents */}
           <div className="space-y-3">
             <Label htmlFor="required_documents">應備文件</Label>
             <Textarea
@@ -826,7 +817,6 @@ export function RecruitmentDialog({
           </div>
         </div>
 
-        {/* Footer */}
         <DialogFooter className="px-8 py-4 border-t flex-row gap-3">
           {isEditMode && (
             <AlertDialog>

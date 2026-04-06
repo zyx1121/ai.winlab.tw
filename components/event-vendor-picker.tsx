@@ -26,16 +26,17 @@ export function EventVendorPicker({
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const supabase = createClient();
-    supabase
-      .from("events")
-      .select("id, name, status")
-      .order("name")
-      .then(({ data, error }) => {
-        if (error) console.error("Failed to fetch events:", error);
-        setEvents((data as EventOption[]) ?? []);
-        setLoading(false);
-      });
+    async function fetchEvents() {
+      const supabase = createClient();
+      const { data, error } = await supabase
+        .from("events")
+        .select("id, name, status")
+        .order("name");
+      if (error) console.error("Failed to fetch events:", error);
+      setEvents((data as EventOption[]) ?? []);
+      setLoading(false);
+    }
+    fetchEvents();
   }, []);
 
   function toggle(id: string) {

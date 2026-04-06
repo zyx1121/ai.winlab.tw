@@ -133,7 +133,6 @@ export function EventEditClient({
 
   return (
     <PageShell tone="editor">
-      {/* Sticky toolbar */}
       <div className="sticky top-16 z-20 bg-background/80 backdrop-blur-sm py-4 -mx-4 px-4 flex flex-col gap-4">
         <div className="flex items-center justify-between gap-4">
           <Button variant="ghost" size="sm" onClick={() => guardNavigation(() => router.push("/events"))}>
@@ -158,7 +157,6 @@ export function EventEditClient({
       </div>
 
       <div className="mt-6 flex flex-col gap-6">
-        {/* Cover image */}
         <div className="flex flex-col gap-1">
           <Label className="text-sm mx-2">封面圖片</Label>
           <div className="flex items-start gap-4">
@@ -182,7 +180,6 @@ export function EventEditClient({
           </div>
         </div>
 
-        {/* Name & slug */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="flex flex-col gap-1">
             <Label htmlFor="name" className="text-sm mx-2">活動名稱</Label>
@@ -209,7 +206,6 @@ export function EventEditClient({
           </div>
         </div>
 
-        {/* Description */}
         <div className="flex flex-col gap-1">
           <Label htmlFor="description" className="text-sm mx-2">活動簡介</Label>
           <Textarea
@@ -221,7 +217,6 @@ export function EventEditClient({
           />
         </div>
 
-        {/* Pinned & sort_order */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="flex flex-col gap-1">
             <Label className="text-sm mx-2">顯示於導覽列</Label>

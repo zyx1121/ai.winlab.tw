@@ -87,21 +87,6 @@ export type Team = {
   leader_id: string;
 };
 
-export type TeamMember = {
-  team_id: string;
-  user_id: string;
-  role: "leader" | "member";
-  joined_at: string;
-};
-
-export type TeamInvitation = {
-  id: string;
-  team_id: string;
-  email: string;
-  invited_by: string;
-  status: "pending" | "accepted" | "rejected";
-  created_at: string;
-};
 
 export type OrganizationMemberCategory =
   | "core"
@@ -118,7 +103,6 @@ export type OrganizationMember = {
   image: string | null;
   link: string | null;
   sort_order: number;
-  // New fields
   school: string | null;
   research_areas: string | null;
   email: string | null;

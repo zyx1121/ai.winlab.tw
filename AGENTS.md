@@ -79,7 +79,7 @@ Conventions:
 - SQL migrations live in `supabase/migrations/` and should be applied in order through the Supabase SQL editor.
 - All tables use RLS.
 - Initial setup also requires the public storage bucket `announcement-images`.
-- Storage policies are defined in `supabase/storage-policies.sql`.
+- Storage policies are configured via the Supabase Dashboard.
 
 ## Shared hooks and editor rules
 
@@ -201,7 +201,7 @@ Defined in `app/globals.css`:
 - Supabase remote patterns already allow `*.supabase.co`
 - Storage path conventions:
   - Announcement inline images: root
-  - Recruitment covers: `competitions/`
+  - Recruitment covers: `recruitment/`
   - Result header images: `results/`
   - Organization member photos: `organization/`
   - Event covers: `events/`
@@ -220,3 +220,4 @@ Defined in `app/globals.css`:
 - Before proposing a push, run the relevant local verification commands for the current topic.
 - When the overall requested goal is finished, stop and ask the user to confirm before pushing anything upstream.
 - Do not push on the user's behalf until they explicitly confirm that the final state is ready.
+

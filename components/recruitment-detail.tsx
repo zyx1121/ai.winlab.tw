@@ -55,7 +55,6 @@ export function RecruitmentDetail({
 
   return (
     <div>
-      {/* Back link */}
       <AppLink
         href={backHref}
         className="inline-flex items-center gap-1.5 text-sm text-muted-foreground mb-10"
@@ -64,7 +63,6 @@ export function RecruitmentDetail({
         {backLabel}
       </AppLink>
 
-      {/* Cover image */}
       {recruitment.image && (
         <div className="w-full rounded-lg overflow-hidden mb-8 bg-muted">
           <Image
@@ -78,7 +76,6 @@ export function RecruitmentDetail({
         </div>
       )}
 
-      {/* Title section */}
       <div className="max-w-6xl mb-8">
         <h1 className="text-4xl font-extrabold tracking-tight text-balance mb-4">
           {recruitment.title}
@@ -114,7 +111,6 @@ export function RecruitmentDetail({
 
       <hr className="mb-8" />
 
-      {/* Company description */}
       {recruitment.company_description && (
         <div className="mb-10">
           <p className="whitespace-pre-line text-base text-muted-foreground leading-relaxed">
@@ -123,7 +119,6 @@ export function RecruitmentDetail({
         </div>
       )}
 
-      {/* Positions list */}
       {canViewPrivateDetails &&
         recruitment.positions &&
         recruitment.positions.length > 0 && (
@@ -217,7 +212,6 @@ export function RecruitmentDetail({
         </Card>
       )}
 
-      {/* Application method */}
       {canViewPrivateDetails && hasApplicationMethod && (
         <div className="mt-8">
           <h2 className="text-lg font-semibold mb-3">應徵方式</h2>
@@ -252,7 +246,6 @@ export function RecruitmentDetail({
         </div>
       )}
 
-      {/* Contact section */}
       {canViewPrivateDetails &&
         recruitment.contact &&
         (recruitment.contact.name ||
@@ -293,7 +286,6 @@ export function RecruitmentDetail({
           </div>
         )}
 
-      {/* Required documents */}
       {canViewPrivateDetails && recruitment.required_documents && (
         <div className="mt-8">
           <h2 className="text-lg font-semibold mb-3">應備文件</h2>
