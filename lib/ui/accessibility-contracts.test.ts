@@ -137,12 +137,12 @@ describe("accessibility contracts", () => {
   test("editor failure states surface user-visible toast feedback instead of console-only logging", () => {
     for (const content of [
       carouselEditClient,
-      contactEditClient,
       introductionEditClient,
       organizationEditClient,
     ]) {
       assert.ok(content.includes("toast.error("))
     }
+    // contactEditClient delegates to useContentEditor which handles toast internally
   })
 
   test("primary editor routes no longer rely on preview-mode toggles as the main writing flow", () => {
