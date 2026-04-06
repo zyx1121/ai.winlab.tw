@@ -4,16 +4,14 @@ import { PageShell } from "@/components/page-shell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { createClient } from "@/lib/supabase/client";
+import { useContentEditor } from "@/hooks/use-content-editor";
+import { useImageUpload } from "@/hooks/use-image-upload";
 import type { CarouselSlide } from "@/lib/supabase/types";
 import { uploadCarouselImage } from "@/lib/upload-image";
 import { isExternalImage, resolveImageSrc } from "@/lib/utils";
-import { toast } from "sonner";
-import { useAutoSave } from "@/hooks/use-auto-save";
 import { ArrowLeft, Check, ImagePlus, Loader2, Save, Trash2 } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useRef, useState } from "react";
 
 interface Props {
   id: string;
@@ -22,76 +20,25 @@ interface Props {
 
 export function CarouselEditClient({ id, initialSlide }: Props) {
   const router = useRouter();
-  const supabase = createClient();
 
-  const [slide, setSlide] = useState<CarouselSlide>(initialSlide);
-  const [savedSlide, setSavedSlide] = useState<CarouselSlide>(initialSlide);
-  const [isSaving, setIsSaving] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
-  const [isUploadingImage, setIsUploadingImage] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const {
+    data: slide, setData: setSlide, hasChanges,
+    isSaving, isDeleting,
+    save, remove, guardNavigation,
+  } = useContentEditor({
+    table: "carousel_slides",
+    id,
+    initialData: initialSlide,
+    fields: ["title", "description", "link", "image", "sort_order"],
+    redirectTo: "/carousel",
+    publishable: false,
+  });
 
-  const hasChanges =
-    slide.title !== savedSlide.title ||
-    (slide.description ?? "") !== (savedSlide.description ?? "") ||
-    (slide.link ?? "") !== (savedSlide.link ?? "") ||
-    (slide.image ?? "") !== (savedSlide.image ?? "") ||
-    slide.sort_order !== savedSlide.sort_order;
+  const { isUploading: isUploadingImage, fileInputRef, triggerFileInput, handleFileChange } = useImageUpload(uploadCarouselImage);
 
-  const handleSave = async () => {
-    setIsSaving(true);
-    const { error } = await supabase
-      .from("carousel_slides")
-      .update({
-        title: slide.title,
-        description: slide.description || null,
-        link: slide.link || null,
-        image: slide.image || null,
-        sort_order: slide.sort_order,
-      })
-      .eq("id", id);
-
-    if (error) {
-      console.error("Error saving carousel slide:", error);
-      toast.error("儲存橫幅失敗，請稍後再試");
-    } else {
-      setSavedSlide({ ...slide });
-    }
-    setIsSaving(false);
-  };
-
-  const { guardNavigation } = useAutoSave({ hasChanges, onSave: handleSave });
-
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    setIsUploadingImage(true);
-    const result = await uploadCarouselImage(file);
-    e.target.value = "";
-
-    if ("error" in result) {
-      toast.error(result.error);
-    } else {
-      setSlide({ ...slide, image: result.url });
-    }
-    setIsUploadingImage(false);
-  };
-
-  const handleDelete = async () => {
-    if (!confirm("確定要刪除此橫幅嗎？")) return;
-
-    setIsDeleting(true);
-    const { error } = await supabase.from("carousel_slides").delete().eq("id", id);
-
-    if (error) {
-      console.error("Error deleting slide:", error);
-      toast.error("刪除橫幅失敗，請稍後再試");
-      setIsDeleting(false);
-      return;
-    }
-
-    router.push("/carousel");
+  const onImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const url = await handleFileChange(e);
+    if (url) setSlide((prev) => ({ ...prev, image: url }));
   };
 
   return (
@@ -105,7 +52,7 @@ export function CarouselEditClient({ id, initialSlide }: Props) {
           <div className="flex gap-2">
             <Button
               variant={hasChanges ? "outline" : "ghost"}
-              onClick={handleSave}
+              onClick={save}
               disabled={isSaving || !hasChanges}
             >
               {isSaving ? (
@@ -117,7 +64,7 @@ export function CarouselEditClient({ id, initialSlide }: Props) {
               )}
               {hasChanges ? "儲存" : "已儲存"}
             </Button>
-            <Button variant="destructive" onClick={handleDelete} disabled={isDeleting}>
+            <Button variant="destructive" onClick={remove} disabled={isDeleting}>
               {isDeleting ? (
                 <Loader2 className="w-4 h-4 animate-spin" />
               ) : (
@@ -135,7 +82,7 @@ export function CarouselEditClient({ id, initialSlide }: Props) {
           <Input
             id="title"
             value={slide.title}
-            onChange={(e) => setSlide({ ...slide, title: e.target.value })}
+            onChange={(e) => setSlide((prev) => ({ ...prev, title: e.target.value }))}
             placeholder="橫幅主標題"
           />
         </div>
@@ -145,7 +92,7 @@ export function CarouselEditClient({ id, initialSlide }: Props) {
           <Input
             id="description"
             value={slide.description ?? ""}
-            onChange={(e) => setSlide({ ...slide, description: e.target.value || null })}
+            onChange={(e) => setSlide((prev) => ({ ...prev, description: e.target.value || null }))}
             placeholder="副標或說明文字"
           />
         </div>
@@ -156,7 +103,7 @@ export function CarouselEditClient({ id, initialSlide }: Props) {
             id="link"
             type="url"
             value={slide.link ?? ""}
-            onChange={(e) => setSlide({ ...slide, link: e.target.value || null })}
+            onChange={(e) => setSlide((prev) => ({ ...prev, link: e.target.value || null }))}
             placeholder="https://..."
           />
         </div>
@@ -167,7 +114,7 @@ export function CarouselEditClient({ id, initialSlide }: Props) {
             id="sort_order"
             type="number"
             value={slide.sort_order}
-            onChange={(e) => setSlide({ ...slide, sort_order: parseInt(e.target.value, 10) || 0 })}
+            onChange={(e) => setSlide((prev) => ({ ...prev, sort_order: parseInt(e.target.value, 10) || 0 }))}
           />
         </div>
 
@@ -189,12 +136,12 @@ export function CarouselEditClient({ id, initialSlide }: Props) {
                 type="file"
                 accept="image/jpeg,image/png,image/webp,image/gif"
                 className="hidden"
-                onChange={handleImageUpload}
+                onChange={onImageChange}
               />
               <Button
                 type="button"
                 variant="secondary"
-                onClick={() => fileInputRef.current?.click()}
+                onClick={triggerFileInput}
                 disabled={isUploadingImage}
               >
                 {isUploadingImage ? (
