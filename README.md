@@ -52,7 +52,7 @@ NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY=
 
 | Route                               | Description                                                                |
 | ----------------------------------- | -------------------------------------------------------------------------- |
-| `/`                                 | Home (carousel, introduction, organization, announcements, events)         |
+| `/`                                 | Home (carousel, introduction, announcements, events, contacts)             |
 | `/introduction`                     | Office introduction                                                        |
 | `/organization`                     | Organization member listing                                                |
 | `/announcement`                     | Global announcements list                                                  |
@@ -80,7 +80,7 @@ NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY=
 
 | Route                 | Description                                   |
 | --------------------- | --------------------------------------------- |
-| `/account`            | Profile, team membership, pending invitations |
+| `/account`            | Profile settings                              |
 
 ### Admin Only
 

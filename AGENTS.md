@@ -1,6 +1,6 @@
 # AGENTS.md
 
-This file is the single source of truth for coding agents working in this repository. Keep agent-facing instructions here. `CLAUDE.md` only exists as a compatibility pointer to this file.
+This file is the single source of truth for coding agents working in this repository.
 
 ## Project overview
 
@@ -38,7 +38,6 @@ NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY=
 
 - Client Components: `@/lib/supabase/client`
 - Server Components and Route Handlers: `@/lib/supabase/server`
-- `proxy.ts` or middleware-style code: `@/lib/supabase/proxy`
 
 ### Access model
 
@@ -64,7 +63,7 @@ Core entities defined in `lib/supabase/types.ts`:
 - `Profile`: extends `auth.users`, includes `role`, profile fields, social links, and resume data
 - `ExternalResult`: user-submitted external result links
 - `Tag` and `ResultTag`: hierarchical result tagging
-- `Team`, `TeamMember`, `TeamInvitation`: team management
+- `Team`: team management
 - `CarouselSlide`, `Contact`: homepage carousel and contact info
 
 Conventions:
@@ -92,7 +91,7 @@ Conventions:
 
 ### Homepage
 
-- `/` is composed from Server Components that fetch independently: `HomeCarousel`, `HomeIntroduction`, `HomeOrganization`, `HomeAnnouncement`, `HomeEvents`, `HomeContacts`
+- `/` is composed from Server Components that fetch independently: `HomeCarousel`, `HomeIntroduction`, `HomeAnnouncement`, `HomeEvents`, `HomeContacts`
 
 ### Events
 
@@ -113,8 +112,7 @@ Conventions:
 
 ### Account and public profile pages
 
-- `/account`: profile, teams, invitations
-- `/account/teams`, `/account/teams/[id]`
+- `/account`: profile
 - `/profile/[id]`: public author page; vendor users see a "My Events" section showing assigned events
 
 ### Admin-only pages
@@ -208,9 +206,7 @@ Defined in `app/globals.css`:
 
 ## Maintenance note
 
-- When agent instructions need updates, edit this file instead of `CLAUDE.md`.
 - Keep `AGENTS.md` and `rules/*.md` in sync when repository guidance changes.
-- The remote branch should carry the latest committed versions of both `AGENTS.md` and `rules/*.md`.
 - The sibling MCP repo lives at `~/mcp.ai.winlab.tw` and powers the `mcp.ai.winlab.tw` tool surface. After changing app-facing schemas, content models, RLS, or admin workflows here, always check whether that repo's MCP tools and shared Supabase types need matching updates.
 
 ## Delivery workflow
