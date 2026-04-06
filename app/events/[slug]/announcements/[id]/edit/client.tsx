@@ -9,61 +9,32 @@ import { createClient } from "@/lib/supabase/client";
 import type { Announcement } from "@/lib/supabase/types";
 import { useAutoSave } from "@/hooks/use-auto-save";
 import { ArrowLeft, Check, Loader2, Save, Send, Trash2 } from "lucide-react";
-import { useParams, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
-export default function EventAnnouncementEditPage() {
+interface Props {
+  id: string;
+  slug: string;
+  initialAnnouncement: Announcement;
+}
+
+export function EventAnnouncementEditClient({ id, slug, initialAnnouncement }: Props) {
   const router = useRouter();
-  const params = useParams();
-  const slug = params.slug as string;
-  const id = params.id as string;
   const supabase = createClient();
 
-  const [announcement, setAnnouncement] = useState<Announcement | null>(null);
-  const [savedAnnouncement, setSavedAnnouncement] = useState<Announcement | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [announcement, setAnnouncement] = useState<Announcement>(initialAnnouncement);
+  const [savedAnnouncement, setSavedAnnouncement] = useState<Announcement>(initialAnnouncement);
   const [isSaving, setIsSaving] = useState(false);
   const [isPublishing, setIsPublishing] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  const hasChanges = announcement && savedAnnouncement
-    ? announcement.title !== savedAnnouncement.title ||
-      announcement.category !== savedAnnouncement.category ||
-      announcement.date !== savedAnnouncement.date ||
-      JSON.stringify(announcement.content) !== JSON.stringify(savedAnnouncement.content)
-    : false;
-
-  useEffect(() => {
-    let cancelled = false;
-
-    async function loadAnnouncement() {
-      const { data, error } = await supabase
-        .from("announcements")
-        .select("*")
-        .eq("id", id)
-        .single();
-
-      if (error) {
-        router.push(`/events/${slug}/edit`);
-        return;
-      }
-
-      if (cancelled) return;
-
-      setAnnouncement(data);
-      setSavedAnnouncement(data);
-      setIsLoading(false);
-    }
-
-    void loadAnnouncement();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [id, router, slug, supabase]);
+  const hasChanges =
+    announcement.title !== savedAnnouncement.title ||
+    announcement.category !== savedAnnouncement.category ||
+    announcement.date !== savedAnnouncement.date ||
+    JSON.stringify(announcement.content) !== JSON.stringify(savedAnnouncement.content);
 
   const handleSave = async () => {
-    if (!announcement) return;
     setIsSaving(true);
     const { error } = await supabase.from("announcements").update({
       title: announcement.title,
@@ -78,7 +49,6 @@ export default function EventAnnouncementEditPage() {
   const { guardNavigation } = useAutoSave({ hasChanges, onSave: handleSave });
 
   const handlePublish = async () => {
-    if (!announcement) return;
     setIsPublishing(true);
     const newStatus: "draft" | "published" = announcement.status === "published" ? "draft" : "published";
     const { error } = await supabase.from("announcements").update({
@@ -99,15 +69,6 @@ export default function EventAnnouncementEditPage() {
     if (error) { setIsDeleting(false); return; }
     router.push(`/events/${slug}?tab=announcements`);
   };
-
-  if (isLoading) {
-    return (
-      <PageShell tone="centeredState">
-        <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
-      </PageShell>
-    );
-  }
-  if (!announcement) return null;
 
   return (
     <PageShell tone="editor">
