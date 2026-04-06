@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import {
@@ -17,6 +17,8 @@ import { useAuth } from "@/components/auth-provider";
 import { normalizeApplicationMethod } from "@/lib/recruitment-application-method";
 import { uploadRecruitmentImage } from "@/lib/upload-image";
 import { isExternalImage } from "@/lib/utils";
+import { useDialogForm } from "@/hooks/use-dialog-form";
+import { useImageUpload } from "@/hooks/use-image-upload";
 import type {
   ApplicationMethod,
   ApplicationMethodLink,
@@ -128,23 +130,20 @@ export function RecruitmentDialog({
 }: RecruitmentDialogProps) {
   const router = useRouter();
   const { user } = useAuth();
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const [formData, setFormData] = useState<FormData>(getDefaults);
+  const { formData, setFormData, updateField, resetForm } = useDialogForm<FormData>({
+    table: "competitions",
+    editingId: recruitment?.id ?? null,
+    getDefaults,
+    buildPayload: () => ({}),
+    onClose: () => onOpenChange(false),
+  });
+  const { isUploading: uploading, fileInputRef, handleFileChange } = useImageUpload(uploadRecruitmentImage);
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
-  const [uploading, setUploading] = useState(false);
 
-  // Reset form when recruitment prop changes (sync external prop → internal state)
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setFormData(
-      recruitment ? formDataFromRecruitment(recruitment) : getDefaults(),
-    );
-  }, [recruitment]);
-
-  function updateField<K extends keyof FormData>(key: K, value: FormData[K]) {
-    setFormData((prev) => ({ ...prev, [key]: value }));
-  }
+    resetForm(recruitment ? formDataFromRecruitment(recruitment) : getDefaults());
+  }, [recruitment, resetForm]);
 
   function updatePosition(
     index: number,
@@ -251,19 +250,9 @@ export function RecruitmentDialog({
     }));
   }
 
-  async function handleImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setUploading(true);
-    const result = await uploadRecruitmentImage(file);
-    setUploading(false);
-    if ("error" in result) {
-      toast.error(result.error);
-    } else {
-      updateField("image", result.url);
-    }
-    // Reset file input
-    if (fileInputRef.current) fileInputRef.current.value = "";
+  async function onImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const url = await handleFileChange(e);
+    if (url) updateField("image", url);
   }
 
   async function handleSave() {
@@ -447,7 +436,7 @@ export function RecruitmentDialog({
                 type="file"
                 accept="image/*"
                 className="hidden"
-                onChange={handleImageUpload}
+                onChange={onImageUpload}
               />
             </div>
           </div>
