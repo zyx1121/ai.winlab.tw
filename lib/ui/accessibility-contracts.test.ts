@@ -4,7 +4,7 @@ import { resolve } from "node:path"
 import { describe, test } from "node:test"
 
 const rootLayout = readFileSync(resolve(process.cwd(), "app/layout.tsx"), "utf8")
-const organizationClient = readFileSync(resolve(process.cwd(), "app/organization/client.tsx"), "utf8")
+const organizationClient = readFileSync(resolve(process.cwd(), "app/introduction/client.tsx"), "utf8")
 const announcementTable = readFileSync(resolve(process.cwd(), "components/announcement-table.tsx"), "utf8")
 const announcementClient = readFileSync(resolve(process.cwd(), "app/announcement/client.tsx"), "utf8")
 const homeAnnouncementTable = readFileSync(resolve(process.cwd(), "components/home-announcement-table.tsx"), "utf8")
@@ -33,7 +33,7 @@ const organizationMemberDialog = readFileSync(resolve(process.cwd(), "components
 const carouselEditClient = readFileSync(resolve(process.cwd(), "app/carousel/[id]/edit/client.tsx"), "utf8")
 const contactEditClient = readFileSync(resolve(process.cwd(), "app/contacts/[id]/edit/client.tsx"), "utf8")
 const introductionEditClient = readFileSync(resolve(process.cwd(), "app/introduction/edit/client.tsx"), "utf8")
-const organizationEditClient = readFileSync(resolve(process.cwd(), "app/organization/[id]/edit/client.tsx"), "utf8")
+const organizationEditClient = readFileSync(resolve(process.cwd(), "app/introduction/[id]/edit/client.tsx"), "utf8")
 const announcementEditClient = readFileSync(resolve(process.cwd(), "app/announcement/[id]/edit/client.tsx"), "utf8")
 const eventAnnouncementEditClient = readFileSync(resolve(process.cwd(), "app/events/[slug]/announcements/[id]/edit/client.tsx"), "utf8")
 const resultEditClient = readFileSync(resolve(process.cwd(), "app/events/[slug]/results/[id]/edit/client.tsx"), "utf8")
@@ -107,7 +107,7 @@ describe("accessibility contracts", () => {
     assert.ok(!homeEvents.includes("<Link href=\"/events\">\n          <Button"))
     assert.ok(!homeAnnouncement.includes("<Link href=\"/announcement\">\n          <Button"))
     assert.ok(!homeIntroduction.includes("<Link href=\"/introduction\">\n          <Button"))
-    assert.ok(!homeOrganization.includes("<Link href=\"/organization\">\n            <Button"))
+    assert.ok(!homeOrganization.includes("<Link href=\"/introduction\">\n            <Button"))
     assert.ok(!privacyEditPage.includes("<Link href=\"/privacy\">\n          <Button"))
   })
 
