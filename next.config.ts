@@ -15,6 +15,7 @@ const nextConfig: NextConfig = {
       { source: "/team/:id", destination: "/", permanent: true },
       { source: "/recruitment", destination: "/events", permanent: true },
       { source: "/recruitment/:id", destination: "/events", permanent: true },
+      { source: "/organization", destination: "/introduction", permanent: true },
     ];
   },
 };

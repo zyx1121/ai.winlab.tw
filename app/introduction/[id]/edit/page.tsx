@@ -18,7 +18,7 @@ export default async function OrganizationMemberEditPage({
     .single();
 
   if (error || !data) {
-    redirect("/organization");
+    redirect("/introduction");
   }
 
   return (

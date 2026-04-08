@@ -41,7 +41,7 @@ export function OrganizationMemberEditClient({
     id,
     initialData: initialMember,
     fields: ["name", "summary", "image", "link", "category", "sort_order", "school", "research_areas", "email", "website", "member_role"],
-    redirectTo: "/organization",
+    redirectTo: "/introduction",
     publishable: false,
   });
 
@@ -58,7 +58,7 @@ export function OrganizationMemberEditClient({
         <Button
           variant="ghost"
           size="sm"
-          onClick={() => guardNavigation(() => router.push("/organization"))}
+          onClick={() => guardNavigation(() => router.push("/introduction"))}
         >
           <ArrowLeft className="w-4 h-4" />
           返回

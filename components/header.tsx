@@ -8,7 +8,6 @@ import { useEffect, useRef, useState } from "react";
 
 const staticNavItems = [
   { href: "/introduction", label: "關於" },
-  { href: "/organization", label: "組織" },
   { href: "/announcement", label: "公告" },
 ];
 

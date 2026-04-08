@@ -36,7 +36,7 @@ export async function HomeOrganization() {
         <h2 className="text-2xl font-bold border-l-4 border-primary pl-3">組織人員</h2>
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {members.slice(0, 6).map((member) => (
-            <Link key={member.id} href="/organization">
+            <Link key={member.id} href="/introduction">
               <Card className="py-0 h-full flex flex-col overflow-hidden transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98]">
                 <div className="relative w-full aspect-square shrink-0 overflow-hidden">
                   <Image
@@ -63,7 +63,7 @@ export async function HomeOrganization() {
         </div>
         <div className="flex justify-center">
           <Button asChild variant="secondary" size="lg" className="px-12 text-lg">
-            <Link href="/organization">
+            <Link href="/introduction">
               探索更多
             </Link>
           </Button>

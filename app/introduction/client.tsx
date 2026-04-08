@@ -71,9 +71,9 @@ export function OrganizationPageClient({
         )}
 
         {members.length === 0 ? (
-          <div className="text-center py-12 text-muted-foreground">尚無成員</div>
+          <div className="text-center py-12 text-muted-foreground">待更新</div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5">
             {members.map((member) => {
               const showWebsiteLink = !isAdmin && !!member.website;
 
@@ -89,34 +89,34 @@ export function OrganizationPageClient({
                     />
                   </div>
 
-                  <div className="p-5 flex flex-col gap-3">
+                  <div className="p-4 flex flex-col gap-2">
                     <div>
-                      <p className="text-xl font-bold text-foreground leading-snug">{member.name}</p>
+                      <p className="text-base font-bold text-foreground leading-snug">{member.name}</p>
                       {member.member_role && (
-                        <p className="text-base text-muted-foreground mt-0.5">{member.member_role}</p>
+                        <p className="text-sm text-muted-foreground mt-0.5">{member.member_role}</p>
                       )}
                     </div>
 
                     {(member.school || member.research_areas || member.email) && (
-                      <div className="flex flex-col gap-2">
+                      <div className="flex flex-col gap-1.5">
                         {member.school && (
-                          <div className="flex items-start gap-2 text-base text-muted-foreground">
-                            <GraduationCap className="w-4 h-4 shrink-0 mt-0.5" />
+                          <div className="flex items-start gap-1.5 text-sm text-muted-foreground">
+                            <GraduationCap className="w-3.5 h-3.5 shrink-0 mt-0.5" />
                             <span>{member.school}</span>
                           </div>
                         )}
                         {member.research_areas && (
-                          <div className="flex items-start gap-2 text-base text-muted-foreground">
-                            <Microscope className="w-4 h-4 shrink-0 mt-0.5" />
+                          <div className="flex items-start gap-1.5 text-sm text-muted-foreground">
+                            <Microscope className="w-3.5 h-3.5 shrink-0 mt-0.5" />
                             <span>{member.research_areas}</span>
                           </div>
                         )}
                         {member.email && (
                           <AppLink
                             href={`mailto:${member.email}`}
-                            className="flex items-center gap-2 text-base text-muted-foreground"
+                            className="flex items-center gap-1.5 text-sm text-muted-foreground"
                           >
-                            <Mail className="w-4 h-4 shrink-0" />
+                            <Mail className="w-3.5 h-3.5 shrink-0" />
                             <span className="truncate">{member.email}</span>
                           </AppLink>
                         )}
