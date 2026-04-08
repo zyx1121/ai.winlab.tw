@@ -138,7 +138,7 @@ export function OrganizationPageClient({
 
               if (member.website) {
                 return (
-                  <AppLink key={member.id} href={member.website} className="block">
+                  <AppLink key={member.id} href={member.website!} className="block">
                     <Card className="py-0 overflow-hidden flex flex-col interactive-scale h-full">
                       {memberContent}
                     </Card>
