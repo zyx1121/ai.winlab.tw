@@ -75,8 +75,6 @@ export function OrganizationPageClient({
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5">
             {members.map((member) => {
-              const showWebsiteLink = !isAdmin && !!member.website;
-
               const memberContent = (
                 <>
                   <div className="relative w-full aspect-square shrink-0 overflow-hidden">
@@ -112,33 +110,19 @@ export function OrganizationPageClient({
                           </div>
                         )}
                         {member.email && (
-                          <AppLink
-                            href={`mailto:${member.email}`}
-                            className="flex items-center gap-1.5 text-sm text-muted-foreground"
-                          >
+                          <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
                             <Mail className="w-3.5 h-3.5 shrink-0" />
                             <span className="truncate">{member.email}</span>
-                          </AppLink>
+                          </div>
                         )}
-                      </div>
-                    )}
-
-                    {showWebsiteLink && (
-                      <div className="pt-2">
-                        <AppLink
-                          href={member.website!}
-                          className="inline-flex items-center text-sm font-medium text-foreground"
-                        >
-                          前往網站
-                        </AppLink>
                       </div>
                     )}
                   </div>
                 </>
               );
 
-              return (
-                isAdmin ? (
+              if (isAdmin) {
+                return (
                   <button
                     key={member.id}
                     type="button"
@@ -149,11 +133,23 @@ export function OrganizationPageClient({
                       {memberContent}
                     </Card>
                   </button>
-                ) : (
-                  <Card key={member.id} className="py-0 overflow-hidden flex flex-col h-full">
-                    {memberContent}
-                  </Card>
-                )
+                );
+              }
+
+              if (member.website) {
+                return (
+                  <AppLink key={member.id} href={member.website!} className="block">
+                    <Card className="py-0 overflow-hidden flex flex-col interactive-scale h-full">
+                      {memberContent}
+                    </Card>
+                  </AppLink>
+                );
+              }
+
+              return (
+                <Card key={member.id} className="py-0 overflow-hidden flex flex-col h-full">
+                  {memberContent}
+                </Card>
               );
             })}
           </div>

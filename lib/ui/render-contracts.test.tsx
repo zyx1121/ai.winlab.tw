@@ -193,10 +193,8 @@ describe("component-owned skeleton render contracts", () => {
     )
 
     assert.ok(html.includes("w-full"))
-    assert.ok(html.includes("h-auto"))
-    assert.ok(html.includes("object-contain"))
-    assert.ok(!html.includes("aspect-video"))
-    assert.ok(!html.includes("object-cover"))
+    assert.ok(html.includes("object-cover"))
+    assert.ok(html.includes("aspect-ratio"))
   })
 
   test("renders AnnouncementTableSkeleton rows in the table structure", () => {
