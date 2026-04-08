@@ -1,14 +1,13 @@
 "use client";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { createClient } from "@/lib/supabase/client";
 import type { PublicProfile } from "@/lib/supabase/types";
 import { Loader2, Search, UserPlus, X } from "lucide-react";
 import Link from "next/link";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 
 type Props = {
@@ -29,8 +28,7 @@ export function CoauthorEditor({ resultId, authorId, initialCoauthors }: Props) 
   const containerRef = useRef<HTMLDivElement>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout>>(undefined);
 
-  const coauthorIdsRef = useRef(new Set(coauthors.map((c) => c.id)));
-  coauthorIdsRef.current = new Set(coauthors.map((c) => c.id));
+  const coauthorIds = useMemo(() => new Set(coauthors.map((c) => c.id)), [coauthors]);
 
   const search = useCallback(async (q: string) => {
     if (q.trim().length < 1) {
@@ -45,23 +43,23 @@ export function CoauthorEditor({ resultId, authorId, initialCoauthors }: Props) 
       .ilike("display_name", `%${q.trim()}%`)
       .limit(10);
     const filtered = (data ?? []).filter(
-      (p) => p.id !== authorId && !coauthorIdsRef.current.has(p.id)
+      (p) => p.id !== authorId && !coauthorIds.has(p.id)
     ) as PublicProfile[];
     setResults(filtered);
     setShowDropdown(true);
     setSearching(false);
-  }, [authorId]);
+  }, [authorId, coauthorIds]);
 
-  useEffect(() => {
+  const handleQueryChange = useCallback((value: string) => {
+    setQuery(value);
     clearTimeout(debounceRef.current);
-    if (!query.trim()) {
+    if (!value.trim()) {
       setResults([]);
       setShowDropdown(false);
       return;
     }
-    debounceRef.current = setTimeout(() => search(query), 300);
-    return () => clearTimeout(debounceRef.current);
-  }, [query, search]);
+    debounceRef.current = setTimeout(() => search(value), 300);
+  }, [search]);
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
@@ -141,7 +139,7 @@ export function CoauthorEditor({ resultId, authorId, initialCoauthors }: Props) 
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
           <Input
             value={query}
-            onChange={(e) => setQuery(e.target.value)}
+            onChange={(e) => handleQueryChange(e.target.value)}
             onFocus={() => { if (results.length) setShowDropdown(true); }}
             placeholder="搜尋使用者名稱…"
             className="pl-9"
