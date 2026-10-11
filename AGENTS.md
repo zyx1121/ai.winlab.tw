@@ -72,8 +72,8 @@ Every hook keeps the Supabase client in `useRef(createClient())`, and keeps call
 - Motion: `duration-200` only, with `hover:scale-[1.02]` and `active:scale-[0.98]`, or `.interactive-scale`.
 - Spacing: home `py-16`, content `py-12`, admin `py-8`, through the `PageSection` and `PageShell` variants.
 - Links: always `AppLink`, never a raw `<a>`.
-- Skeletons: each high-level component owns its skeleton. Route loading files compose them.
-- Editor: on desktop, `BubbleMenu` (inline) and `FloatingMenu` (blocks, with `/` insertion) instead of a fixed toolbar. On mobile, a compact toolbar.
+- Skeletons: High-level UI components should own their matching skeleton components. Route-level loading files should compose layout with component-owned skeletons.
+- Editor: Desktop Tiptap editing should use contextual controls instead of a persistent full toolbar: `BubbleMenu` (inline) and `FloatingMenu` (blocks, with `/`-triggered insertion). Mobile Tiptap editing should use a dedicated compact toolbar instead of desktop-style floating controls.
 - Status: the `Badge` component, `variant="default"` for published and `variant="secondary"` for drafts.
 - Empty states: centered `尚無{entity}` in `text-muted-foreground`.
 - Color: semantic tokens such as `text-foreground` and `bg-background`. Never hard-code `gray-*`.
